@@ -1,4 +1,4 @@
-@import url('./main-layout.css');
+@import url('./dashboard-layout.css');
 @import url('./views/distribution-overview-view.css');
 @import url('./views/customers-view.css');
 @import url('./views/films-view.css');
@@ -6,6 +6,15 @@
 @import url('./views/age-groups-view.css');
 
 .versionText {
+    text-align: center;
+    width: 100%;
+}
+
+vaadin-login-overlay-wrapper::part(title) {
+    font-size: 2.2em;
+}
+
+vaadin-login-form-wrapper::part(footer) {
     text-align: center;
     width: 100%;
 }

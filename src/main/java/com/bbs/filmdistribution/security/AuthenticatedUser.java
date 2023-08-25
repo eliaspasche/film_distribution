@@ -4,6 +4,7 @@ import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.data.service.UserRepository;
 import com.bbs.filmdistribution.service.SessionService;
 import com.bbs.filmdistribution.util.NotificationUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 
 import java.util.Optional;

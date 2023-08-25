@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.views.dashboard;
 
+import com.bbs.filmdistribution.config.AppConfig;
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.security.AuthenticatedUser;
 import com.bbs.filmdistribution.service.DarkModeService;
@@ -40,12 +41,15 @@ public class DashboardLayout extends AppLayout
 
     private H2 viewTitle;
 
+    private final AppConfig appConfig;
     private final DarkModeService darkModeService;
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
 
-    public DashboardLayout( DarkModeService darkModeService, AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker )
+    public DashboardLayout( AppConfig appConfig, DarkModeService darkModeService,
+                            AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker )
     {
+        this.appConfig = appConfig;
         this.darkModeService = darkModeService;
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
@@ -164,7 +168,7 @@ public class DashboardLayout extends AppLayout
     {
         Footer layout = new Footer();
 
-        Paragraph version = new Paragraph( "Version -" );
+        Paragraph version = new Paragraph( appConfig.getVersion() );
         version.setClassName( "versionText" );
         layout.add( version );
         return layout;
