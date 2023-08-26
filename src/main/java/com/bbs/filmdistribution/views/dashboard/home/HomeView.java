@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.views.dashboard.home;
 
+import com.bbs.filmdistribution.components.ExampleCard;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -30,6 +31,8 @@ public class HomeView extends VerticalLayout
         header.addClassNames( Margin.Top.XLARGE, Margin.Bottom.MEDIUM );
         add( header );
         add( new Paragraph( "It’s a place where you can grow your own UI 🤗" ) );
+
+        add( new ExampleCard( "The title", "description" ) );
 
         setSizeFull();
         setJustifyContentMode( JustifyContentMode.CENTER );
