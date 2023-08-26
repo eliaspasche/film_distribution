@@ -8,14 +8,35 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
+/**
+ * Utility class to create notification for the application
+ */
 public class NotificationUtil
 {
 
-    private static void sendNotification( String text, int durationInSeconds, Notification.Position position )
+    /**
+     * The constructor
+     */
+    private NotificationUtil()
     {
-        Notification.show( text, 5000, position );
+        // Private constructor to hide the implicit public one
     }
 
+    /**
+     * Create a notification with a text, duration in seconds and a position.
+     *
+     * @param text The text
+     * @param durationInSeconds The duration in seconds
+     * @param position The {@link Notification.Position}
+     */
+    private static void sendNotification( String text, int durationInSeconds, Notification.Position position )
+    {
+        Notification.show( text, durationInSeconds * 1000, position );
+    }
+
+    /**
+     * Show a login notification
+     */
     public static void sendLoginNotification()
     {
         Notification notification = new Notification();
@@ -32,6 +53,12 @@ public class NotificationUtil
         notification.open();
     }
 
+    /**
+     * Create and show a success notification with defined text and a duration value in seconds.
+     *
+     * @param text The text do display
+     * @param durationInSeconds The duration in seconds
+     */
     public static void sendSuccessNotification( String text, int durationInSeconds )
     {
         sendNotification( text, durationInSeconds, Notification.Position.BOTTOM_END );
