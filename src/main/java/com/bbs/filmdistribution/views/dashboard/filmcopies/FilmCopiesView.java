@@ -1,7 +1,9 @@
 package com.bbs.filmdistribution.views.dashboard.filmcopies;
 
+import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
+import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -14,50 +16,53 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.converter.StringToUuidConverter;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @PageTitle( "Film Copies" )
 @Route( value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
+@RequiredArgsConstructor
 public class FilmCopiesView extends Div implements BeforeEnterObserver
 {
-
+    // Route
     private static final String FILMCOPY_ID = "filmCopyID";
     private static final String FILMCOPY_EDIT_ROUTE_TEMPLATE = DashboardLayout.DASHBOARD_PATH + "/filmCopies/%s/edit";
 
+    // Services
+    private final FilmCopyService filmCopyService;
+    private final FilmService filmService;
+
+    // Layout
     private final Grid<FilmCopy> grid = new Grid<>( FilmCopy.class, false );
-
-    private TextField inventoryId;
-    private TextField filmId;
-
+    private Select<Film> film;
     private final Button cancel = new Button( "Cancel" );
     private final Button save = new Button( "Save" );
 
-    private final BeanValidationBinder<FilmCopy> binder;
+    // Validation
+    private BeanValidationBinder<FilmCopy> binder;
 
     private FilmCopy filmCopy;
 
-    private final FilmCopyService filmCopyService;
-
-    public FilmCopiesView( FilmCopyService filmCopyService )
+    @PostConstruct
+    public void init()
     {
-        this.filmCopyService = filmCopyService;
         addClassNames( "film-copies-view" );
 
         // Create UI
@@ -69,8 +74,8 @@ public class FilmCopiesView extends Div implements BeforeEnterObserver
         add( splitLayout );
 
         // Configure Grid
-        grid.addColumn( "inventoryId" ).setAutoWidth( true );
-        grid.addColumn( "filmId" ).setAutoWidth( true );
+        grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
+        grid.addColumn( filmCopy -> filmCopy.getFilm().getName() ).setHeader( "Film" ).setAutoWidth( true );
         grid.setItems( query -> filmCopyService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 
@@ -91,9 +96,7 @@ public class FilmCopiesView extends Div implements BeforeEnterObserver
         binder = new BeanValidationBinder<>( FilmCopy.class );
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField( inventoryId ).withConverter( new StringToUuidConverter( "Invalid UUID" ) ).bind( "inventoryId" );
-        binder.forField( filmId ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "filmId" );
-
+        binder.bind( film, FilmCopy::getFilm, FilmCopy::setFilm );
         binder.bindInstanceFields( this );
 
         cancel.addClickListener( e -> {
@@ -160,9 +163,13 @@ public class FilmCopiesView extends Div implements BeforeEnterObserver
         editorLayoutDiv.add( editorDiv );
 
         FormLayout formLayout = new FormLayout();
-        inventoryId = new TextField( "Inventory Id" );
-        filmId = new TextField( "Film Id" );
-        formLayout.add( inventoryId, filmId );
+        TextField inventoryNumber = new TextField( "Inventory Id" );
+        film = new Select<>();
+        film.setLabel( "Film" );
+        film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
+        film.setItemLabelGenerator( Film::getName );
+
+        formLayout.add( inventoryNumber, film );
 
         editorDiv.add( formLayout );
         createButtonLayout( editorLayoutDiv );

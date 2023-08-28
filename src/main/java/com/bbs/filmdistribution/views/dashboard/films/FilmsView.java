@@ -1,6 +1,8 @@
 package com.bbs.filmdistribution.views.dashboard.films;
 
+import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.entity.Film;
+import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
@@ -14,6 +16,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -24,8 +27,11 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.security.PermitAll;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
@@ -33,33 +39,36 @@ import java.util.Optional;
 @PageTitle( "Films" )
 @Route( value = "films/:filmID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
+@RequiredArgsConstructor
 public class FilmsView extends Div implements BeforeEnterObserver
 {
-
+    // Route
     private static final String FILM_ID = "filmID";
     private static final String FILM_EDIT_ROUTE_TEMPLATE = DashboardLayout.DASHBOARD_PATH + "/films/%s/edit";
 
+    // Services
+    private final FilmService filmService;
+    private final AgeGroupService ageGroupService;
+
+    // Layout
     private final Grid<Film> grid = new Grid<>( Film.class, false );
 
-    private TextField name;
     private TextField length;
-    private TextField ageGroupId;
+    private Select<AgeGroup> ageGroup;
     private TextField price;
-    private TextField discount;
     private TextField availableCopies;
 
     private final Button cancel = new Button( "Cancel" );
     private final Button save = new Button( "Save" );
 
-    private final BeanValidationBinder<Film> binder;
+    // Validator
+    private BeanValidationBinder<Film> binder;
 
     private Film film;
 
-    private final FilmService filmService;
-
-    public FilmsView( FilmService filmService )
+    @PostConstruct
+    public void init()
     {
-        this.filmService = filmService;
         addClassNames( "films-view" );
 
         // Create UI
@@ -73,9 +82,8 @@ public class FilmsView extends Div implements BeforeEnterObserver
         // Configure Grid
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "length" ).setAutoWidth( true );
-        grid.addColumn( "ageGroupId" ).setAutoWidth( true );
+        grid.addColumn( ( film ) -> film.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
-        grid.addColumn( "discount" ).setAutoWidth( true );
         grid.addColumn( "availableCopies" ).setAutoWidth( true );
         grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
@@ -98,9 +106,8 @@ public class FilmsView extends Div implements BeforeEnterObserver
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( length ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "length" );
-        binder.forField( ageGroupId ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "ageGroupId" );
         binder.forField( price ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "price" );
-        binder.forField( discount ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "discount" );
+        binder.bind( ageGroup, Film::getAgeGroup, Film::setAgeGroup );
         binder.forField( availableCopies ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "availableCopies" );
 
         binder.bindInstanceFields( this );
@@ -169,13 +176,15 @@ public class FilmsView extends Div implements BeforeEnterObserver
         editorLayoutDiv.add( editorDiv );
 
         FormLayout formLayout = new FormLayout();
-        name = new TextField( "Name" );
+        TextField name = new TextField( "Name" );
         length = new TextField( "Length" );
-        ageGroupId = new TextField( "Age Group Id" );
+        ageGroup = new Select<>();
+        ageGroup.setLabel( "Age Group" );
+        ageGroup.setItems( ageGroupService.list( Pageable.unpaged() ).stream().toList() );
+        ageGroup.setItemLabelGenerator( AgeGroup::getName );
         price = new TextField( "Price" );
-        discount = new TextField( "Discount" );
         availableCopies = new TextField( "Available Copies" );
-        formLayout.add( name, length, ageGroupId, price, discount, availableCopies );
+        formLayout.add( name, length, ageGroup, price, availableCopies );
 
         editorDiv.add( formLayout );
         createButtonLayout( editorLayoutDiv );

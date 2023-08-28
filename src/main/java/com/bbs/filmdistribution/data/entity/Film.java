@@ -1,18 +1,24 @@
 package com.bbs.filmdistribution.data.entity;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
+@Table( name = "film" )
 public class Film extends AbstractEntity
 {
     private String name;
+
     private Integer length;
-    private Integer ageGroupId;
+
+    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    private AgeGroup ageGroup;
+
     private Integer price;
-    private Integer discount;
-    private Integer availableCopies;
+
+    @Transient
+    private Integer availableCopies = 0;
 }

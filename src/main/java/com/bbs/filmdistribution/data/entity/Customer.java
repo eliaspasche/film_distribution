@@ -1,6 +1,7 @@
 package com.bbs.filmdistribution.data.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@Table( name = "customer" )
 public class Customer extends AbstractEntity
 {
     private String name;

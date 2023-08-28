@@ -46,8 +46,7 @@ public class DashboardLayout extends AppLayout
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
 
-    public DashboardLayout( AppConfig appConfig, DarkModeService darkModeService,
-                            AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker )
+    public DashboardLayout( AppConfig appConfig, DarkModeService darkModeService, AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker )
     {
         this.appConfig = appConfig;
         this.darkModeService = darkModeService;
@@ -143,25 +142,31 @@ public class DashboardLayout extends AppLayout
 
         Button logout = new Button( "Logout", e -> authenticatedUser.logout() );
 
-        navbarLayout.add( logout, darkModeButton() );
+        Button darkModeButton = createDarkModeButton();
+        navbarLayout.add( logout, darkModeButton );
 
         if ( user.getDarkMode() == 1 && !darkModeService.isDarkModeActive() )
         {
             user.setDarkMode( darkModeService.changeDarkMode() );
+            darkModeButton.setIcon( getDarkModeIcon() );
         }
 
         return navbarLayout;
     }
 
-    private Button darkModeButton()
+    private Button createDarkModeButton()
     {
-        Button darkModeButton = new Button( new Icon( VaadinIcon.CIRCLE ) );
+        Button darkModeButton = new Button( getDarkModeIcon() );
         darkModeButton.addThemeVariants( ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST );
 
-        darkModeButton.addClickListener( click ->
-                authenticatedUser.get().ifPresent( user -> user.setDarkMode( darkModeService.changeDarkMode() ) ) );
+        darkModeButton.addClickListener( click -> authenticatedUser.get().ifPresent( user -> user.setDarkMode( darkModeService.changeDarkMode() ) ) );
 
         return darkModeButton;
+    }
+
+    private Icon getDarkModeIcon()
+    {
+        return new Icon( darkModeService.isDarkModeActive() ? VaadinIcon.SUN_O : VaadinIcon.MOON_O );
     }
 
     private Footer createFooter()
