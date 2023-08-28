@@ -1,24 +1,20 @@
 package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.FilmCopy;
-
-import java.util.Optional;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
+@RequiredArgsConstructor
 public class FilmCopyService
 {
 
     private final FilmCopyRepository repository;
-
-    public FilmCopyService( FilmCopyRepository repository )
-    {
-        this.repository = repository;
-    }
 
     public Optional<FilmCopy> get( Long id )
     {
