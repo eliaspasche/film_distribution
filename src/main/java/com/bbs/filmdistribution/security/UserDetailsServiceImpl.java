@@ -2,17 +2,13 @@ package com.bbs.filmdistribution.security;
 
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.data.service.UserRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService
@@ -36,14 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService
         }
         else
         {
-            return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getHashedPassword(), getAuthorities( user ) );
+            return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getHashedPassword(), Collections.emptyList() );
         }
-    }
-
-    private static List<GrantedAuthority> getAuthorities( User user )
-    {
-        return user.getRoles().stream().map( role -> new SimpleGrantedAuthority( "ROLE_" + role ) ).collect( Collectors.toList() );
-
     }
 
 }
