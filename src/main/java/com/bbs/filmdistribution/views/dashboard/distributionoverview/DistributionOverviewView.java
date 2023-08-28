@@ -1,7 +1,6 @@
 package com.bbs.filmdistribution.views.dashboard.distributionoverview;
 
-import com.bbs.filmdistribution.data.entity.SamplePerson;
-import com.bbs.filmdistribution.data.service.SamplePersonService;
+import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
@@ -23,20 +22,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 
 @PageTitle( "Distribution Overview" )
 @Route( value = "distributionOverview", layout = DashboardLayout.class )
@@ -44,19 +36,16 @@ import org.springframework.data.jpa.domain.Specification;
 @Uses( Icon.class )
 public class DistributionOverviewView extends Div
 {
+    private Grid<User> grid;
 
-    private Grid<SamplePerson> grid;
+    private final Filters filters;
 
-    private Filters filters;
-    private final SamplePersonService samplePersonService;
-
-    public DistributionOverviewView( SamplePersonService SamplePersonService )
+    public DistributionOverviewView()
     {
-        this.samplePersonService = SamplePersonService;
         setSizeFull();
         addClassNames( "distribution-overview-view" );
 
-        filters = new Filters( () -> refreshGrid() );
+        filters = new Filters( this::refreshGrid );
         VerticalLayout layout = new VerticalLayout( createMobileFilters(), filters, createGrid() );
         layout.setSizeFull();
         layout.setPadding( false );
@@ -91,7 +80,7 @@ public class DistributionOverviewView extends Div
         return mobileFilters;
     }
 
-    public static class Filters extends Div implements Specification<SamplePerson>
+    public static class Filters extends Div implements Specification<User>
     {
 
         private final TextField name = new TextField( "Name" );
@@ -155,7 +144,7 @@ public class DistributionOverviewView extends Div
         }
 
         @Override
-        public Predicate toPredicate( Root<SamplePerson> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder )
+        public Predicate toPredicate( Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder )
         {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -233,16 +222,9 @@ public class DistributionOverviewView extends Div
 
     private Component createGrid()
     {
-        grid = new Grid<>( SamplePerson.class, false );
-        grid.addColumn( "firstName" ).setAutoWidth( true );
-        grid.addColumn( "lastName" ).setAutoWidth( true );
-        grid.addColumn( "email" ).setAutoWidth( true );
-        grid.addColumn( "phone" ).setAutoWidth( true );
-        grid.addColumn( "dateOfBirth" ).setAutoWidth( true );
-        grid.addColumn( "occupation" ).setAutoWidth( true );
-        grid.addColumn( "role" ).setAutoWidth( true );
+        grid = new Grid<>( User.class, false );
+        grid.addColumn( "username" ).setAutoWidth( true );
 
-        grid.setItems( query -> samplePersonService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ), filters ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
         grid.addClassNames( LumoUtility.Border.TOP, LumoUtility.BorderColor.CONTRAST_10 );
 
