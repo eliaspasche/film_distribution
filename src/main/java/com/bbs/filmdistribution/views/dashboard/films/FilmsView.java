@@ -4,7 +4,9 @@ import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
+import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
+import com.bbs.filmdistribution.wrapper.DeleteDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -40,7 +42,7 @@ import java.util.Optional;
 @Route( value = "films/:filmID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 @RequiredArgsConstructor
-public class FilmsView extends Div implements BeforeEnterObserver
+public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
 {
     // Route
     private static final String FILM_ID = "filmID";
@@ -53,12 +55,13 @@ public class FilmsView extends Div implements BeforeEnterObserver
     // Layout
     private final Grid<Film> grid = new Grid<>( Film.class, false );
 
+    private TextField name;
     private TextField length;
     private Select<AgeGroup> ageGroup;
     private TextField price;
     private TextField availableCopies;
 
-    private final Button cancel = new Button( "Cancel" );
+    private final Button create = new Button( "New Film" );
     private final Button save = new Button( "Save" );
 
     // Validator
@@ -80,13 +83,21 @@ public class FilmsView extends Div implements BeforeEnterObserver
         add( splitLayout );
 
         // Configure Grid
-        grid.addColumn( "name" ).setAutoWidth( true );
-        grid.addColumn( "length" ).setAutoWidth( true );
-        grid.addColumn( ( film ) -> film.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
-        grid.addColumn( "price" ).setAutoWidth( true );
-        grid.addColumn( "availableCopies" ).setAutoWidth( true );
         grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
+
+        grid.addColumn( "name" ).setAutoWidth( true );
+        grid.addColumn( "length" ).setAutoWidth( true );
+        grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
+        grid.addColumn( "price" ).setAutoWidth( true );
+        grid.addColumn( "availableCopies" ).setAutoWidth( true );
+        grid.addComponentColumn( item -> {
+            Button deleteButton = new Button( "Delete",
+                    event -> new DeleteDialog( "Soll der Film \"" + item.getName() + "\" entfernt werden?", filmService, item, this ) );
+            deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
+
+            return deleteButton;
+        } );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {
@@ -105,14 +116,15 @@ public class FilmsView extends Div implements BeforeEnterObserver
         binder = new BeanValidationBinder<>( Film.class );
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField( length ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "length" );
-        binder.forField( price ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "price" );
-        binder.bind( ageGroup, Film::getAgeGroup, Film::setAgeGroup );
-        binder.forField( availableCopies ).withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "availableCopies" );
+        binder.forField( name ).asRequired().bind( "name" );
+        binder.forField( length ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "length" );
+        binder.forField( price ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "price" );
+        binder.forField( ageGroup ).asRequired().bind( Film::getAgeGroup, Film::setAgeGroup );
+        binder.forField( availableCopies ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "availableCopies" );
 
         binder.bindInstanceFields( this );
 
-        cancel.addClickListener( e -> {
+        create.addClickListener( e -> {
             clearForm();
             refreshGrid();
         } );
@@ -148,6 +160,7 @@ public class FilmsView extends Div implements BeforeEnterObserver
     public void beforeEnter( BeforeEnterEvent event )
     {
         Optional<Long> filmId = event.getRouteParameters().get( FILM_ID ).map( Long::parseLong );
+        create.setVisible( filmId.isPresent() );
         if ( filmId.isPresent() )
         {
             Optional<Film> filmFromBackend = filmService.get( filmId.get() );
@@ -176,10 +189,11 @@ public class FilmsView extends Div implements BeforeEnterObserver
         editorLayoutDiv.add( editorDiv );
 
         FormLayout formLayout = new FormLayout();
-        TextField name = new TextField( "Name" );
+        name = new TextField( "Name" );
         length = new TextField( "Length" );
         ageGroup = new Select<>();
         ageGroup.setLabel( "Age Group" );
+        ageGroup.setEmptySelectionAllowed( false );
         ageGroup.setItems( ageGroupService.list( Pageable.unpaged() ).stream().toList() );
         ageGroup.setItemLabelGenerator( AgeGroup::getName );
         price = new TextField( "Price" );
@@ -196,9 +210,10 @@ public class FilmsView extends Div implements BeforeEnterObserver
     {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName( "button-layout" );
-        cancel.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+        create.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         save.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
-        buttonLayout.add( save, cancel );
+
+        buttonLayout.add( save, create );
         editorLayoutDiv.add( buttonLayout );
     }
 
@@ -225,6 +240,11 @@ public class FilmsView extends Div implements BeforeEnterObserver
     {
         this.film = value;
         binder.readBean( this.film );
+    }
 
+    @Override
+    public void updateView()
+    {
+        refreshGrid();
     }
 }

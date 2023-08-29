@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FilmService
+public class FilmService extends AbstractDatabaseService
 {
 
     private final FilmRepository repository;
@@ -27,6 +27,7 @@ public class FilmService
         return repository.save( entity );
     }
 
+    @Override
     public void delete( Long id )
     {
         repository.deleteById( id );

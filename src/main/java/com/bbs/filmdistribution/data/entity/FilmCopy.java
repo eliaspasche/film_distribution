@@ -14,7 +14,7 @@ public class FilmCopy extends AbstractEntity
 {
     private String inventoryNumber;
 
-    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    @ManyToOne( cascade = CascadeType.ALL )
     private Film film;
 
     @ManyToMany( fetch = FetchType.EAGER )

@@ -159,7 +159,10 @@ public class DashboardLayout extends AppLayout
         Button darkModeButton = new Button( getDarkModeIcon() );
         darkModeButton.addThemeVariants( ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_CONTRAST );
 
-        darkModeButton.addClickListener( click -> authenticatedUser.get().ifPresent( user -> user.setDarkMode( darkModeService.changeDarkMode() ) ) );
+        darkModeButton.addClickListener( click -> {
+            authenticatedUser.get().ifPresent( user -> user.setDarkMode( darkModeService.changeDarkMode() ) );
+            darkModeButton.setIcon( getDarkModeIcon() );
+        } );
 
         return darkModeButton;
     }

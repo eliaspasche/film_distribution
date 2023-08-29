@@ -1,6 +1,9 @@
 package com.bbs.filmdistribution.data.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +17,7 @@ public class Film extends AbstractEntity
 
     private Integer length;
 
-    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    @OneToOne
     private AgeGroup ageGroup;
 
     private Integer price;
