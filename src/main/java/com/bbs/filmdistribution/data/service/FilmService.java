@@ -50,4 +50,8 @@ public class FilmService extends AbstractDatabaseService<Film>
         return ( int ) repository.count();
     }
 
+    public int availableCopies( long id )
+    {
+        return repository.availableCopies( id );
+    }
 }

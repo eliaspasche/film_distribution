@@ -139,7 +139,7 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
         grid.addColumn( "length" ).setAutoWidth( true );
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
-        grid.addColumn( "availableCopies" ).setAutoWidth( true );
+        grid.addColumn( item -> filmService.availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
         grid.addComponentColumn( item -> {
             Button deleteButton = new Button( "Delete" );
             deleteButton.setTooltipText( "Shift + Click = Instant delete" );
