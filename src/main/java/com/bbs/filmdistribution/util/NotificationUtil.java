@@ -25,13 +25,18 @@ public class NotificationUtil
     /**
      * Create a notification with a text, duration in seconds and a position.
      *
-     * @param text The text
+     * @param text              The text
      * @param durationInSeconds The duration in seconds
-     * @param position The {@link Notification.Position}
+     * @param position          The {@link Notification.Position}
+     * @param variant           The {@link NotificationVariant}
      */
-    private static void sendNotification( String text, int durationInSeconds, Notification.Position position )
+    private static void sendNotification( String text, int durationInSeconds, Notification.Position position, NotificationVariant variant )
     {
-        Notification.show( text, durationInSeconds * 1000, position );
+        Notification notification = Notification.show( text, durationInSeconds * 1000, position );
+        if ( variant != null )
+        {
+            notification.addThemeVariants( variant );
+        }
     }
 
     /**
@@ -56,12 +61,23 @@ public class NotificationUtil
     /**
      * Create and show a success notification with defined text and a duration value in seconds.
      *
-     * @param text The text do display
+     * @param text              The text do display
      * @param durationInSeconds The duration in seconds
      */
     public static void sendSuccessNotification( String text, int durationInSeconds )
     {
-        sendNotification( text, durationInSeconds, Notification.Position.BOTTOM_END );
+        sendNotification( text, durationInSeconds, Notification.Position.BOTTOM_END, NotificationVariant.LUMO_SUCCESS );
+    }
+
+    /**
+     * Create and show a error notification with defined text and a duration value in seconds.
+     *
+     * @param text              The text do display
+     * @param durationInSeconds The duration in seconds
+     */
+    public static void sendErrorNotification( String text, int durationInSeconds )
+    {
+        sendNotification( text, durationInSeconds, Notification.Position.BOTTOM_END, NotificationVariant.LUMO_ERROR );
     }
 
 }

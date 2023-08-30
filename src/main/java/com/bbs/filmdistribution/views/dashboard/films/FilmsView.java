@@ -4,6 +4,8 @@ import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
+import com.bbs.filmdistribution.util.ComponentUtil;
+import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.DeleteDialog;
@@ -13,17 +15,19 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -55,11 +59,11 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     // Layout
     private final Grid<Film> grid = new Grid<>( Film.class, false );
 
+    private H3 splitTitle;
     private TextField name;
-    private TextField length;
+    private IntegerField length;
     private Select<AgeGroup> ageGroup;
-    private TextField price;
-    private TextField availableCopies;
+    private NumberField price;
 
     private final Button create = new Button( "New Film" );
     private final Button save = new Button( "Save" );
@@ -82,45 +86,16 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
 
         add( splitLayout );
 
-        // Configure Grid
-        grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
-        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
-
-        grid.addColumn( "name" ).setAutoWidth( true );
-        grid.addColumn( "length" ).setAutoWidth( true );
-        grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
-        grid.addColumn( "price" ).setAutoWidth( true );
-        grid.addColumn( "availableCopies" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> {
-            Button deleteButton = new Button( "Delete",
-                    event -> new DeleteDialog( "Soll der Film \"" + item.getName() + "\" entfernt werden?", filmService, item, this ) );
-            deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
-
-            return deleteButton;
-        } );
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener( event -> {
-            if ( event.getValue() != null )
-            {
-                UI.getCurrent().navigate( String.format( FILM_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
-            }
-            else
-            {
-                clearForm();
-                UI.getCurrent().navigate( FilmsView.class );
-            }
-        } );
+        buildGrid();
 
         // Configure Form
         binder = new BeanValidationBinder<>( Film.class );
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( name ).asRequired().bind( "name" );
-        binder.forField( length ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "length" );
-        binder.forField( price ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "price" );
+        binder.forField( length ).asRequired().bind( "length" );
+        binder.forField( price ).asRequired().bind( "price" );
         binder.forField( ageGroup ).asRequired().bind( Film::getAgeGroup, Film::setAgeGroup );
-        binder.forField( availableCopies ).asRequired().withConverter( new StringToIntegerConverter( "Only numbers are allowed" ) ).bind( "availableCopies" );
 
         binder.bindInstanceFields( this );
 
@@ -140,20 +115,71 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
                 filmService.update( this.film );
                 clearForm();
                 refreshGrid();
-                Notification.show( "Data updated" );
+                NotificationUtil.sendSuccessNotification( "Data updated", 2 );
                 UI.getCurrent().navigate( FilmsView.class );
             }
             catch ( ObjectOptimisticLockingFailureException exception )
             {
-                Notification n = Notification.show( "Error updating the data. Somebody else has updated the record while you were making changes." );
-                n.setPosition( Position.MIDDLE );
-                n.addThemeVariants( NotificationVariant.LUMO_ERROR );
+                NotificationUtil.sendErrorNotification( "Error updating the data. Somebody else has updated the record while you were making changes", 2 );
             }
             catch ( ValidationException validationException )
             {
-                Notification.show( "Failed to update the data. Check again that all values are valid" );
+                NotificationUtil.sendErrorNotification( "Failed to update the data. Check again that all values are valid", 2 );
             }
         } );
+    }
+
+    private void buildGrid()
+    {
+        // Configure Grid
+        grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
+
+        Grid.Column<Film> filmNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
+        grid.addColumn( "length" ).setAutoWidth( true );
+        grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
+        grid.addColumn( "price" ).setAutoWidth( true );
+        grid.addColumn( "availableCopies" ).setAutoWidth( true );
+        grid.addComponentColumn( item -> {
+            Button deleteButton = new Button( "Delete" );
+            deleteButton.setTooltipText( "Shift + Click = Instant delete" );
+            deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
+            deleteButton.addClickListener( e -> {
+                if ( e.isShiftKey() )
+                {
+                    filmService.delete( item.getId() );
+                    refreshGrid();
+                    return;
+                }
+                new DeleteDialog( "Soll der Film \"" + item.getName() + "\" entfernt werden?", filmService, item, this );
+            } );
+
+            return deleteButton;
+        } );
+
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener( event -> {
+            if ( event.getValue() != null )
+            {
+                UI.getCurrent().navigate( String.format( FILM_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
+            }
+            else
+            {
+                clearForm();
+                UI.getCurrent().navigate( FilmsView.class );
+            }
+        } );
+
+        // Create search filter
+        HeaderRow headerRow = grid.appendHeaderRow();
+
+        GridFilter<Film> gridFilter = new GridFilter<>( grid, filmService );
+
+        TextField filterTextField = ComponentUtil.createGridSearchField( "Search" );
+        filterTextField.setValueChangeMode( ValueChangeMode.LAZY );
+        filterTextField.addValueChangeListener( e -> gridFilter.filterFieldName( "name", e.getValue() ) );
+
+        headerRow.getCell( filmNameColumn ).setComponent( filterTextField );
     }
 
     @Override
@@ -189,18 +215,22 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
         editorLayoutDiv.add( editorDiv );
 
         FormLayout formLayout = new FormLayout();
+
+        splitTitle = new H3( "New film" );
         name = new TextField( "Name" );
-        length = new TextField( "Length" );
+        length = ComponentUtil.createIntegerField( "Length", "sec." );
         ageGroup = new Select<>();
         ageGroup.setLabel( "Age Group" );
         ageGroup.setEmptySelectionAllowed( false );
         ageGroup.setItems( ageGroupService.list( Pageable.unpaged() ).stream().toList() );
         ageGroup.setItemLabelGenerator( AgeGroup::getName );
-        price = new TextField( "Price" );
-        availableCopies = new TextField( "Available Copies" );
-        formLayout.add( name, length, ageGroup, price, availableCopies );
 
-        editorDiv.add( formLayout );
+        price = ComponentUtil.createNumberField( "Price", "€/week" );
+        price.setMax( 99.99 );
+
+        formLayout.add( name, length, ageGroup, price );
+
+        editorDiv.add( splitTitle, formLayout );
         createButtonLayout( editorLayoutDiv );
 
         splitLayout.addToSecondary( editorLayoutDiv );
@@ -240,6 +270,7 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     {
         this.film = value;
         binder.readBean( this.film );
+        splitTitle.setText( ( this.film == null ? "New" : "Edit" ) + " film" );
     }
 
     @Override
@@ -247,4 +278,5 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     {
         refreshGrid();
     }
+
 }

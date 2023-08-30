@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FilmService extends AbstractDatabaseService
+public class FilmService extends AbstractDatabaseService<Film>
 {
 
     private final FilmRepository repository;
@@ -33,11 +33,13 @@ public class FilmService extends AbstractDatabaseService
         repository.deleteById( id );
     }
 
+    @Override
     public Page<Film> list( Pageable pageable )
     {
         return repository.findAll( pageable );
     }
 
+    @Override
     public Page<Film> list( Pageable pageable, Specification<Film> filter )
     {
         return repository.findAll( filter, pageable );

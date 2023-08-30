@@ -20,7 +20,7 @@ public class Film extends AbstractEntity
     @OneToOne
     private AgeGroup ageGroup;
 
-    private Integer price;
+    private Double price;
 
     @Transient
     private Integer availableCopies = 0;

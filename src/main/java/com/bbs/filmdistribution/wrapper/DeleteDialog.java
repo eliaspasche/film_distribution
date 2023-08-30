@@ -53,7 +53,7 @@ public class DeleteDialog extends Dialog
         deleteButton.getStyle().set( "margin-right", "auto" );
         deleteButton.addClickListener( click -> {
             abstractDatabaseService.delete( entityToDelete.getId() );
-            NotificationUtil.sendSuccessNotification( "Erfolgreich entfernt " + entityToDelete.getId(), 2 );
+            NotificationUtil.sendSuccessNotification( "Erfolgreich entfernt", 2 );
             if ( dynamicView != null )
             {
                 dynamicView.updateView();
