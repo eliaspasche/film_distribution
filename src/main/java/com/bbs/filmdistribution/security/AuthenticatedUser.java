@@ -51,7 +51,6 @@ public class AuthenticatedUser
                 if ( appConfig.isAutoLogin() )
                 {
                     cookieService.setJSCookie( AppConfig.AUTO_LOGIN_KEY, user.getUsername(), 1 );
-                    System.out.println( "Added autologin cookie" );
                 }
             }
         }

@@ -65,10 +65,12 @@ public class ServiceInitListener implements VaadinServiceInitListener
         String autoLoginUsername = cookieService.getJSCookie( AppConfig.AUTO_LOGIN_KEY );
         if ( autoLoginUsername == null )
         {
-            if ( !appConfig.isAutoLogin() )
-            {
-                cookieService.removeJSCookie( AppConfig.AUTO_LOGIN_KEY );
-            }
+            return;
+        }
+
+        if ( !appConfig.isAutoLogin() )
+        {
+            cookieService.removeJSCookie( AppConfig.AUTO_LOGIN_KEY );
             return;
         }
 
