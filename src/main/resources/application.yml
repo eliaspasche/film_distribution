@@ -1,5 +1,6 @@
 filmdistribution:
     version: Version @project.version@
+    autologin: false
 logging:
     level:
         org:
