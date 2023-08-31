@@ -45,7 +45,10 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver
         {
             // Already logged in
             setOpened( false );
-            event.forwardTo( HomeView.class );
+            if ( LoginView.class.equals( event.getNavigationTarget() ) )
+            {
+                event.forwardTo( HomeView.class );
+            }
             return;
         }
 
