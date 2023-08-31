@@ -11,11 +11,11 @@ import com.vaadin.flow.component.dialog.Dialog;
 /**
  * Dialog to delete a {@link AbstractEntity}
  */
-public class DeleteDialog extends Dialog
+public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
 {
     private final String title;
-    private final AbstractDatabaseService abstractDatabaseService;
-    private final AbstractEntity entityToDelete;
+    private final AbstractDatabaseService<T> abstractDatabaseService;
+    private final T entityToDelete;
     private final DynamicView dynamicView;
 
     /**
@@ -26,7 +26,7 @@ public class DeleteDialog extends Dialog
      * @param entityToDelete          The {@link AbstractEntity} to delete
      * @param dynamicView             The {@link DynamicView}
      */
-    public DeleteDialog( String title, AbstractDatabaseService abstractDatabaseService, AbstractEntity entityToDelete, DynamicView dynamicView )
+    public EntityDeleteDialog( String title, AbstractDatabaseService<T> abstractDatabaseService, T entityToDelete, DynamicView dynamicView )
     {
         this.title = title;
         this.abstractDatabaseService = abstractDatabaseService;
@@ -35,7 +35,7 @@ public class DeleteDialog extends Dialog
         init();
     }
 
-    public DeleteDialog( String title, AbstractDatabaseService abstractDatabaseService, AbstractEntity entityToDelete )
+    public EntityDeleteDialog( String title, AbstractDatabaseService<T> abstractDatabaseService, T entityToDelete )
     {
         this( title, abstractDatabaseService, entityToDelete, null );
     }
@@ -53,7 +53,7 @@ public class DeleteDialog extends Dialog
         deleteButton.getStyle().set( "margin-right", "auto" );
         deleteButton.addClickListener( click -> {
             abstractDatabaseService.delete( entityToDelete.getId() );
-            NotificationUtil.sendSuccessNotification( "Erfolgreich entfernt", 2 );
+            NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
             if ( dynamicView != null )
             {
                 dynamicView.updateView();

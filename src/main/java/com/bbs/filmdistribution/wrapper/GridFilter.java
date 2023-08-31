@@ -1,4 +1,4 @@
-package com.bbs.filmdistribution.views.dashboard.films;
+package com.bbs.filmdistribution.wrapper;
 
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
 import com.vaadin.flow.component.grid.Grid;

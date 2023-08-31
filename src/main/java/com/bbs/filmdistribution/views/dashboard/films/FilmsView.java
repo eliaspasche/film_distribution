@@ -8,7 +8,8 @@ import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
-import com.bbs.filmdistribution.wrapper.DeleteDialog;
+import com.bbs.filmdistribution.wrapper.EntityDeleteDialog;
+import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -132,6 +133,8 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     private void buildGrid()
     {
         // Configure Grid
+        grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES );
+
         grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 
@@ -151,7 +154,7 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
                     refreshGrid();
                     return;
                 }
-                new DeleteDialog( "Soll der Film \"" + item.getName() + "\" entfernt werden?", filmService, item, this );
+                new EntityDeleteDialog<>( "Should the film \"" + item.getName() + "\" removed?", filmService, item, this );
             } );
 
             return deleteButton;
@@ -203,6 +206,8 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
                 event.forwardTo( FilmsView.class );
             }
         }
+
+
     }
 
     private void createEditorLayout( SplitLayout splitLayout )
