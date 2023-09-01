@@ -133,10 +133,9 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     private void buildGrid()
     {
         // Configure Grid
-        grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES );
+        grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER );
 
         grid.setItems( query -> filmService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
-        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 
         Grid.Column<Film> filmNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "length" ).setAutoWidth( true );

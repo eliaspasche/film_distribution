@@ -2,6 +2,7 @@ package com.bbs.filmdistribution.wrapper;
 
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -36,7 +37,8 @@ public class GridFilter<T>
      */
     public void filterFieldName( String fieldName, String searchValue )
     {
-        grid.setItems( q -> abstractDatabaseService.list( PageRequest.of( q.getPage(), q.getPageSize() ), fieldInputLike( fieldName, searchValue ) ).stream() );
+        Specification<T> specificationFilter = fieldInputLike( fieldName, searchValue );
+        grid.setItems( q -> abstractDatabaseService.list( PageRequest.of( q.getPage(), q.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( q ) ), specificationFilter ).stream() );
     }
 
     /**
