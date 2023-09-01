@@ -26,7 +26,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 public class ServiceInitListener implements VaadinServiceInitListener
 {
 
-    private static final Logger LOGGER = Logger.getLogger( ServiceInitListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger( ServiceInitListener.class.getName() );
 
     private final AppConfig appConfig;
     private final UserDetailsService userDetailsService;
@@ -35,8 +35,8 @@ public class ServiceInitListener implements VaadinServiceInitListener
     /**
      * The constructor.
      *
-     * @param appConfig The {@link AppConfig}
-     * @param cookieService The {@link CookieService}
+     * @param appConfig          The {@link AppConfig}
+     * @param cookieService      The {@link CookieService}
      * @param userDetailsService The {@link UserDetailsService}
      */
     public ServiceInitListener( AppConfig appConfig, CookieService cookieService,

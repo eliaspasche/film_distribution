@@ -28,4 +28,4 @@ vaadin:
     frontend:
         hotdeploy: true
     launch-browser: true
-    whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.bbs.filmdistribution
+    whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.bbs.filmdistribution,com.github.appreciated.apexcharts

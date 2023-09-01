@@ -18,3 +18,10 @@ vaadin-login-form-wrapper::part(footer) {
     text-align: center;
     width: 100%;
 }
+
+.chartLayout {
+    width: 60%;
+    margin: .5em auto;
+    padding: 2em;
+    box-shadow: rgba(0, 0, 0, .35) 0 5px 15px;
+}

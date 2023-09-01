@@ -1,10 +1,11 @@
 package com.bbs.filmdistribution.service;
 
+import com.bbs.filmdistribution.event.ThemeVariantChangedEvent;
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 /**
  * Service to manage the dark/light theme on the application.
@@ -23,16 +24,20 @@ public class DarkModeService
     {
         ThemeList themeList = UI.getCurrent().getElement().getThemeList();
 
-        if ( themeList.contains( Lumo.DARK ) )
+        String currentTheme = Lumo.LIGHT;
+        if ( isDarkModeActive() )
         {
             themeList.remove( Lumo.DARK );
-            return 0;
         }
         else
         {
             themeList.add( Lumo.DARK );
-            return 1;
+            currentTheme = Lumo.DARK;
         }
+
+        UI ui = UI.getCurrent();
+        ComponentUtil.fireEvent( ui, new ThemeVariantChangedEvent( ui, currentTheme ) );
+        return isDarkModeActive() ? 1 : 0;
     }
 
     /**
