@@ -24,7 +24,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -32,7 +31,6 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 /**
  * A view to manage the {@link Film} objects.
@@ -58,11 +56,17 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
 
     private final Button saveButton = new Button( "Save" );
 
+    /**
+     * The constructor.
+     *
+     * @param filmService     The {@link FilmService}
+     * @param ageGroupService The {@link AgeGroupService}
+     */
     public FilmsView( FilmService filmService, AgeGroupService ageGroupService )
     {
         super( FILM_ID, FILM_EDIT_ROUTE_TEMPLATE, filmService );
         this.ageGroupService = ageGroupService;
-        this.createButton = new Button( "New Film" );
+        this.createButton = new Button( "New " + getEditItemName() );
     }
 
     @Override
@@ -85,27 +89,11 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         } );
 
         saveButton.addClickListener( e -> {
-            try
+            if ( this.itemToEdit == null )
             {
-                if ( this.itemToEdit == null )
-                {
-                    this.itemToEdit = new Film();
-                }
-                binder.writeBean( this.itemToEdit );
-                databaseService.update( this.itemToEdit );
-                clearForm();
-                refreshGrid();
-                NotificationUtil.sendSuccessNotification( "Data updated", 2 );
-                UI.getCurrent().navigate( FilmsView.class );
+                this.itemToEdit = new Film();
             }
-            catch ( ObjectOptimisticLockingFailureException exception )
-            {
-                NotificationUtil.sendErrorNotification( "Error updating the data. Somebody else has updated the record while you were making changes", 2 );
-            }
-            catch ( ValidationException validationException )
-            {
-                NotificationUtil.sendErrorNotification( "Failed to update the data. Check again that all values are valid", 2 );
-            }
+            saveItem();
         } );
     }
 
@@ -172,7 +160,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     {
         FormLayout formLayout = new FormLayout();
 
-        splitTitle = new H3( "New film" );
+        splitTitle = new H3( "New " + getEditItemName() );
 
         name = new TextField( "Name" );
         length = ComponentUtil.createIntegerField( "Length", "sec." );
@@ -192,6 +180,12 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         createButtonLayout();
     }
 
+    @Override
+    protected String getEditItemName()
+    {
+        return "Film";
+    }
+
     /**
      * Create the button layout to persist the {@link Film} object.
      */
@@ -207,7 +201,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     protected void populateForm( Film value )
     {
         super.populateForm( value );
-        splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " film" );
+        splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " " + getEditItemName() );
     }
 
     @Override

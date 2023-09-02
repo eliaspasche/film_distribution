@@ -9,34 +9,54 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service for the {@link AgeGroup} object to make interactions with the database.
+ */
 @Service
 @RequiredArgsConstructor
-public class AgeGroupService {
+public class AgeGroupService extends AbstractDatabaseService<AgeGroup>
+{
 
     private final AgeGroupRepository repository;
 
-    public Optional<AgeGroup> get(Long id) {
-        return repository.findById(id);
+    @Override
+    public Optional<AgeGroup> get( Long id )
+    {
+        return repository.findById( id );
     }
 
-    public AgeGroup update(AgeGroup entity) {
-        return repository.save(entity);
+    @Override
+    public AgeGroup update( AgeGroup entity )
+    {
+        return repository.save( entity );
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    @Override
+    public void delete( Long id )
+    {
+        repository.deleteById( id );
     }
 
-    public Page<AgeGroup> list(Pageable pageable) {
-        return repository.findAll(pageable);
+    @Override
+    public Page<AgeGroup> list( Pageable pageable )
+    {
+        return repository.findAll( pageable );
     }
 
-    public Page<AgeGroup> list(Pageable pageable, Specification<AgeGroup> filter) {
-        return repository.findAll(filter, pageable);
+    @Override
+    public Page<AgeGroup> list( Pageable pageable, Specification<AgeGroup> filter )
+    {
+        return repository.findAll( filter, pageable );
     }
 
-    public int count() {
-        return (int) repository.count();
+    /**
+     * Get the amount of entities in the database.
+     *
+     * @return The amount of entities
+     */
+    public int count()
+    {
+        return ( int ) repository.count();
     }
 
 }

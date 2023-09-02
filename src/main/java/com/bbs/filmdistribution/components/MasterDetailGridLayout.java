@@ -2,16 +2,26 @@ package com.bbs.filmdistribution.components;
 
 import com.bbs.filmdistribution.data.entity.AbstractEntity;
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
+import com.bbs.filmdistribution.util.NotificationUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import jakarta.annotation.PostConstruct;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
 
+/**
+ * Master detail grid layout to persists an {@link AbstractEntity} with an {@link AbstractDatabaseService}
+ *
+ * @param <T> The {@link AbstractEntity}
+ * @param <K> The {@link AbstractDatabaseService}
+ */
 public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T>>
         extends MasterDetailLayout implements BeforeEnterObserver
 {
@@ -30,6 +40,13 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
 
     protected Button createButton = new Button();
 
+    /**
+     * The constructor.
+     *
+     * @param editId          The key in url to edit a {@link AbstractEntity}
+     * @param editRoute       The edit url which includes the editId
+     * @param databaseService The {@link AbstractDatabaseService}
+     */
     protected MasterDetailGridLayout( String editId, String editRoute, K databaseService )
     {
         this.editId = editId;
@@ -37,6 +54,9 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
         this.databaseService = databaseService;
     }
 
+    /**
+     * Initialization of the components in the current view.
+     */
     @PostConstruct
     public void init()
     {
@@ -61,6 +81,34 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
      * Create the layout to edit a defined entity
      */
     protected abstract void createEditorLayout();
+
+    /**
+     * Get the name of the entity
+     *
+     * @return The entity name.
+     */
+    protected abstract String getEditItemName();
+
+    protected void saveItem()
+    {
+        try
+        {
+            binder.writeBean( this.itemToEdit );
+            databaseService.update( this.itemToEdit );
+            clearForm();
+            refreshGrid();
+            NotificationUtil.sendSuccessNotification( "Data updated", 2 );
+            UI.getCurrent().navigate( this.getClass() );
+        }
+        catch ( ObjectOptimisticLockingFailureException exception )
+        {
+            NotificationUtil.sendErrorNotification( "Error updating the data. Somebody else has updated the record while you were making changes", 2 );
+        }
+        catch ( ValidationException validationException )
+        {
+            NotificationUtil.sendErrorNotification( "Failed to update the data. Check again that all values are valid", 2 );
+        }
+    }
 
     @Override
     public void beforeEnter( BeforeEnterEvent event )
