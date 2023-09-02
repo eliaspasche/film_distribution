@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.views.dashboard.films;
 
+import com.bbs.filmdistribution.components.MasterDetailLayout;
 import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
@@ -17,12 +18,10 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -43,11 +42,14 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
 
+/**
+ * A view to manage the {@link Film} objects.
+ */
 @PageTitle( "Films" )
 @Route( value = "films/:filmID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 @RequiredArgsConstructor
-public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
+public class FilmsView extends MasterDetailLayout implements DynamicView, BeforeEnterObserver
 {
     // Route
     private static final String FILM_ID = "filmID";
@@ -77,15 +79,9 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
     @PostConstruct
     public void init()
     {
-        addClassNames( "films-view" );
-
         // Create UI
-        SplitLayout splitLayout = new SplitLayout();
-
-        createGridLayout( splitLayout );
-        createEditorLayout( splitLayout );
-
-        add( splitLayout );
+        getPrimaryDiv().add( grid );
+        createEditorLayout();
 
         buildGrid();
 
@@ -130,6 +126,9 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
         } );
     }
 
+    /**
+     * Build the {@link Grid} component which includes the available {@link Film} objects.
+     */
     private void buildGrid()
     {
         // Configure Grid
@@ -205,19 +204,13 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
                 event.forwardTo( FilmsView.class );
             }
         }
-
-
     }
 
-    private void createEditorLayout( SplitLayout splitLayout )
+    /**
+     * Create the layout to edit a {@link Film}
+     */
+    private void createEditorLayout()
     {
-        Div editorLayoutDiv = new Div();
-        editorLayoutDiv.setClassName( "editor-layout" );
-
-        Div editorDiv = new Div();
-        editorDiv.setClassName( "editor" );
-        editorLayoutDiv.add( editorDiv );
-
         FormLayout formLayout = new FormLayout();
 
         splitTitle = new H3( "New film" );
@@ -234,13 +227,15 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
 
         formLayout.add( name, length, ageGroup, price );
 
-        editorDiv.add( splitTitle, formLayout );
-        createButtonLayout( editorLayoutDiv );
+        getEditorDiv().add( splitTitle, formLayout );
 
-        splitLayout.addToSecondary( editorLayoutDiv );
+        createButtonLayout();
     }
 
-    private void createButtonLayout( Div editorLayoutDiv )
+    /**
+     * Create the button layout to persist the {@link Film} object.
+     */
+    private void createButtonLayout()
     {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName( "button-layout" );
@@ -248,28 +243,31 @@ public class FilmsView extends Div implements DynamicView, BeforeEnterObserver
         save.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
 
         buttonLayout.add( save, create );
-        editorLayoutDiv.add( buttonLayout );
+        getSecondaryDiv().add( buttonLayout );
     }
 
-    private void createGridLayout( SplitLayout splitLayout )
-    {
-        Div wrapper = new Div();
-        wrapper.setClassName( "grid-wrapper" );
-        splitLayout.addToPrimary( wrapper );
-        wrapper.add( grid );
-    }
-
+    /**
+     * Refresh the {@link Grid}
+     */
     private void refreshGrid()
     {
         grid.select( null );
         grid.getDataProvider().refreshAll();
     }
 
+    /**
+     * Clear all input fields.
+     */
     private void clearForm()
     {
         populateForm( null );
     }
 
+    /**
+     * Update the editor layout with a specific {@link Film} object.
+     *
+     * @param value The {@link Film}
+     */
     private void populateForm( Film value )
     {
         this.film = value;
