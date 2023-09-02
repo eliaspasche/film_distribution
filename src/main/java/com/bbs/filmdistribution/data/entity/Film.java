@@ -1,12 +1,15 @@
 package com.bbs.filmdistribution.data.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * This object represents a film.
+ */
 @Entity
 @Getter
 @Setter
@@ -17,7 +20,7 @@ public class Film extends AbstractEntity
 
     private Integer length;
 
-    @OneToOne
+    @ManyToOne
     private AgeGroup ageGroup;
 
     private Double price;

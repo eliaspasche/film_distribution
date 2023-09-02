@@ -16,7 +16,7 @@
 .master-detail .editor-layout {
     display: flex;
     flex-direction: column;
-    width: 400px;
+    width: 500px;
 }
 
 .master-detail .editor {

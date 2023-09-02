@@ -76,6 +76,9 @@ public class FilmsView extends MasterDetailLayout implements DynamicView, Before
 
     private Film film;
 
+    /**
+     * Initialization of the components in the current view.
+     */
     @PostConstruct
     public void init()
     {
@@ -85,6 +88,14 @@ public class FilmsView extends MasterDetailLayout implements DynamicView, Before
 
         buildGrid();
 
+        defineValidator();
+    }
+
+    /**
+     * Define the validator for a {@link Film} object.
+     */
+    private void defineValidator()
+    {
         // Configure Form
         binder = new BeanValidationBinder<>( Film.class );
 
@@ -149,6 +160,7 @@ public class FilmsView extends MasterDetailLayout implements DynamicView, Before
                 if ( e.isShiftKey() )
                 {
                     filmService.delete( item.getId() );
+                    NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
                     refreshGrid();
                     return;
                 }

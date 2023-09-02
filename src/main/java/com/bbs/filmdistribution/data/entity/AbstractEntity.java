@@ -7,6 +7,9 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Base entity for database interactions.
+ */
 @MappedSuperclass
 @Getter
 @Setter
