@@ -1,6 +1,7 @@
 package com.bbs.filmdistribution.components;
 
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public class MasterDetailLayout extends Div
     private final Div primaryDiv;
     private final Div secondaryDiv;
     private final Div editorDiv;
+    private final HorizontalLayout buttonLayout;
 
     /**
      * Build the layout.
@@ -29,14 +31,19 @@ public class MasterDetailLayout extends Div
 
         this.primaryDiv = new Div();
         primaryDiv.setClassName( "grid-wrapper" );
+
         splitLayout.addToPrimary( primaryDiv );
+
+        // Editor div (secondary)
+        this.buttonLayout = new HorizontalLayout();
+        buttonLayout.setClassName( "button-layout" );
 
         this.secondaryDiv = new Div();
         secondaryDiv.setClassName( "editor-layout" );
 
         this.editorDiv = new Div();
         editorDiv.setClassName( "editor" );
-        secondaryDiv.add( editorDiv );
+        secondaryDiv.add( editorDiv, buttonLayout );
 
         splitLayout.addToSecondary( secondaryDiv );
     }
