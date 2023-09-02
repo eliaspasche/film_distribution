@@ -14,3 +14,30 @@ vaadin-scroller[slot="drawer"] {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+
+vaadin-app-layout::part(navbar) {
+  z-index: 3;
+  box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 3px;
+}
+
+vaadin-app-layout::part(drawer) {
+  z-index: 2;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+vaadin-login-overlay-wrapper::part(title) {
+  font-size: 2.2em;
+}
+
+vaadin-login-form-wrapper::part(footer) {
+  text-align: center;
+  width: 100%;
+}
+
+.chartLayout {
+  width: 60%;
+  margin: .5em auto;
+  padding: 2em;
+  box-shadow: rgba(0, 0, 0, .35) 0 5px 15px;
+}
