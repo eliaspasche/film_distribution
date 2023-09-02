@@ -1,11 +1,11 @@
 package com.bbs.filmdistribution.data.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This object represents a film.
@@ -22,6 +22,9 @@ public class Film extends AbstractEntity
 
     @ManyToOne
     private AgeGroup ageGroup;
+
+    @OneToMany(mappedBy = "film", cascade = CascadeType.ALL )
+    private List<FilmCopy> filmCopies = new ArrayList<>();
 
     private Double price;
 

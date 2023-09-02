@@ -4,10 +4,8 @@ import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
-import com.bbs.filmdistribution.wrapper.EntityDeleteDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -89,23 +87,8 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
 
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "minimumAge" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> {
-            Button deleteButton = new Button( "Delete" );
-            deleteButton.setTooltipText( "Shift + Click = Instant delete" );
-            deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
-            deleteButton.addClickListener( e -> {
-                if ( e.isShiftKey() )
-                {
-                    databaseService.delete( item.getId() );
-                    NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
-                    refreshGrid();
-                    return;
-                }
-                new EntityDeleteDialog<>( "Should the agegroup \"" + item.getName() + "\" removed?", databaseService, item, this );
-            } );
+        grid.addComponentColumn(item -> getDeleteButton(item, item.getName(), this));
 
-            return deleteButton;
-        } );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

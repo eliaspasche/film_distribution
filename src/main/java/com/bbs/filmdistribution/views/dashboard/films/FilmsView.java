@@ -6,10 +6,8 @@ import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
-import com.bbs.filmdistribution.wrapper.EntityDeleteDialog;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -53,6 +51,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     private IntegerField length;
     private Select<AgeGroup> ageGroup;
     private NumberField price;
+    private IntegerField availableCopies;
 
     private final Button saveButton = new Button( "Save" );
 
@@ -79,6 +78,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         binder.forField( name ).asRequired().bind( "name" );
         binder.forField( length ).asRequired().bind( "length" );
         binder.forField( price ).asRequired().bind( "price" );
+        binder.forField(availableCopies).asRequired().bind("availableCopies");
         binder.forField( ageGroup ).asRequired().bind( Film::getAgeGroup, Film::setAgeGroup );
 
         binder.bindInstanceFields( this );
@@ -112,23 +112,8 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
         grid.addColumn( item -> databaseService.availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> {
-            Button deleteButton = new Button( "Delete" );
-            deleteButton.setTooltipText( "Shift + Click = Instant delete" );
-            deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
-            deleteButton.addClickListener( e -> {
-                if ( e.isShiftKey() )
-                {
-                    databaseService.delete( item.getId() );
-                    NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
-                    refreshGrid();
-                    return;
-                }
-                new EntityDeleteDialog<>( "Should the film \"" + item.getName() + "\" removed?", databaseService, item, this );
-            } );
+        grid.addComponentColumn(item -> getDeleteButton(item, item.getName(), this));
 
-            return deleteButton;
-        } );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {
@@ -164,6 +149,8 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
 
         name = new TextField( "Name" );
         length = ComponentUtil.createIntegerField( "Length", "sec." );
+        length.setMax(99999);
+
         ageGroup = new Select<>();
         ageGroup.setLabel( "Age Group" );
         ageGroup.setEmptySelectionAllowed( false );
@@ -173,7 +160,9 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         price = ComponentUtil.createNumberField( "Price", "€/week" );
         price.setMax( 99.99 );
 
-        formLayout.add( name, length, ageGroup, price );
+        availableCopies = ComponentUtil.createIntegerField("Available Copies", "pieces");
+
+        formLayout.add(name, length, ageGroup, price, availableCopies);
 
         getEditorDiv().add( splitTitle, formLayout );
 
@@ -202,6 +191,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     {
         super.populateForm( value );
         splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " " + getEditItemName() );
+        availableCopies.setEnabled(value == null || value.getId() == null);
     }
 
     @Override

@@ -3,9 +3,14 @@ package com.bbs.filmdistribution.components;
 import com.bbs.filmdistribution.data.entity.AbstractEntity;
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
 import com.bbs.filmdistribution.util.NotificationUtil;
+import com.bbs.filmdistribution.views.DynamicView;
+import com.bbs.filmdistribution.wrapper.EntityDeleteDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -159,6 +164,27 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     protected void clearForm()
     {
         populateForm( null );
+    }
+
+    /**
+     * Returns a delete button for the given item.
+     */
+    protected Button getDeleteButton(T item, String identifier, DynamicView view)
+    {
+        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
+        deleteButton.setTooltipText("Shift + Click = Instant delete");
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(e -> {
+            if (e.isShiftKey()) {
+                databaseService.delete(item.getId());
+                NotificationUtil.sendSuccessNotification("Successfully removed", 2);
+                refreshGrid();
+                return;
+            }
+            new EntityDeleteDialog<>("Should the item \"" + identifier + "\" removed?", databaseService, item, view);
+        });
+
+        return deleteButton;
     }
 
 }

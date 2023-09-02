@@ -1,6 +1,7 @@
 package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.Film;
+import com.bbs.filmdistribution.data.entity.FilmCopy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service for the {@link Film} object to make interactions with the database.
@@ -28,6 +30,18 @@ public class FilmService extends AbstractDatabaseService<Film>
     @Override
     public Film update( Film entity )
     {
+        if (entity.getId() == null)
+        {
+            for(var i = 0; i < entity.getAvailableCopies(); i++)
+            {
+                FilmCopy filmCopy = new FilmCopy();
+                filmCopy.setFilm(entity);
+                filmCopy.setInventoryNumber(UUID.randomUUID().toString());
+
+                entity.getFilmCopies().add(filmCopy);
+            }
+        }
+
         return repository.save( entity );
     }
 

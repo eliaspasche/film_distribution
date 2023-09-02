@@ -11,8 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FilmCopyService
-{
+public class FilmCopyService extends AbstractDatabaseService<FilmCopy> {
 
     private final FilmCopyRepository repository;
 

@@ -45,6 +45,7 @@ public class AccountView extends Composite<VerticalLayout>
         Button buttonPrimary = new Button();
         Button buttonSecondary = new Button();
         VerticalLayout layoutColumn6 = new VerticalLayout();
+
         getContent().setWidthFull();
         getContent().addClassName( Padding.LARGE );
         layoutRow.setWidthFull();
