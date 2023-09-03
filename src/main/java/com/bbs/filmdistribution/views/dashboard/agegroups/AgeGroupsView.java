@@ -47,14 +47,15 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
     public AgeGroupsView( AgeGroupService ageGroupService )
     {
         super( AGEGROUP_ID, AGEGROUP_EDIT_ROUTE_TEMPLATE, ageGroupService );
-        this.createButton = new Button( "New " + getEditItemName() );
+        setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
     @Override
     protected void defineValidator()
     {
         // Configure Form
-        binder = new BeanValidationBinder<>( AgeGroup.class );
+        BeanValidationBinder<AgeGroup> binder = new BeanValidationBinder<>( AgeGroup.class );
+        setBinder( binder );
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( name ).asRequired().bind( "name" );
@@ -62,15 +63,15 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
 
         binder.bindInstanceFields( this );
 
-        createButton.addClickListener( e -> {
+        getCreateButton().addClickListener( e -> {
             clearForm();
             refreshGrid();
         } );
 
         saveButton.addClickListener( e -> {
-            if ( this.itemToEdit == null )
+            if ( getItemToEdit() == null )
             {
-                this.itemToEdit = new AgeGroup();
+                setItemToEdit( new AgeGroup() );
             }
             saveItem();
         } );
@@ -80,14 +81,15 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
     protected void buildGrid()
     {
         // Configure Grid
-        grid = new Grid<>( AgeGroup.class, false );
+        Grid<AgeGroup> grid = new Grid<>( AgeGroup.class, false );
+        setGrid( grid );
 
         grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER );
-        grid.setItems( query -> databaseService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
 
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "minimumAge" ).setAutoWidth( true );
-        grid.addComponentColumn(item -> getDeleteButton(item, item.getName(), this));
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
 
 
         // when a row is selected or deselected, populate form
@@ -131,17 +133,17 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
      */
     private void createButtonLayout()
     {
-        createButton.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+        getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
 
-        getButtonLayout().add( saveButton, createButton );
+        getButtonLayout().add( saveButton, getCreateButton() );
     }
 
     @Override
     protected void populateForm( AgeGroup value )
     {
         super.populateForm( value );
-        splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " " + getEditItemName() );
+        splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
     }
 
     @Override

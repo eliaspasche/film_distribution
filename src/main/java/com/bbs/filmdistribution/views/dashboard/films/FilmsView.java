@@ -65,14 +65,15 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     {
         super( FILM_ID, FILM_EDIT_ROUTE_TEMPLATE, filmService );
         this.ageGroupService = ageGroupService;
-        this.createButton = new Button( "New " + getEditItemName() );
+        setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
     @Override
     protected void defineValidator()
     {
         // Configure Form
-        binder = new BeanValidationBinder<>( Film.class );
+        BeanValidationBinder<Film> binder = new BeanValidationBinder<>( Film.class );
+        setBinder( binder );
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( name ).asRequired().bind( "name" );
@@ -83,15 +84,15 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
 
         binder.bindInstanceFields( this );
 
-        createButton.addClickListener( e -> {
+        getCreateButton().addClickListener( e -> {
             clearForm();
             refreshGrid();
         } );
 
         saveButton.addClickListener( e -> {
-            if ( this.itemToEdit == null )
+            if ( getItemToEdit() == null )
             {
-                this.itemToEdit = new Film();
+                setItemToEdit( new Film() );
             }
             saveItem();
         } );
@@ -101,17 +102,18 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     protected void buildGrid()
     {
         // Configure Grid
-        this.grid = new Grid<>( Film.class, false );
+        Grid<Film> grid = new Grid<>( Film.class, false );
+        setGrid( grid );
 
         grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER );
 
-        grid.setItems( query -> databaseService.list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
 
         Grid.Column<Film> filmNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "length" ).setAutoWidth( true );
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
-        grid.addColumn( item -> databaseService.availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
+        grid.addColumn( item -> getDatabaseService().availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
         grid.addComponentColumn(item -> getDeleteButton(item, item.getName(), this));
 
 
@@ -131,7 +133,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         // Create search filter
         HeaderRow headerRow = grid.appendHeaderRow();
 
-        GridFilter<Film> gridFilter = new GridFilter<>( grid, databaseService );
+        GridFilter<Film> gridFilter = new GridFilter<>( grid, getDatabaseService() );
 
         TextField filterTextField = ComponentUtil.createGridSearchField( "Search" );
         filterTextField.setValueChangeMode( ValueChangeMode.LAZY );
@@ -180,17 +182,17 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
      */
     private void createButtonLayout()
     {
-        createButton.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+        getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
 
-        getButtonLayout().add( saveButton, createButton );
+        getButtonLayout().add( saveButton, getCreateButton() );
     }
 
     @Override
     protected void populateForm( Film value )
     {
         super.populateForm( value );
-        splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " " + getEditItemName() );
+        splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
         availableCopies.setVisible( value == null || value.getId() == null );
     }
 

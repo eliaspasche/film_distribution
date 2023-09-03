@@ -17,6 +17,8 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
@@ -27,23 +29,25 @@ import java.util.Optional;
  * @param <T> The {@link AbstractEntity}
  * @param <K> The {@link AbstractDatabaseService}
  */
+@Getter
+@Setter
 public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T, ?>>
         extends MasterDetailLayout implements BeforeEnterObserver
 {
 
-    protected final String editId;
-    protected final String editRoute;
+    private final String editId;
+    private final String editRoute;
 
-    protected final K databaseService;
+    private final K databaseService;
 
-    protected T itemToEdit;
+    private T itemToEdit;
 
-    protected BeanValidationBinder<T> binder;
+    private BeanValidationBinder<T> binder;
 
     // Layout
-    protected Grid<T> grid;
+    private Grid<T> grid;
 
-    protected Button createButton = new Button();
+    private Button createButton = new Button();
 
     /**
      * The constructor.

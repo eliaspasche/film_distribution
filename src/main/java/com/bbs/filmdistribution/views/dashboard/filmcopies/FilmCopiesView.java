@@ -24,8 +24,8 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@PageTitle("Film Copies")
-@Route(value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class)
+@PageTitle( "Film Copies" )
+@Route( value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopyService> implements DynamicView
 {
@@ -40,106 +40,120 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     private H3 splitTitle;
     private TextField inventoryNumber;
     private Select<Film> film;
-    private final Button saveButton = new Button("Save");
+    private final Button saveButton = new Button( "Save" );
 
 
-    protected FilmCopiesView(FilmCopyService filmCopyService, FilmService filmService) {
-        super(FILMCOPY_ID, FILMCOPY_EDIT_ROUTE_TEMPLATE, filmCopyService);
+    protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService )
+    {
+        super( FILMCOPY_ID, FILMCOPY_EDIT_ROUTE_TEMPLATE, filmCopyService );
         this.filmService = filmService;
-        this.createButton = new Button("New " + getEditItemName());
+        setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
     @Override
-    protected void defineValidator() {
+    protected void defineValidator()
+    {
         // Configure Form
-        binder = new BeanValidationBinder<>(FilmCopy.class);
+        BeanValidationBinder<FilmCopy> binder = new BeanValidationBinder<>( FilmCopy.class );
+        setBinder( binder );
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField(inventoryNumber).asRequired().bind("inventoryNumber");
-        binder.bind(film, FilmCopy::getFilm, FilmCopy::setFilm);
+        binder.forField( inventoryNumber ).asRequired().bind( "inventoryNumber" );
+        binder.bind( film, FilmCopy::getFilm, FilmCopy::setFilm );
 
-        binder.bindInstanceFields(this);
+        binder.bindInstanceFields( this );
 
-        createButton.addClickListener(e -> {
+        getCreateButton().addClickListener( e -> {
             clearForm();
             refreshGrid();
-        });
+        } );
 
-        saveButton.addClickListener(e -> {
-            if (this.itemToEdit == null) {
-                this.itemToEdit = new FilmCopy();
+        saveButton.addClickListener( e -> {
+            if ( getItemToEdit() == null )
+            {
+                setItemToEdit( new FilmCopy() );
             }
             saveItem();
-        });
+        } );
     }
 
 
     @Override
-    protected void buildGrid() {
-        this.grid = new Grid<>(FilmCopy.class, false);
+    protected void buildGrid()
+    {
+        Grid<FilmCopy> grid = new Grid<>( FilmCopy.class, false );
+        setGrid( grid );
 
-        grid.addColumn("inventoryNumber").setAutoWidth(true);
-        grid.addColumn(filmCopy -> filmCopy.getFilm().getName()).setHeader("Film").setAutoWidth(true);
-        grid.addComponentColumn(item -> getDeleteButton(item, item.getInventoryNumber(), this));
-        grid.setItems(query -> databaseService.list(PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query))).stream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
+        grid.addColumn( filmCopy -> filmCopy.getFilm().getName() ).setHeader( "Film" ).setAutoWidth( true );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 
         // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(FILMCOPY_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else {
-                clearForm();
-                UI.getCurrent().navigate(FilmCopiesView.class);
+        grid.asSingleSelect().addValueChangeListener( event -> {
+            if ( event.getValue() != null )
+            {
+                UI.getCurrent().navigate( String.format( FILMCOPY_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
             }
-        });
+            else
+            {
+                clearForm();
+                UI.getCurrent().navigate( FilmCopiesView.class );
+            }
+        } );
     }
 
     @Override
-    protected void createEditorLayout() {
+    protected void createEditorLayout()
+    {
 
         FormLayout formLayout = new FormLayout();
 
-        splitTitle = new H3("New " + getEditItemName());
+        splitTitle = new H3( "New " + getEditItemName() );
 
-        inventoryNumber = new TextField("Inventory Number");
+        inventoryNumber = new TextField( "Inventory Number" );
         film = new Select<>();
-        film.setLabel("Film");
-        film.setItems(filmService.list(Pageable.unpaged()).stream().toList());
-        film.setItemLabelGenerator(Film::getName);
+        film.setLabel( "Film" );
+        film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
+        film.setItemLabelGenerator( Film::getName );
 
-        formLayout.add(inventoryNumber, film);
+        formLayout.add( inventoryNumber, film );
 
-        getEditorDiv().add(splitTitle, formLayout);
+        getEditorDiv().add( splitTitle, formLayout );
 
         createButtonLayout();
     }
 
     @Override
-    protected String getEditItemName() {
+    protected String getEditItemName()
+    {
         return "Film Copy";
     }
 
     /**
      * Create the button layout to persist the {@link Film} object.
      */
-    private void createButtonLayout() {
-        createButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    private void createButtonLayout()
+    {
+        getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+        saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
 
-        getButtonLayout().add(saveButton, createButton);
+        getButtonLayout().add( saveButton, getCreateButton() );
     }
 
 
     @Override
-    protected void populateForm(FilmCopy value) {
-        super.populateForm(value);
-        splitTitle.setText((this.itemToEdit == null ? "New" : "Edit") + " " + getEditItemName());
+    protected void populateForm( FilmCopy value )
+    {
+        super.populateForm( value );
+        splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
 
     }
 
     @Override
-    public void updateView() {
+    public void updateView()
+    {
         refreshGrid();
     }
 }
