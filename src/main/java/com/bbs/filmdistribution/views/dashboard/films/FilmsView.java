@@ -79,7 +79,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         binder.forField( name ).asRequired().bind( "name" );
         binder.forField( length ).asRequired().bind( "length" );
         binder.forField( price ).asRequired().bind( "price" );
-        binder.forField(availableCopies).asRequired().bind("availableCopies");
+        binder.forField( availableCopies ).asRequired().bind( "availableCopies" );
         binder.forField( ageGroup ).asRequired().bind( Film::getAgeGroup, Film::setAgeGroup );
 
         binder.bindInstanceFields( this );
@@ -114,7 +114,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
         grid.addColumn( item -> getDatabaseService().availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
-        grid.addComponentColumn(item -> getDeleteButton(item, item.getName(), this));
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
 
 
         // when a row is selected or deselected, populate form
@@ -151,7 +151,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
 
         name = new TextField( "Name" );
         length = ComponentUtil.createIntegerField( "Length", "sec." );
-        length.setMax(99999);
+        length.setMax( 99999 );
 
         ageGroup = new Select<>();
         ageGroup.setLabel( "Age Group" );
@@ -162,9 +162,9 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         price = ComponentUtil.createNumberField( "Price", "€/week" );
         price.setMax( 99.99 );
 
-        availableCopies = ComponentUtil.createIntegerField("Available Copies", "pieces");
+        availableCopies = ComponentUtil.createIntegerField( "Available Copies", "pieces" );
 
-        formLayout.add(name, length, ageGroup, price, availableCopies);
+        formLayout.add( name, length, ageGroup, price, availableCopies );
 
         getEditorDiv().add( splitTitle, formLayout );
 

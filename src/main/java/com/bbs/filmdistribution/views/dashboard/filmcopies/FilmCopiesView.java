@@ -90,7 +90,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         Grid<FilmCopy> grid = new Grid<>( FilmCopy.class, false );
         setGrid( grid );
 
-        Grid.Column<FilmCopy> inventoryNumberColumn = grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
+        grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
         Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
                 .setHeader( "Film" ).setAutoWidth( true );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) );
