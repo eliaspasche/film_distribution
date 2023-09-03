@@ -5,24 +5,30 @@ import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmService;
+import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
+import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import java.util.UUID;
 
 @PageTitle( "Film Copies" )
 @Route( value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class )
@@ -84,8 +90,9 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         Grid<FilmCopy> grid = new Grid<>( FilmCopy.class, false );
         setGrid( grid );
 
-        grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
-        grid.addColumn( filmCopy -> filmCopy.getFilm().getName() ).setHeader( "Film" ).setAutoWidth( true );
+        Grid.Column<FilmCopy> inventoryNumberColumn = grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
+        Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
+                .setHeader( "Film" ).setAutoWidth( true );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) );
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
@@ -102,6 +109,17 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
                 UI.getCurrent().navigate( FilmCopiesView.class );
             }
         } );
+
+        // Create search filter
+        HeaderRow headerRow = grid.appendHeaderRow();
+
+        GridFilter<FilmCopy> gridFilter = new GridFilter<>( grid, getDatabaseService() );
+
+        TextField filterTextField = ComponentUtil.createGridSearchField( "Search" );
+        filterTextField.setValueChangeMode( ValueChangeMode.LAZY );
+        filterTextField.addValueChangeListener( e -> gridFilter.filterFieldName( e.getValue(), "film", "name" ) );
+
+        headerRow.getCell( filmNameColumn ).setComponent( filterTextField );
     }
 
     @Override
@@ -112,7 +130,15 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
         splitTitle = new H3( "New " + getEditItemName() );
 
+        Button generateUuidButton = new Button( "UUID" );
+        generateUuidButton.setTooltipText( "Generate UUID" );
+        generateUuidButton.addThemeVariants( ButtonVariant.LUMO_SMALL );
+
         inventoryNumber = new TextField( "Inventory Number" );
+        inventoryNumber.setSuffixComponent( generateUuidButton );
+
+        generateUuidButton.addClickListener( click -> inventoryNumber.setValue( UUID.randomUUID().toString() ) );
+
         film = new Select<>();
         film.setLabel( "Film" );
         film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );

@@ -176,20 +176,21 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     /**
      * Returns a delete button for the given item.
      */
-    protected Button getDeleteButton(T item, String identifier, DynamicView view)
+    protected Button getDeleteButton( T item, String identifier, DynamicView view )
     {
-        Button deleteButton = new Button(new Icon(VaadinIcon.TRASH));
-        deleteButton.setTooltipText("Shift + Click = Instant delete");
-        deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        deleteButton.addClickListener(e -> {
-            if (e.isShiftKey()) {
-                databaseService.delete(item.getId());
-                NotificationUtil.sendSuccessNotification("Successfully removed", 2);
+        Button deleteButton = new Button( new Icon( VaadinIcon.TRASH ) );
+        deleteButton.setTooltipText( "Shift + Click = Instant delete" );
+        deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
+        deleteButton.addClickListener( e -> {
+            if ( e.isShiftKey() )
+            {
+                databaseService.delete( item.getId() );
+                NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
                 refreshGrid();
                 return;
             }
-            new EntityDeleteDialog<>("Should the item \"" + identifier + "\" removed?", databaseService, item, view);
-        });
+            new EntityDeleteDialog<>( "Should the item \"" + identifier + "\" removed?", databaseService, item, view );
+        } );
 
         return deleteButton;
     }

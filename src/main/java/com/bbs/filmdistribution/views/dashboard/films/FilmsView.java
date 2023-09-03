@@ -137,7 +137,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
 
         TextField filterTextField = ComponentUtil.createGridSearchField( "Search" );
         filterTextField.setValueChangeMode( ValueChangeMode.LAZY );
-        filterTextField.addValueChangeListener( e -> gridFilter.filterFieldName( "name", e.getValue() ) );
+        filterTextField.addValueChangeListener( e -> gridFilter.filterFieldName( e.getValue(), "name" ) );
 
         headerRow.getCell( filmNameColumn ).setComponent( filterTextField );
     }
