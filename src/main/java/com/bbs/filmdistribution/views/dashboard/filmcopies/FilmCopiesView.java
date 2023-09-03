@@ -65,7 +65,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( inventoryNumber ).asRequired().bind( "inventoryNumber" );
-        binder.bind( film, FilmCopy::getFilm, FilmCopy::setFilm );
+        binder.forField( film ).asRequired().bind( FilmCopy::getFilm, FilmCopy::setFilm );
 
         binder.bindInstanceFields( this );
 
