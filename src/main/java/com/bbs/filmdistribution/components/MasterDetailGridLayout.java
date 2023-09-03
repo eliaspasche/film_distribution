@@ -27,7 +27,7 @@ import java.util.Optional;
  * @param <T> The {@link AbstractEntity}
  * @param <K> The {@link AbstractDatabaseService}
  */
-public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T>>
+public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T, ?>>
         extends MasterDetailLayout implements BeforeEnterObserver
 {
 
@@ -94,6 +94,9 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
      */
     protected abstract String getEditItemName();
 
+    /**
+     * Persist item in database.
+     */
     protected void saveItem()
     {
         try

@@ -2,65 +2,43 @@ package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Service for the {@link Film} object to make interactions with the database.
  */
 @Service
-@RequiredArgsConstructor
-public class FilmService extends AbstractDatabaseService<Film>
+public class FilmService extends AbstractDatabaseService<Film, FilmRepository>
 {
 
-    private final FilmRepository repository;
-
-    @Override
-    public Optional<Film> get( Long id )
+    /**
+     * The constructor.
+     *
+     * @param repository The {@link FilmRepository}
+     */
+    public FilmService( FilmRepository repository )
     {
-        return repository.findById( id );
+        super( repository );
     }
 
     @Override
     public Film update( Film entity )
     {
-        if (entity.getId() == null)
+        if ( entity.getId() == null )
         {
-            for(var i = 0; i < entity.getAvailableCopies(); i++)
+            for ( var i = 0; i < entity.getAvailableCopies(); i++ )
             {
                 FilmCopy filmCopy = new FilmCopy();
-                filmCopy.setFilm(entity);
-                filmCopy.setInventoryNumber(UUID.randomUUID().toString());
+                filmCopy.setFilm( entity );
+                filmCopy.setInventoryNumber( UUID.randomUUID().toString() );
 
-                entity.getFilmCopies().add(filmCopy);
+                entity.getFilmCopies().add( filmCopy );
             }
         }
 
-        return repository.save( entity );
-    }
-
-    @Override
-    public void delete( Long id )
-    {
-        repository.deleteById( id );
-    }
-
-    @Override
-    public Page<Film> list( Pageable pageable )
-    {
-        return repository.findAll( pageable );
-    }
-
-    @Override
-    public Page<Film> list( Pageable pageable, Specification<Film> filter )
-    {
-        return repository.findAll( filter, pageable );
+        return getRepository().save( entity );
     }
 
     /**
@@ -70,7 +48,7 @@ public class FilmService extends AbstractDatabaseService<Film>
      */
     public int count()
     {
-        return ( int ) repository.count();
+        return ( int ) getRepository().count();
     }
 
     /**
@@ -81,6 +59,6 @@ public class FilmService extends AbstractDatabaseService<Film>
      */
     public int availableCopies( long id )
     {
-        return repository.availableCopies( id );
+        return getRepository().availableCopies( id );
     }
 }

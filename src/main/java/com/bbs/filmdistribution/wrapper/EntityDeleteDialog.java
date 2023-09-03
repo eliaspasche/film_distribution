@@ -14,7 +14,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
 {
     private final String title;
-    private final AbstractDatabaseService<T> abstractDatabaseService;
+    private final AbstractDatabaseService<T, ?> abstractDatabaseService;
     private final T entityToDelete;
     private final DynamicView dynamicView;
 
@@ -26,7 +26,7 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
      * @param entityToDelete          The {@link AbstractEntity} to delete
      * @param dynamicView             The {@link DynamicView}
      */
-    public EntityDeleteDialog( String title, AbstractDatabaseService<T> abstractDatabaseService, T entityToDelete, DynamicView dynamicView )
+    public EntityDeleteDialog( String title, AbstractDatabaseService<T, ?> abstractDatabaseService, T entityToDelete, DynamicView dynamicView )
     {
         this.title = title;
         this.abstractDatabaseService = abstractDatabaseService;
@@ -35,7 +35,7 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
         init();
     }
 
-    public EntityDeleteDialog( String title, AbstractDatabaseService<T> abstractDatabaseService, T entityToDelete )
+    public EntityDeleteDialog( String title, AbstractDatabaseService<T, ?> abstractDatabaseService, T entityToDelete )
     {
         this( title, abstractDatabaseService, entityToDelete, null );
     }

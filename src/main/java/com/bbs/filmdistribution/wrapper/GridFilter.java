@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.wrapper;
 
+import com.bbs.filmdistribution.data.entity.AbstractEntity;
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
@@ -11,10 +12,10 @@ import org.springframework.data.jpa.domain.Specification;
  *
  * @param <T> The object
  */
-public class GridFilter<T>
+public class GridFilter<T extends AbstractEntity>
 {
     private final Grid<T> grid;
-    private final AbstractDatabaseService<T> abstractDatabaseService;
+    private final AbstractDatabaseService<T, ?> abstractDatabaseService;
 
 
     /**
@@ -23,7 +24,7 @@ public class GridFilter<T>
      * @param grid The {@link Grid}
      * @param abstractDatabaseService The {@link AbstractDatabaseService}
      */
-    public GridFilter( Grid<T> grid, AbstractDatabaseService<T> abstractDatabaseService )
+    public GridFilter( Grid<T> grid, AbstractDatabaseService<T, ?> abstractDatabaseService )
     {
         this.grid = grid;
         this.abstractDatabaseService = abstractDatabaseService;

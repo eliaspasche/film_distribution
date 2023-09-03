@@ -1,17 +1,36 @@
 package com.bbs.filmdistribution.data.service;
 
+import com.bbs.filmdistribution.data.entity.AbstractEntity;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
 /**
  * Abstract database service with basic database functions.
- * @param <T> The defined entity
+ * @param <T> The {@link AbstractEntity}
+ * @param <K> The {@link JpaRepository}
  */
-public abstract class AbstractDatabaseService<T>
+@Getter
+public abstract class AbstractDatabaseService<T extends AbstractEntity, K extends JpaRepository<T, Long> & JpaSpecificationExecutor<T>>
 {
+
+    
+    private final K repository;
+
+    /**
+     * The constructor.
+     *
+     * @param repository The {@link JpaRepository}
+     */
+    protected AbstractDatabaseService( K repository )
+    {
+        this.repository = repository;
+    }
 
     /**
      * Update an entity.
@@ -19,14 +38,20 @@ public abstract class AbstractDatabaseService<T>
      * @param entity The entity to update
      * @return The updated entity from database
      */
-    public abstract T update( T entity );
+    public T update( T entity )
+    {
+        return repository.save( entity );
+    }
 
     /**
      * Delete an entity by id.
      *
      * @param id The id
      */
-    public abstract void delete( Long id );
+    public void delete( Long id )
+    {
+        repository.deleteById( id );
+    }
 
     /**
      * Get an entity by id.
@@ -34,7 +59,10 @@ public abstract class AbstractDatabaseService<T>
      * @param id The id
      * @return The entity
      */
-    public abstract Optional<T> get( Long id );
+    public Optional<T> get( Long id )
+    {
+        return repository.findById( id );
+    }
 
     /**
      * Get a list of a specific entity (lazy loading).
@@ -42,7 +70,10 @@ public abstract class AbstractDatabaseService<T>
      * @param pageable The {@link Pageable} for lazy loading
      * @return The {@link Page} with entities
      */
-    public abstract Page<T> list( Pageable pageable );
+    public Page<T> list( Pageable pageable )
+    {
+        return repository.findAll( pageable );
+    }
 
     /**
      * Get a list of a specific entity (lazy loading).
@@ -51,7 +82,9 @@ public abstract class AbstractDatabaseService<T>
      * @param filter   The {@link Specification} to filter in the database
      * @return The {@link Page} with entities
      */
-    public abstract Page<T> list( Pageable pageable, Specification<T> filter );
-
+    public Page<T> list( Pageable pageable, Specification<T> filter )
+    {
+        return repository.findAll( filter, pageable );
+    }
 
 }

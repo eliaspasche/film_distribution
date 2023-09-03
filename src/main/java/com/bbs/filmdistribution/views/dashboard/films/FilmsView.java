@@ -191,7 +191,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
     {
         super.populateForm( value );
         splitTitle.setText( ( this.itemToEdit == null ? "New" : "Edit" ) + " " + getEditItemName() );
-        availableCopies.setEnabled(value == null || value.getId() == null);
+        availableCopies.setVisible( value == null || value.getId() == null );
     }
 
     @Override
