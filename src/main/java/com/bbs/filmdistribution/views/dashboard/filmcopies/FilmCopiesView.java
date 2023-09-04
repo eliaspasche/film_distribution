@@ -4,6 +4,7 @@ import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
+import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.views.DynamicView;
@@ -17,6 +18,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -44,6 +47,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
     // Services
     private final FilmService filmService;
+    private final FilmDistributionService filmDistributionService;
 
     // Layout
     private H3 splitTitle;
@@ -57,10 +61,11 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
      * @param filmCopyService The {@link FilmCopyService}
      * @param filmService     The {@link FilmService}
      */
-    protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService )
+    protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService, FilmDistributionService filmDistributionService )
     {
         super( FILMCOPY_ID, FILMCOPY_EDIT_ROUTE_TEMPLATE, filmCopyService );
         this.filmService = filmService;
+        this.filmDistributionService = filmDistributionService;
         setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
@@ -101,6 +106,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
         Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
                 .setHeader( "Film" ).setAutoWidth( true );
+        grid.addComponentColumn( this::createCopyAvailableBadge ).setAutoWidth( true );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) );
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
@@ -128,6 +134,28 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         filterTextField.addValueChangeListener( e -> gridFilter.filterFieldName( e.getValue(), "film", "name" ) );
 
         headerRow.getCell( filmNameColumn ).setComponent( filterTextField );
+    }
+
+    private Icon createCopyAvailableBadge( FilmCopy filmCopy )
+    {
+        boolean copyAvailable = filmDistributionService.isCopyAvailable( filmCopy.getId() );
+        VaadinIcon icon = copyAvailable ? VaadinIcon.CHECK : VaadinIcon.CLOSE;
+        String styleLabel = "badge " + ( copyAvailable ? "success" : "error" );
+
+        Icon confirmed = createIcon( icon, copyAvailable ? "Available" : "Not Available" );
+        confirmed.getElement().getThemeList().add( styleLabel );
+        return confirmed;
+    }
+
+    private Icon createIcon( VaadinIcon vaadinIcon, String label )
+    {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set( "padding", "var(--lumo-space-xs" );
+        // Accessible label
+        icon.getElement().setAttribute( "aria-label", label );
+        // Tooltip
+        icon.getElement().setAttribute( "title", label );
+        return icon;
     }
 
     @Override
