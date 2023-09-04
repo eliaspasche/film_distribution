@@ -1,49 +1,28 @@
 package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.Customer;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+/**
+ * Service for the {@link Customer} object to make interactions with the database.
+ */
 @Service
-@RequiredArgsConstructor
-public class CustomerService
+public class CustomerService extends AbstractDatabaseService<Customer, CustomerRepository>
 {
 
-    private final CustomerRepository repository;
-
-    public Optional<Customer> get( Long id )
+    /**
+     * The constructor.
+     *
+     * @param customerRepository The {@link CustomerRepository}
+     */
+    public CustomerService( CustomerRepository customerRepository )
     {
-        return repository.findById( id );
-    }
-
-    public Customer update( Customer entity )
-    {
-        return repository.save( entity );
-    }
-
-    public void delete( Long id )
-    {
-        repository.deleteById( id );
-    }
-
-    public Page<Customer> list( Pageable pageable )
-    {
-        return repository.findAll( pageable );
-    }
-
-    public Page<Customer> list( Pageable pageable, Specification<Customer> filter )
-    {
-        return repository.findAll( filter, pageable );
+        super( customerRepository );
     }
 
     public int count()
     {
-        return ( int ) repository.count();
+        return ( int ) getRepository().count();
     }
 
 }
