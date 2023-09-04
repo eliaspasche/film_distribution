@@ -8,6 +8,7 @@ import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -36,6 +37,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
     private H3 splitTitle;
     private TextField firstName;
     private TextField lastName;
+    private DatePicker dateOfBirth;
     private TextField address;
     private TextField zipCode;
     private TextField city;
@@ -66,6 +68,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "firstName" ).setAutoWidth( true );
+        grid.addColumn( "dateOfBirth" ).setAutoWidth( true );
         grid.addColumn( "address" ).setAutoWidth( true );
         grid.addColumn( "zipCode" ).setAutoWidth( true );
         grid.addColumn( "city" ).setAutoWidth( true );
@@ -97,6 +100,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         // Bind fields. This is where you'd define e.g. validation rules
         binder.forField( firstName ).asRequired().bind( "firstName" );
         binder.forField( lastName ).asRequired().bind( "name" );
+        binder.forField( dateOfBirth ).asRequired().bind( "dateOfBirth" );
         binder.forField( address ).asRequired().bind( "address" );
         binder.forField( zipCode ).asRequired().bind( "zipCode" );
         binder.forField( city ).asRequired().bind( "city" );
@@ -126,11 +130,12 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         firstName = new TextField( "Firstname" );
         lastName = new TextField( "Lastname" );
+        dateOfBirth = new DatePicker( "Date of birth" );
         address = new TextField( "Address" );
         zipCode = new TextField( "Zip-Code" );
         city = new TextField( "City" );
 
-        formLayout.add( firstName, lastName, address, zipCode, city );
+        formLayout.add( firstName, lastName, dateOfBirth, address, zipCode, city );
 
         getEditorDiv().add( splitTitle, formLayout );
 
