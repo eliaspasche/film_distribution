@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * This object represents a film copy.
+ */
 @Entity
 @Getter
 @Setter

@@ -23,7 +23,7 @@ public class Film extends AbstractEntity
     @ManyToOne
     private AgeGroup ageGroup;
 
-    @OneToMany(mappedBy = "film", cascade = CascadeType.ALL )
+    @OneToMany( mappedBy = "film", cascade = CascadeType.ALL )
     private List<FilmCopy> filmCopies = new ArrayList<>();
 
     private Double price;

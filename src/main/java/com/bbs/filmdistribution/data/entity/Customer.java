@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+/**
+ * This object represents a customer.
+ */
 @Entity
 @Getter
 @Setter

@@ -9,6 +9,9 @@ import lombok.Setter;
 
 import java.util.List;
 
+/**
+ * This object represents a age group.
+ */
 @Entity
 @Getter
 @Setter

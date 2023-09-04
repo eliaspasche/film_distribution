@@ -30,6 +30,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
+/**
+ * A view to manage the {@link FilmCopy} objects.
+ */
 @PageTitle( "Film Copies" )
 @Route( value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
@@ -48,7 +51,12 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     private Select<Film> film;
     private final Button saveButton = new Button( "Save" );
 
-
+    /**
+     * The constructor.
+     *
+     * @param filmCopyService The {@link FilmCopyService}
+     * @param filmService     The {@link FilmService}
+     */
     protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService )
     {
         super( FILMCOPY_ID, FILMCOPY_EDIT_ROUTE_TEMPLATE, filmCopyService );
@@ -157,10 +165,8 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         return "Film Copy";
     }
 
-    /**
-     * Create the button layout to persist the {@link Film} object.
-     */
-    private void createButtonLayout()
+    @Override
+    protected void createButtonLayout()
     {
         getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );

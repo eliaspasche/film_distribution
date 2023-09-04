@@ -92,6 +92,11 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     protected abstract void createEditorLayout();
 
     /**
+     * Create the button layout to persist the defined entity.
+     */
+    protected abstract void createButtonLayout();
+
+    /**
      * Get the name of the entity
      *
      * @return The entity name.

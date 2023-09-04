@@ -7,6 +7,9 @@ import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * This object represents the logged-in user.
+ */
 @Entity
 @Getter
 @Setter

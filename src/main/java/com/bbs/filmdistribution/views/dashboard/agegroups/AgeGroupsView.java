@@ -22,6 +22,9 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.PageRequest;
 
+/**
+ * A view to manage the {@link AgeGroup} objects.
+ */
 @PageTitle( "Age Groups" )
 @Route( value = "ageGroups/:ageGroupID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
@@ -128,10 +131,8 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
         return "Age Group";
     }
 
-    /**
-     * Create the button layout to persist the {@link AgeGroup} object.
-     */
-    private void createButtonLayout()
+    @Override
+    protected void createButtonLayout()
     {
         getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );

@@ -177,10 +177,8 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         return "Film";
     }
 
-    /**
-     * Create the button layout to persist the {@link Film} object.
-     */
-    private void createButtonLayout()
+    @Override
+    protected void createButtonLayout()
     {
         getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
