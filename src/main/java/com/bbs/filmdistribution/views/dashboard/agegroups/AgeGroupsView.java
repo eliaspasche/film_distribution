@@ -99,12 +99,12 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
         grid.asSingleSelect().addValueChangeListener( event -> {
             if ( event.getValue() != null )
             {
-                UI.getCurrent().navigate( String.format( AGEGROUP_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
+                UI.getCurrent().navigate( String.format( getEditRoute(), event.getValue().getId() ) );
             }
             else
             {
                 clearForm();
-                UI.getCurrent().navigate( AgeGroupsView.class );
+                UI.getCurrent().navigate( this.getClass() );
             }
         } );
     }

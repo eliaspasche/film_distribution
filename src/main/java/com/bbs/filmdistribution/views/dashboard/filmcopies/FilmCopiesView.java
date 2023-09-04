@@ -112,12 +112,12 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         grid.asSingleSelect().addValueChangeListener( event -> {
             if ( event.getValue() != null )
             {
-                UI.getCurrent().navigate( String.format( FILMCOPY_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
+                UI.getCurrent().navigate( String.format( getEditRoute(), event.getValue().getId() ) );
             }
             else
             {
                 clearForm();
-                UI.getCurrent().navigate( FilmCopiesView.class );
+                UI.getCurrent().navigate( this.getClass() );
             }
         } );
 

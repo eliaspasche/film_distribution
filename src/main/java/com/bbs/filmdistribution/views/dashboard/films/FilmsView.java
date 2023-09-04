@@ -121,12 +121,12 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         grid.asSingleSelect().addValueChangeListener( event -> {
             if ( event.getValue() != null )
             {
-                UI.getCurrent().navigate( String.format( FILM_EDIT_ROUTE_TEMPLATE, event.getValue().getId() ) );
+                UI.getCurrent().navigate( String.format( getEditRoute(), event.getValue().getId() ) );
             }
             else
             {
                 clearForm();
-                UI.getCurrent().navigate( FilmsView.class );
+                UI.getCurrent().navigate( this.getClass() );
             }
         } );
 
