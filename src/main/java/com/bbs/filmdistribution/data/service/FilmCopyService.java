@@ -22,4 +22,17 @@ public class FilmCopyService extends AbstractDatabaseService<FilmCopy, FilmCopyR
         return ( int ) getRepository().count();
     }
 
+
+    /**
+     * Check if the {@link FilmCopy} object is available.
+     *
+     * @param id The id of the {@link FilmCopy}
+     * @return object is available
+     */
+    public boolean isFilmCopyAvailable( long id )
+    {
+        return getRepository().getDistributionsByFilmCopyId( id ) == 0;
+    }
+
+
 }

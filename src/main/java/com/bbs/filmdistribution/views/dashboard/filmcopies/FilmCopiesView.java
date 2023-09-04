@@ -4,7 +4,6 @@ import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
-import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.views.DynamicView;
@@ -47,7 +46,6 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
     // Services
     private final FilmService filmService;
-    private final FilmDistributionService filmDistributionService;
 
     // Layout
     private H3 splitTitle;
@@ -61,11 +59,10 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
      * @param filmCopyService The {@link FilmCopyService}
      * @param filmService     The {@link FilmService}
      */
-    protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService, FilmDistributionService filmDistributionService )
+    protected FilmCopiesView( FilmCopyService filmCopyService, FilmService filmService )
     {
         super( FILMCOPY_ID, FILMCOPY_EDIT_ROUTE_TEMPLATE, filmCopyService );
         this.filmService = filmService;
-        this.filmDistributionService = filmDistributionService;
         setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
@@ -136,9 +133,15 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         headerRow.getCell( filmNameColumn ).setComponent( filterTextField );
     }
 
+    /**
+     * Create badge to display the available state of a {@link FilmCopy}
+     *
+     * @param filmCopy The {@link FilmCopy}
+     * @return The {@link Icon}
+     */
     private Icon createCopyAvailableBadge( FilmCopy filmCopy )
     {
-        boolean copyAvailable = filmDistributionService.isCopyAvailable( filmCopy.getId() );
+        boolean copyAvailable = getDatabaseService().isFilmCopyAvailable( filmCopy.getId() );
         VaadinIcon icon = copyAvailable ? VaadinIcon.CHECK : VaadinIcon.CLOSE;
         String styleLabel = "badge " + ( copyAvailable ? "success" : "error" );
 
@@ -147,6 +150,13 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         return confirmed;
     }
 
+    /**
+     * Create {@link VaadinIcon} with label.
+     *
+     * @param vaadinIcon The {@link VaadinIcon}
+     * @param label      The label
+     * @return The created {@link Icon}
+     */
     private Icon createIcon( VaadinIcon vaadinIcon, String label )
     {
         Icon icon = vaadinIcon.create();
@@ -161,7 +171,6 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     @Override
     protected void createEditorLayout()
     {
-
         FormLayout formLayout = new FormLayout();
 
         splitTitle = new H3( "New " + getEditItemName() );

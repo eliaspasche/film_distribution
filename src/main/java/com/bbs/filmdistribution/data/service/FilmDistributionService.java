@@ -47,9 +47,4 @@ public class FilmDistributionService
         return ( int ) repository.count();
     }
 
-    public boolean isCopyAvailable( long id )
-    {
-        return repository.isCopyAvailable( id ) > 0;
-    }
-
 }
