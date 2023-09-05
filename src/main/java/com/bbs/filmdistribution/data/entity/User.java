@@ -1,9 +1,7 @@
 package com.bbs.filmdistribution.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,4 +23,7 @@ public class User extends AbstractEntity
 
     @Transient
     private int darkMode;
+
+    @Enumerated( EnumType.STRING )
+    private UserRole userRole;
 }

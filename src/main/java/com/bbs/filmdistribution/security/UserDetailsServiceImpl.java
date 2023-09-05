@@ -2,6 +2,7 @@ package com.bbs.filmdistribution.security;
 
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.data.service.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
         }
         else
         {
-            return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getHashedPassword(), Collections.emptyList() );
+            return new org.springframework.security.core.userdetails.User( user.getUsername(), user.getHashedPassword(), Collections.singletonList( new SimpleGrantedAuthority( "ROLE_" + user.getUserRole() ) ) );
         }
     }
 

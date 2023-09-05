@@ -1,102 +1,172 @@
 package com.bbs.filmdistribution.views.dashboard.account;
 
+import com.bbs.filmdistribution.components.MasterDetailGridLayout;
+import com.bbs.filmdistribution.converter.PasswordConverter;
+import com.bbs.filmdistribution.data.entity.User;
+import com.bbs.filmdistribution.data.entity.UserRole;
+import com.bbs.filmdistribution.data.service.UserService;
+import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
-import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import jakarta.annotation.security.PermitAll;
+import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import jakarta.annotation.security.RolesAllowed;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
+/**
+ * A view to manage the {@link User} objects.
+ * This view is only accessible from users with the ADMIN {@link UserRole}.
+ */
 @PageTitle( "Account" )
-@Route( value = "account", layout = DashboardLayout.class )
-@PermitAll
-@Uses( Icon.class )
-public class AccountView extends Composite<VerticalLayout>
+@Route( value = "account/:accountID?/:action?(edit)", layout = DashboardLayout.class )
+@RolesAllowed( "ADMIN" )
+public class AccountView extends MasterDetailGridLayout<User, UserService> implements DynamicView
 {
 
-    public AccountView()
-    {
-        HorizontalLayout layoutRow = new HorizontalLayout();
-        VerticalLayout layoutColumn5 = new VerticalLayout();
-        VerticalLayout layoutColumn2 = new VerticalLayout();
-        H3 h3 = new H3();
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
-        VerticalLayout layoutColumn3 = new VerticalLayout();
-        TextField textField = new TextField();
-        DatePicker datePicker = new DatePicker();
-        EmailField emailField = new EmailField();
-        VerticalLayout layoutColumn4 = new VerticalLayout();
-        TextField textField2 = new TextField();
-        HorizontalLayout layoutRow3 = new HorizontalLayout();
-        TextField textField3 = new TextField();
-        TextField textField4 = new TextField();
-        HorizontalLayout layoutRow4 = new HorizontalLayout();
-        Button buttonPrimary = new Button();
-        Button buttonSecondary = new Button();
-        VerticalLayout layoutColumn6 = new VerticalLayout();
+    // Route
+    private static final String ACCOUNT_ID = "accountID";
+    private static final String ACCOUNT_EDIT_ROUTE_TEMPLATE = DashboardLayout.DASHBOARD_PATH + "/account/%s/edit";
 
-        getContent().setWidthFull();
-        getContent().addClassName( Padding.LARGE );
-        layoutRow.setWidthFull();
-        layoutRow.setFlexGrow( 1.0, layoutColumn5 );
-        layoutColumn5.setWidth( null );
-        layoutRow.setFlexGrow( 1.0, layoutColumn2 );
-        layoutColumn2.setWidth( null );
-        h3.setText( "Personal Information" );
-        layoutRow2.setWidthFull();
-        layoutRow2.addClassName( Gap.LARGE );
-        layoutRow2.setFlexGrow( 1.0, layoutColumn3 );
-        layoutColumn3.setWidth( null );
-        textField.setLabel( "First Name" );
-        textField.setWidthFull();
-        datePicker.setLabel( "Birthday" );
-        datePicker.setWidthFull();
-        emailField.setLabel( "Email" );
-        emailField.setWidthFull();
-        layoutRow2.setFlexGrow( 1.0, layoutColumn4 );
-        layoutColumn4.setWidth( null );
-        textField2.setLabel( "Last Name" );
-        textField2.setWidthFull();
-        layoutRow3.addClassName( Gap.MEDIUM );
-        layoutRow3.setWidthFull();
-        textField3.setLabel( "Phone Number" );
-        layoutRow3.setFlexGrow( 1.0, textField3 );
-        textField4.setLabel( "Occupation" );
-        textField4.setWidthFull();
-        layoutRow4.addClassName( Gap.MEDIUM );
-        buttonPrimary.setText( "Save" );
-        buttonPrimary.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
-        buttonSecondary.setText( "Cancel" );
-        layoutRow.setFlexGrow( 1.0, layoutColumn6 );
-        layoutColumn6.setWidth( null );
-        getContent().add( layoutRow );
-        layoutRow.add( layoutColumn5 );
-        layoutRow.add( layoutColumn2 );
-        layoutColumn2.add( h3 );
-        layoutColumn2.add( layoutRow2 );
-        layoutRow2.add( layoutColumn3 );
-        layoutColumn3.add( textField );
-        layoutColumn3.add( datePicker );
-        layoutColumn3.add( emailField );
-        layoutRow2.add( layoutColumn4 );
-        layoutColumn4.add( textField2 );
-        layoutColumn4.add( layoutRow3 );
-        layoutRow3.add( textField3 );
-        layoutColumn4.add( textField4 );
-        layoutColumn2.add( layoutRow4 );
-        layoutRow4.add( buttonPrimary );
-        layoutRow4.add( buttonSecondary );
-        layoutRow.add( layoutColumn6 );
+    // Layout
+    private H3 splitTitle;
+    private TextField name;
+    private TextField username;
+    private PasswordField password;
+    private Select<UserRole> userRoleSelect;
+
+    private final Button saveButton = new Button( "Save" );
+
+    /**
+     * The constructor.
+     *
+     * @param databaseService The {@link UserService}
+     */
+    protected AccountView( UserService databaseService )
+    {
+        super( ACCOUNT_ID, ACCOUNT_EDIT_ROUTE_TEMPLATE, databaseService );
+        setCreateButton( new Button( "New " + getEditItemName() ) );
+    }
+
+    @Override
+    protected void buildGrid()
+    {
+        // Configure Grid
+        Grid<User> grid = new Grid<>( User.class, false );
+        setGrid( grid );
+
+        grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+
+        grid.addColumn( "name" ).setAutoWidth( true );
+        grid.addColumn( "username" ).setAutoWidth( true );
+        grid.addColumn( item -> item.getUserRole().name() ).setHeader( "Role" ).setAutoWidth( true );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
+
+
+        // when a row is selected or deselected, populate form
+        grid.asSingleSelect().addValueChangeListener( event -> {
+            if ( event.getValue() != null )
+            {
+                UI.getCurrent().navigate( String.format( getEditRoute(), event.getValue().getId() ) );
+            }
+            else
+            {
+                clearForm();
+                UI.getCurrent().navigate( this.getClass() );
+            }
+        } );
+
+    }
+
+    @Override
+    protected void defineValidator()
+    {
+        // Configure Form
+        BeanValidationBinder<User> binder = new BeanValidationBinder<>( User.class );
+        setBinder( binder );
+
+        // Bind fields. This is where you'd define e.g. validation rules
+        binder.forField( name ).asRequired().bind( "name" );
+        binder.forField( username ).asRequired().bind( "username" );
+        binder.forField( password ).asRequired().withConverter( new PasswordConverter() ).bind( "hashedPassword" );
+        binder.forField( userRoleSelect ).asRequired().bind( User::getUserRole, User::setUserRole );
+
+        binder.bindInstanceFields( this );
+
+        getCreateButton().addClickListener( e -> {
+            clearForm();
+            refreshGrid();
+        } );
+
+        saveButton.addClickListener( e -> {
+            if ( getItemToEdit() == null )
+            {
+                setItemToEdit( new User() );
+            }
+            saveItem();
+        } );
+    }
+
+    @Override
+    protected void createEditorLayout()
+    {
+        FormLayout formLayout = new FormLayout();
+
+        splitTitle = new H3( "New " + getEditItemName() );
+        name = new TextField( "Name" );
+        username = new TextField( "Username" );
+        password = new PasswordField( "Password" );
+
+        userRoleSelect = new Select<>();
+        userRoleSelect.setLabel( "Role" );
+        userRoleSelect.setItems( List.of( UserRole.values() ) );
+        userRoleSelect.setItemLabelGenerator( UserRole::name );
+
+        formLayout.add( name, username, password, userRoleSelect );
+
+        getEditorDiv().add( splitTitle, formLayout );
+
+        createButtonLayout();
+    }
+
+    @Override
+    protected void createButtonLayout()
+    {
+        getCreateButton().addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+        saveButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
+
+        getButtonLayout().add( saveButton, getCreateButton() );
+    }
+
+    @Override
+    protected String getEditItemName()
+    {
+        return "Account";
+    }
+
+    @Override
+    protected void populateForm( User value )
+    {
+        super.populateForm( value );
+        splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
+    }
+
+    @Override
+    public void updateView()
+    {
+        refreshGrid();
     }
 }

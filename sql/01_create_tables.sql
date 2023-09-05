@@ -4,6 +4,7 @@ CREATE TABLE application_user
     username        nvarchar2(60),
     name            nvarchar2(30),
     hashed_password nvarchar2(1000),
+    user_role       nvarchar2(30) default 'USER',
     CONSTRAINT application_user_pk PRIMARY KEY (id)
 );
 

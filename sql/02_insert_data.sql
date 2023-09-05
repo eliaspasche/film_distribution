@@ -10,6 +10,8 @@ FROM age_group;
 DELETE
 FROM film_copy;
 
+INSERT INTO application_user (username, name, hashed_password, userrole)
+VALUES ('admin', 'Admin Account', '$2a$10$imjfqJuXRgDUqIMhskmZoucc4dO1TSKNqcmEy1uoakpvJD2lPvvzK', 'ADMIN');
 
 INSERT INTO application_user (username, name, hashed_password)
 VALUES ('jah', 'Jan Heinrich', '$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe');
