@@ -10,11 +10,10 @@ import org.jboss.logging.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
 
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
@@ -74,8 +73,10 @@ public class ServiceInitListener implements VaadinServiceInitListener
             return;
         }
 
+        UserDetails userDetails = userDetailsService.loadUserByUsername( autoLoginUsername );
+
         UsernamePasswordAuthenticationToken authentication
-                = new UsernamePasswordAuthenticationToken( userDetailsService.loadUserByUsername( autoLoginUsername ), "user", Collections.emptyList() );
+                = new UsernamePasswordAuthenticationToken( userDetails, userDetails.getPassword(), userDetails.getAuthorities() );
         authentication.setDetails( new WebAuthenticationDetails( vaadinRequest.getRemoteAddr(), vaadinRequest.getWrappedSession().getId() ) );
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
