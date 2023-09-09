@@ -3,8 +3,11 @@ package com.bbs.filmdistribution.views.dashboard.customers;
 import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Customer;
 import com.bbs.filmdistribution.data.service.CustomerService;
+import com.bbs.filmdistribution.util.ComponentUtil;
+import com.bbs.filmdistribution.util.CustomerNumberUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
+import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,6 +15,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -66,14 +70,14 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
 
-        grid.addColumn( "name" ).setAutoWidth( true );
-        grid.addColumn( "firstName" ).setAutoWidth( true );
+        grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
+        Grid.Column<Customer> lastNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
+        Grid.Column<Customer> firstNameColumn = grid.addColumn( "firstName" ).setAutoWidth( true );
         grid.addColumn( "dateOfBirth" ).setAutoWidth( true );
-        grid.addColumn( "address" ).setAutoWidth( true );
-        grid.addColumn( "zipCode" ).setAutoWidth( true );
-        grid.addColumn( "city" ).setAutoWidth( true );
+        Grid.Column<Customer> addressColumn = grid.addColumn( "address" ).setAutoWidth( true );
+        Grid.Column<Customer> zipCodeColumn = grid.addColumn( "zipCode" ).setAutoWidth( true );
+        Grid.Column<Customer> cityColumn = grid.addColumn( "city" ).setAutoWidth( true );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
-
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {
@@ -87,6 +91,17 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
                 UI.getCurrent().navigate( this.getClass() );
             }
         } );
+
+        // Create search filter
+        HeaderRow headerRow = grid.appendHeaderRow();
+
+        GridFilter<Customer> gridFilter = new GridFilter<>( grid, getDatabaseService() );
+
+        headerRow.getCell( lastNameColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "name" ) );
+        headerRow.getCell( firstNameColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "firstName" ) );
+        headerRow.getCell( addressColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "address" ) );
+        headerRow.getCell( zipCodeColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "zipCode" ) );
+        headerRow.getCell( cityColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "city" ) );
 
     }
 
