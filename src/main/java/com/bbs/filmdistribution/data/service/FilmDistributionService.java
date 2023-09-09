@@ -1,50 +1,28 @@
 package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+/**
+ * Service for the {@link FilmDistribution} object to make interactions with the database.
+ */
 @Service
-@RequiredArgsConstructor
-public class FilmDistributionService
+public class FilmDistributionService extends AbstractDatabaseService<FilmDistribution, FilmDistributionRepository>
 {
 
-    private final FilmDistributionRepository repository;
-
-
-    public Optional<FilmDistribution> get( Long id )
+    /**
+     * The constructor.
+     *
+     * @param filmDistributionRepository The {@link FilmDistributionRepository}
+     */
+    public FilmDistributionService( FilmDistributionRepository filmDistributionRepository )
     {
-        return repository.findById( id );
-    }
-
-    public FilmDistribution update( FilmDistribution entity )
-    {
-        return repository.save( entity );
-    }
-
-    public void delete( Long id )
-    {
-        repository.deleteById( id );
-    }
-
-    public Page<FilmDistribution> list( Pageable pageable )
-    {
-        return repository.findAll( pageable );
-    }
-
-    public Page<FilmDistribution> list( Pageable pageable, Specification<FilmDistribution> filter )
-    {
-        return repository.findAll( filter, pageable );
+        super( filmDistributionRepository );
     }
 
     public int count()
     {
-        return ( int ) repository.count();
+        return ( int ) getRepository().count();
     }
 
 }

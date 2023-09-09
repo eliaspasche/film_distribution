@@ -5,8 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
+/**
+ * This object represents a film distribution.
+ */
 @Entity
 @Getter
 @Setter
@@ -18,7 +21,7 @@ public class FilmDistribution extends AbstractEntity
 
     @ManyToMany( fetch = FetchType.EAGER )
     @JoinTable( name = "film_distribution_items", joinColumns = @JoinColumn( name = "film_distribution_id" ), inverseJoinColumns = @JoinColumn( name = "film_copy_id" ) )
-    private List<FilmCopy> filmCopies;
+    private Set<FilmCopy> filmCopies;
 
     private LocalDate startDate;
 
