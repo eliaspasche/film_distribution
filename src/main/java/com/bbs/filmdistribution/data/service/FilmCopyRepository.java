@@ -12,9 +12,20 @@ import java.util.List;
  */
 public interface FilmCopyRepository extends JpaRepository<FilmCopy, Long>, JpaSpecificationExecutor<FilmCopy>
 {
+    /**
+     * Get the amount of distribution item by a {@link FilmCopy}
+     *
+     * @param filmCopyId The id of a {@link FilmCopy}
+     * @return The amount of distributions.
+     */
     @Query( value = "select count(*) from FILM_DISTRIBUTION_ITEMS where FILM_COPY_ID = :filmCopyId", nativeQuery = true )
     int getDistributionsByFilmCopyId( long filmCopyId );
 
-    @Query( value = "select * from FILM_COPY copy where ID NOT IN (select FILM_COPY_ID from FILM_DISTRIBUTION_ITEMS items)", nativeQuery = true )
+    /**
+     * Get the available {@link FilmCopy} objects
+     *
+     * @return The available {@link FilmCopy} as {@link List}
+     */
+    @Query( value = "select * from FILM_COPY where ID NOT IN (select FILM_COPY_ID from FILM_DISTRIBUTION_ITEMS)", nativeQuery = true )
     List<FilmCopy> getAvailableCopies();
 }
