@@ -69,5 +69,5 @@ CREATE TABLE film_distribution_items
     film_copy_id         number,
     CONSTRAINT film_distribution_items_pk PRIMARY KEY (film_distribution_id, film_copy_id),
     CONSTRAINT film_distribution_items_fk_film_distribution FOREIGN KEY (film_distribution_id) REFERENCES film_distribution (id),
-    CONSTRAINT film_distribution_items_fk_film_copy FOREIGN KEY (film_distribution_id) REFERENCES film_copy (id)
+    CONSTRAINT film_distribution_items_fk_film_copy FOREIGN KEY (film_copy_id) REFERENCES film_copy (id)
 );

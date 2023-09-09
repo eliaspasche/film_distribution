@@ -13,7 +13,7 @@ import java.util.List;
 @Table( name = "film_distribution" )
 public class FilmDistribution extends AbstractEntity
 {
-    @ManyToOne( fetch = FetchType.EAGER, cascade = CascadeType.ALL )
+    @ManyToOne
     private Customer customer;
 
     @ManyToMany( fetch = FetchType.EAGER )
