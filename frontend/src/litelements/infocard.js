@@ -5,20 +5,30 @@ class InfoCard extends LitElement {
     static get styles() {
         return css`
           .info-card {
-            box-shadow: rgba(0, 0, 0, .35) 0 5px 15px;
+            box-shadow: var(--lumo-contrast-10pct) 0 0 0 2px;
             text-align: center;
             border-radius: .5em;
-            margin: .8em 0;
             padding: .4em;
           }
 
           .info-card h2 {
+            transition: color .8s;
             font-size: 3em;
             margin: 0;
           }
 
           .info-card p {
+            transition: opacity .8s;
             margin: 0;
+            opacity: 1;
+          }
+
+          .info-card h2.progress {
+            color: var(--lumo-success-text-color);
+          }
+
+          .info-card p.progress {
+            opacity: 0;
           }
         `;
     }
@@ -26,15 +36,16 @@ class InfoCard extends LitElement {
     static get properties() {
         return {
             title: { type: String },
-            desc: { type: String }
+            desc: {type: String},
+            titleCss: {type: String}
         }
     }
 
     render() {
         return html`
             <div class="info-card">
-                <h2>${this.title}</h2>
-                <p>${this.desc}</p>
+                <h2 class="${this.titleCss}">${this.title}</h2>
+                <p class="${this.titleCss}">${this.desc}</p>
             </div>
         `;
     }

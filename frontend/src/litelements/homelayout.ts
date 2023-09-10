@@ -19,10 +19,11 @@ class HomeLayout extends LitElement {
                 }
 
                 section {
-                    padding: 1em;
+                    padding: 2em;
                 }
 
                 .grid-container {
+                    margin-top: 2em;
                     display: grid;
                     gap: 1rem;
                     grid-template-columns: repeat(auto-fit, minmax(var(--max-width-card), 1fr));
@@ -44,21 +45,13 @@ class HomeLayout extends LitElement {
                 .info-card h2 {
                     font-size: 4em;
                 }
-                
+
                 @media (max-width: 1200px) {
                     .grid-container {
                         --max-width-card: 20em;
                     }
                 }
             </style>
-            <section>
-                <div>
-                    <h1>Film Distribution</h1>
-
-                    <p>Example text</p>
-                </div>
-            </section>
-
             <section>
                 <div class="grid-info-container" id="info-layout">
                 </div>

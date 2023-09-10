@@ -17,7 +17,6 @@ import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.datalables.builder.StyleBuilder;
 import com.github.appreciated.apexcharts.config.legend.Position;
 import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
-import com.github.appreciated.apexcharts.config.responsive.builder.OptionsBuilder;
 import com.github.appreciated.apexcharts.config.theme.Mode;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.UI;
@@ -55,7 +54,7 @@ public class HomeView extends HomeLayout
     }
 
     /**
-     * Build the layout
+     * Build the layout with {@link InfoCard} and {@link ApexCharts}
      */
     private void buildLayout()
     {
@@ -63,22 +62,29 @@ public class HomeView extends HomeLayout
         getInfoLayout().add( new InfoCard( "" + filmService.count(), "Films", true ) );
         getInfoLayout().add( new InfoCard( "" + filmCopyService.count(), "Film Copies", true ) );
         getInfoLayout().add( new InfoCard( "" + filmDistributionService.count(), "Distributions", true ) );
-        getLayout().add( buildChart(), buildPieChart() );
+        getLayout().add( buildTopFilmDistributionChart(), buildPieChart() );
 
         ThemeVariantChangedEvent.addThemeChangedListener( UI.getCurrent(), e -> {
             getLayout().removeAll();
-            getLayout().add( buildChart(), buildPieChart() );
+            getLayout().add( buildTopFilmDistributionChart(), buildPieChart() );
         } );
 
     }
 
-    private ApexCharts buildChart()
+    /**
+     * Create the chart for the top film distribution in the application.
+     *
+     * @return The {@link ApexCharts}
+     */
+    private ApexCharts buildTopFilmDistributionChart()
     {
+        int displayAmount = 5;
+
         ApexChartsBuilder apexChartsBuilder = new ApexChartsBuilder();
         apexChartsBuilder.withTheme( ThemeBuilder.get()
                 .withMode( darkModeService.isDarkModeActive() ? Mode.DARK : Mode.LIGHT ).build() );
 
-        List<TopFilmDistributionDTO> topFilmDistributions = filmDistributionService.getTopFilmDistributions( 3 );
+        List<TopFilmDistributionDTO> topFilmDistributions = filmDistributionService.getTopFilmDistributions( displayAmount );
 
         Long[] dataValues = new Long[ topFilmDistributions.size() ];
         String[] filmNames = new String[ topFilmDistributions.size() ];
@@ -98,16 +104,17 @@ public class HomeView extends HomeLayout
                                 .build() ).withStroke(
                         StrokeBuilder.get().withShow( true ).withWidth( 1.0 ).withColors( "var(--lumo-contrast)" ).build() )
                 .withSeries( new Series<>( "Amount", dataValues ) )
-                .withXaxis( XAxisBuilder.get().withCategories( filmNames ).build() );
+                .withXaxis( XAxisBuilder.get().withCategories( filmNames ).build() )
+                .withTitle( TitleSubtitleBuilder.get().withText( "Top " + displayAmount + " film distributions" ).build() );
 
         ApexCharts apexCharts = apexChartsBuilder.build();
         apexCharts.setClassName( "chartLayout" );
+
         return apexCharts;
     }
 
     private ApexCharts buildPieChart()
     {
-
         ApexChartsBuilder apexChartsBuilder = new ApexChartsBuilder();
         apexChartsBuilder.withTheme( ThemeBuilder.get()
                 .withMode( darkModeService.isDarkModeActive() ? Mode.DARK : Mode.LIGHT ).build() );
@@ -117,17 +124,11 @@ public class HomeView extends HomeLayout
                         .withPosition( Position.BOTTOM )
                         .build() )
                 .withSeries( 44.0, 55.0, 41.0, 17.0, 15.0 )
-                .withResponsive( ResponsiveBuilder.get()
-                        .withBreakpoint( 480.0 )
-                        .withOptions( OptionsBuilder.get()
-                                .withLegend( LegendBuilder.get()
-                                        .withPosition( Position.BOTTOM )
-                                        .build() )
-                                .build() )
-                        .build() );
+                .withTitle( TitleSubtitleBuilder.get().withText( "Example chart" ).build() );
 
         ApexCharts apexCharts = apexChartsBuilder.build();
         apexCharts.setClassName( "chartLayout" );
+
         return apexCharts;
     }
 }

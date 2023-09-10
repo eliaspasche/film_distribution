@@ -23,6 +23,12 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
         super( filmDistributionRepository );
     }
 
+    /**
+     * Get a {@link List} with the top distributed films.
+     *
+     * @param amount The maximum value to be returned
+     * @return The {@link List} of {@link TopFilmDistributionDTO}
+     */
     public List<TopFilmDistributionDTO> getTopFilmDistributions( int amount )
     {
         return getRepository().getTopFilmDistributions( amount );

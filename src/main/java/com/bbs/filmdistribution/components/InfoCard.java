@@ -70,7 +70,7 @@ public class InfoCard extends LitTemplate
 
                 if ( goal > 0 && goal <= 10 )
                 {
-                    delay = 500L;
+                    delay = 400L;
                 }
                 else if ( goal > 10 && goal <= 25 )
                 {
@@ -82,9 +82,14 @@ public class InfoCard extends LitTemplate
                 }
 
                 executor = Executors.newScheduledThreadPool( 1 );
+                getElement().setProperty( "titleCss", "progress" );
                 Runnable task = () -> {
                     if ( current > goal )
                     {
+                        ui.access( () -> {
+                            getElement().setProperty( "titleCss", "" );
+                            ui.push();
+                        } );
                         executor.shutdown();
                         return;
                     }

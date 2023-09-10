@@ -23,7 +23,7 @@ vaadin-app-layout::part(navbar) {
 
 vaadin-app-layout::part(drawer) {
   z-index: 2;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
 }
 
 vaadin-login-overlay-wrapper::part(title) {
@@ -38,6 +38,10 @@ vaadin-login-form-wrapper::part(footer) {
 .chartLayout {
   margin: .5em auto;
   padding-top: .5em;
-  box-shadow: rgba(0, 0, 0, .35) 0 5px 15px;
+  box-shadow: var(--lumo-contrast-10pct) 0 0 0 2px;
   border-radius: .5em;
+}
+
+.chartLayout text {
+  font-family: var(--lumo-font-family) !important;
 }
