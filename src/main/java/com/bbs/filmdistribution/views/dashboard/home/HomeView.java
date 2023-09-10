@@ -78,13 +78,13 @@ public class HomeView extends HomeLayout
      */
     private ApexCharts buildTopFilmDistributionChart()
     {
-        int displayAmount = 5;
-
         ApexChartsBuilder apexChartsBuilder = new ApexChartsBuilder();
         apexChartsBuilder.withTheme( ThemeBuilder.get()
                 .withMode( darkModeService.isDarkModeActive() ? Mode.DARK : Mode.LIGHT ).build() );
 
-        List<TopFilmDistributionDTO> topFilmDistributions = filmDistributionService.getTopFilmDistributions( displayAmount );
+        List<TopFilmDistributionDTO> topFilmDistributions = filmDistributionService.getTopFilmDistributions( 5 );
+
+        int displayAmount = topFilmDistributions.size();
 
         Long[] dataValues = new Long[ topFilmDistributions.size() ];
         String[] filmNames = new String[ topFilmDistributions.size() ];

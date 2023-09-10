@@ -23,6 +23,8 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
@@ -152,7 +154,7 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
             }
             saveItem();
         } );
-        
+
     }
 
     @Override
@@ -171,8 +173,9 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
         customer.setItemLabelGenerator( c -> c.getFirstName() + " " + c.getName() );
 
         filmCopies = new MultiSelectComboBox<>( "Film Copies" );
+        filmCopies.setRenderer( createFilmCopyRenderer() );
         filmCopies.setItems( filmCopyService.getAvailableCopies() );
-        filmCopies.setItemLabelGenerator( c -> c.getInventoryNumber() + " (" + c.getFilm().getName() + ")" );
+        filmCopies.setItemLabelGenerator( c -> c.getFilm().getName() + " " + c.getInventoryNumber() );
 
         startDate = new DatePicker( "Start Date" );
         endDate = new DatePicker( "End Date" );
@@ -192,6 +195,28 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
         getEditorDiv().add( splitTitle, formLayout );
 
         createButtonLayout();
+    }
+
+    /**
+     * Create the {@link Renderer} for a {@link FilmCopy}.
+     * This is the layout for the dropdown menu of the {@link MultiSelectComboBox}
+     *
+     * @return The created {@link Renderer}
+     */
+    private Renderer<FilmCopy> createFilmCopyRenderer()
+    {
+        StringBuilder htmlStructure = new StringBuilder();
+        htmlStructure.append( "<div style=\"display: flex;\">" );
+        htmlStructure.append( "  <div>" );
+        htmlStructure.append( "    ${item.filmName}" );
+        htmlStructure.append(
+                "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.inventoryId}</div>" );
+        htmlStructure.append( "  </div>" );
+        htmlStructure.append( "</div>" );
+
+        return LitRenderer.<FilmCopy> of( htmlStructure.toString() )
+                .withProperty( "filmName", item -> item.getFilm().getName() )
+                .withProperty( "inventoryId", FilmCopy::getInventoryNumber );
     }
 
     @Override
