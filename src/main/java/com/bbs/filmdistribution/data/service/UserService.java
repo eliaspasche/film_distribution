@@ -20,9 +20,4 @@ public class UserService extends AbstractDatabaseService<User, UserRepository>
         super( repository );
     }
 
-    public int count()
-    {
-        return ( int ) getRepository().count();
-    }
-
 }

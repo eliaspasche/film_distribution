@@ -1,7 +1,10 @@
 package com.bbs.filmdistribution.data.service;
 
+import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Service for the {@link FilmDistribution} object to make interactions with the database.
@@ -20,9 +23,9 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
         super( filmDistributionRepository );
     }
 
-    public int count()
+    public List<TopFilmDistributionDTO> getTopFilmDistributions( int amount )
     {
-        return ( int ) getRepository().count();
+        return getRepository().getTopFilmDistributions( amount );
     }
 
 }

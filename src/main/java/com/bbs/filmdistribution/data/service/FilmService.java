@@ -42,16 +42,6 @@ public class FilmService extends AbstractDatabaseService<Film, FilmRepository>
     }
 
     /**
-     * Get the amount of entities in the database.
-     *
-     * @return The amount of entities
-     */
-    public int count()
-    {
-        return ( int ) getRepository().count();
-    }
-
-    /**
      * Get the amount of available copies by an {@link Film} id
      *
      * @param id The id

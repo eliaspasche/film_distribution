@@ -15,7 +15,8 @@ public class CookieService
 
     /**
      * Get a {@link Cookie} list from {@link VaadinService}
-     * @return
+     *
+     * @return The cookies in a current request
      */
     private Cookie[] getCookies()
     {

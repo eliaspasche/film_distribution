@@ -20,9 +20,4 @@ public class CustomerService extends AbstractDatabaseService<Customer, CustomerR
         super( customerRepository );
     }
 
-    public int count()
-    {
-        return ( int ) getRepository().count();
-    }
-
 }

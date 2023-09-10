@@ -24,8 +24,6 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 /**
  * A view to manage the {@link User} objects.
  * This view is only accessible from users with the ADMIN {@link UserRole}.
@@ -132,7 +130,7 @@ public class AccountView extends MasterDetailGridLayout<User, UserService> imple
 
         userRoleSelect = new Select<>();
         userRoleSelect.setLabel( "Role" );
-        userRoleSelect.setItems( List.of( UserRole.values() ) );
+        userRoleSelect.setItems( UserRole.values() );
         userRoleSelect.setItemLabelGenerator( UserRole::name );
 
         formLayout.add( name, username, password, userRoleSelect );

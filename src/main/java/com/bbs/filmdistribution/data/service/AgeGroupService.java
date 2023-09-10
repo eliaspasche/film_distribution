@@ -20,14 +20,4 @@ public class AgeGroupService extends AbstractDatabaseService<AgeGroup, AgeGroupR
         super( repository );
     }
 
-    /**
-     * Get the amount of entities in the database.
-     *
-     * @return The amount of entities
-     */
-    public int count()
-    {
-        return ( int ) getRepository().count();
-    }
-
 }

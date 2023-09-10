@@ -87,4 +87,13 @@ public abstract class AbstractDatabaseService<T extends AbstractEntity, K extend
         return repository.findAll( filter, pageable );
     }
 
+    /**
+     * Get the amount of entities in the database.
+     *
+     * @return The amount of entities
+     */
+    public int count()
+    {
+        return ( int ) repository.count();
+    }
 }

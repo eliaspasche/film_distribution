@@ -36,8 +36,8 @@ vaadin-login-form-wrapper::part(footer) {
 }
 
 .chartLayout {
-  width: 60%;
   margin: .5em auto;
-  padding: 2em;
+  padding-top: .5em;
   box-shadow: rgba(0, 0, 0, .35) 0 5px 15px;
+  border-radius: .5em;
 }

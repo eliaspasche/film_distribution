@@ -22,12 +22,6 @@ public class FilmCopyService extends AbstractDatabaseService<FilmCopy, FilmCopyR
         super( repository );
     }
 
-    public int count()
-    {
-        return ( int ) getRepository().count();
-    }
-
-
     /**
      * Check if the {@link FilmCopy} object is available.
      *

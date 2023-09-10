@@ -152,6 +152,7 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
             }
             saveItem();
         } );
+        
     }
 
     @Override
