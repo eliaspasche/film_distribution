@@ -34,7 +34,10 @@ public class InfoCard extends LitTemplate
         {
             countToNumber( title );
         }
-        getElement().setProperty( "title", title );
+        else
+        {
+            getElement().setProperty( "title", title );
+        }
     }
 
     /**
@@ -79,6 +82,11 @@ public class InfoCard extends LitTemplate
                 else if ( goal > 25 && goal <= 80 )
                 {
                     delay = 60L;
+                }
+                else if ( goal <= 0 )
+                {
+                    getElement().setProperty( "title", title );
+                    return;
                 }
 
                 executor = Executors.newScheduledThreadPool( 1 );
