@@ -114,7 +114,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( "price" ).setAutoWidth( true );
         grid.addColumn( item -> getDatabaseService().availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );;
 
 
         // when a row is selected or deselected, populate form

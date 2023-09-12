@@ -104,7 +104,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
                 .setHeader( "Film" ).setAutoWidth( true );
         grid.addComponentColumn( this::createCopyAvailableBadge ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
         grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 

@@ -5,6 +5,7 @@ import com.bbs.filmdistribution.data.entity.Customer;
 import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.util.CustomerNumberUtil;
+import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
@@ -73,11 +74,12 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         Grid.Column<Customer> lastNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         Grid.Column<Customer> firstNameColumn = grid.addColumn( "firstName" ).setAutoWidth( true );
-        grid.addColumn( "dateOfBirth" ).setAutoWidth( true );
+        grid.addColumn( DateUtil.createLocalDateRenderer( Customer::getDateOfBirth ) ).setHeader( "Date of birth" ).setAutoWidth( true );
+
         Grid.Column<Customer> addressColumn = grid.addColumn( "address" ).setAutoWidth( true );
         Grid.Column<Customer> zipCodeColumn = grid.addColumn( "zipCode" ).setAutoWidth( true );
         Grid.Column<Customer> cityColumn = grid.addColumn( "city" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

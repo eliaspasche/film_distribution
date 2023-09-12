@@ -8,6 +8,7 @@ import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.util.CustomerNumberUtil;
+import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
@@ -93,10 +94,10 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
 
         grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         grid.addColumn( item -> item.getCustomer().getFirstName() + " " + item.getCustomer().getName() ).setHeader( "Customer" ).setAutoWidth( true );
-        grid.addColumn( "startDate" ).setAutoWidth( true );
-        grid.addColumn( "endDate" ).setAutoWidth( true );
+        grid.addColumn( DateUtil.createLocalDateRenderer( FilmDistribution::getStartDate ) ).setHeader( "Start-Date" ).setAutoWidth( true );
+        grid.addColumn( DateUtil.createLocalDateRenderer( FilmDistribution::getEndDate ) ).setHeader( "End-Date" ).setAutoWidth( true );
         grid.addComponentColumn( this::createReadOnlyFilmCopySelectBox ).setHeader( "Film Copies" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getId().toString(), this ) );
+        grid.addComponentColumn( item -> getDeleteButton( item, item.getId().toString(), this ) ).setAutoWidth( true ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

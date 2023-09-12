@@ -66,6 +66,7 @@ public class HomeView extends HomeLayout
         getInfoLayout().add( new InfoCard( "" + filmService.count(), "Films", true ) );
         getInfoLayout().add( new InfoCard( "" + filmCopyService.count(), "Film Copies", true ) );
         getInfoLayout().add( new InfoCard( "" + filmDistributionService.count(), "Distributions", true ) );
+
         getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
 
         ThemeVariantChangedEvent.addThemeChangedListener( UI.getCurrent(), e -> {
