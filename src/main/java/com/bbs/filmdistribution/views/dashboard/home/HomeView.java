@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.views.dashboard.home;
 
+import com.bbs.filmdistribution.common.DistributionRevenueDTO;
 import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.components.HomeLayout;
 import com.bbs.filmdistribution.components.InfoCard;
@@ -18,7 +19,10 @@ import com.github.appreciated.apexcharts.config.datalables.builder.StyleBuilder;
 import com.github.appreciated.apexcharts.config.legend.Position;
 import com.github.appreciated.apexcharts.config.plotoptions.builder.BarBuilder;
 import com.github.appreciated.apexcharts.config.theme.Mode;
+import com.github.appreciated.apexcharts.config.yaxis.builder.LabelsBuilder;
+import com.github.appreciated.apexcharts.helper.NumberFormatFormatter;
 import com.github.appreciated.apexcharts.helper.Series;
+import com.github.appreciated.apexcharts.helper.SuffixFormatter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -62,11 +66,11 @@ public class HomeView extends HomeLayout
         getInfoLayout().add( new InfoCard( "" + filmService.count(), "Films", true ) );
         getInfoLayout().add( new InfoCard( "" + filmCopyService.count(), "Film Copies", true ) );
         getInfoLayout().add( new InfoCard( "" + filmDistributionService.count(), "Distributions", true ) );
-        getLayout().add( buildTopFilmDistributionChart(), buildPieChart() );
+        getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
 
         ThemeVariantChangedEvent.addThemeChangedListener( UI.getCurrent(), e -> {
             getLayout().removeAll();
-            getLayout().add( buildTopFilmDistributionChart(), buildPieChart() );
+            getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
         } );
 
     }
@@ -86,8 +90,8 @@ public class HomeView extends HomeLayout
 
         int displayAmount = topFilmDistributions.size();
 
-        Long[] dataValues = new Long[ topFilmDistributions.size() ];
-        String[] filmNames = new String[ topFilmDistributions.size() ];
+        Long[] dataValues = new Long[ displayAmount ];
+        String[] filmNames = new String[ displayAmount ];
         for ( int i = 0; i < dataValues.length; i++ )
         {
             TopFilmDistributionDTO topFilmDistributionDTO = topFilmDistributions.get( i );
@@ -104,7 +108,8 @@ public class HomeView extends HomeLayout
                                 .build() ).withStroke(
                         StrokeBuilder.get().withShow( true ).withWidth( 1.0 ).withColors( "var(--lumo-contrast)" ).build() )
                 .withSeries( new Series<>( "Amount", dataValues ) )
-                .withXaxis( XAxisBuilder.get().withCategories( filmNames ).build() )
+                .withLabels( filmNames )
+                .withYaxis( YAxisBuilder.get().withLabels( LabelsBuilder.get().withFormatter( new NumberFormatFormatter( 0 ) ).build() ).build() )
                 .withTitle( TitleSubtitleBuilder.get().withText( "Top " + displayAmount + " film distributions" ).build() );
 
         ApexCharts apexCharts = apexChartsBuilder.build();
@@ -113,8 +118,24 @@ public class HomeView extends HomeLayout
         return apexCharts;
     }
 
-    private ApexCharts buildPieChart()
+    /**
+     * Create the chart for the film distribution revenue in the application.
+     *
+     * @return The {@link ApexCharts}
+     */
+    private ApexCharts buildDistributionRevenuePieChart()
     {
+        List<DistributionRevenueDTO> filmsSortedByRevenue = filmDistributionService.getDistributionRevenue();
+
+        Double[] dataValues = new Double[ filmsSortedByRevenue.size() ];
+        String[] filmNames = new String[ filmsSortedByRevenue.size() ];
+        for ( int i = 0; i < dataValues.length; i++ )
+        {
+            DistributionRevenueDTO distributionRevenueDTO = filmsSortedByRevenue.get( i );
+            dataValues[ i ] = distributionRevenueDTO.getRevenue();
+            filmNames[ i ] = distributionRevenueDTO.getFilmName();
+        }
+
         ApexChartsBuilder apexChartsBuilder = new ApexChartsBuilder();
         apexChartsBuilder.withTheme( ThemeBuilder.get()
                 .withMode( darkModeService.isDarkModeActive() ? Mode.DARK : Mode.LIGHT ).build() );
@@ -123,8 +144,10 @@ public class HomeView extends HomeLayout
                 .withLegend( LegendBuilder.get()
                         .withPosition( Position.BOTTOM )
                         .build() )
-                .withSeries( 44.0, 55.0, 41.0, 17.0, 15.0 )
-                .withTitle( TitleSubtitleBuilder.get().withText( "Example chart" ).build() );
+                .withSeries( dataValues )
+                .withLabels( filmNames )
+                .withYaxis( YAxisBuilder.get().withLabels( LabelsBuilder.get().withFormatter( new SuffixFormatter( " €" ) ).build() ).build() )
+                .withTitle( TitleSubtitleBuilder.get().withText( "Distribution revenues" ).build() );
 
         ApexCharts apexCharts = apexChartsBuilder.build();
         apexCharts.setClassName( "chartLayout" );

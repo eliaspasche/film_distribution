@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.data.service;
 
+import com.bbs.filmdistribution.common.DistributionRevenueDTO;
 import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,16 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
     public List<TopFilmDistributionDTO> getTopFilmDistributions( int amount )
     {
         return getRepository().getTopFilmDistributions( amount );
+    }
+
+    /**
+     * Get a {@link List} with the distributed film revenue.
+     *
+     * @return The {@link List} of {@link DistributionRevenueDTO}
+     */
+    public List<DistributionRevenueDTO> getDistributionRevenue()
+    {
+        return getRepository().getDistributionRevenue();
     }
 
 }
