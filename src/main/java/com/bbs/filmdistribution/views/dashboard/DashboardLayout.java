@@ -7,11 +7,10 @@ import com.bbs.filmdistribution.service.DarkModeService;
 import com.bbs.filmdistribution.views.dashboard.account.AccountView;
 import com.bbs.filmdistribution.views.dashboard.agegroups.AgeGroupsView;
 import com.bbs.filmdistribution.views.dashboard.customers.CustomersView;
-import com.bbs.filmdistribution.views.dashboard.distributionoverview.DistributionOverviewView;
+import com.bbs.filmdistribution.views.dashboard.distribution.DistributionView;
 import com.bbs.filmdistribution.views.dashboard.filmcopies.FilmCopiesView;
 import com.bbs.filmdistribution.views.dashboard.films.FilmsView;
 import com.bbs.filmdistribution.views.dashboard.home.HomeView;
-import com.bbs.filmdistribution.views.dashboard.newdistribution.NewDistributionView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -89,14 +88,9 @@ public class DashboardLayout extends AppLayout
             nav.addItem( new SideNavItem( "Dashboard", HomeView.class, LineAwesomeIcon.HOME_SOLID.create() ) );
 
         }
-        if ( accessChecker.hasAccess( NewDistributionView.class ) )
+        if ( accessChecker.hasAccess( DistributionView.class ) )
         {
-            nav.addItem( new SideNavItem( "New Distribution", NewDistributionView.class, LineAwesomeIcon.USER.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( DistributionOverviewView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Distribution Overview", DistributionOverviewView.class, LineAwesomeIcon.RECEIPT_SOLID.create() ) );
+            nav.addItem( new SideNavItem( "Distributions", DistributionView.class, LineAwesomeIcon.USER.create() ) );
 
         }
         if ( accessChecker.hasAccess( CustomersView.class ) )

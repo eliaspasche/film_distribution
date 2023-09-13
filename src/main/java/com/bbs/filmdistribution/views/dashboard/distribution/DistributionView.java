@@ -1,4 +1,4 @@
-package com.bbs.filmdistribution.views.dashboard.newdistribution;
+package com.bbs.filmdistribution.views.dashboard.distribution;
 
 import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Customer;
@@ -11,6 +11,8 @@ import com.bbs.filmdistribution.util.CustomerNumberUtil;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -20,18 +22,29 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.jboss.logging.Logger;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -45,7 +58,7 @@ import java.util.List;
 @Route( value = "distribution/:distributionID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 @Uses( Icon.class )
-public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution, FilmDistributionService> implements DynamicView
+public class DistributionView extends MasterDetailGridLayout<FilmDistribution, FilmDistributionService> implements DynamicView
 {
 
     // Route
@@ -65,6 +78,8 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
 
     private final Button saveButton = new Button( "Save" );
 
+    private final Filters filters;
+
     /**
      * The constructor.
      *
@@ -72,12 +87,18 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
      * @param customerService     The {@link CustomerService}
      * @param filmCopyService     The {@link FilmCopyService}
      */
-    public NewDistributionView( FilmDistributionService distributionService,
-                                CustomerService customerService, FilmCopyService filmCopyService )
+    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService )
     {
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
         this.filmCopyService = filmCopyService;
+
+
+        getHeaderDiv().addClassNames( "distribution-view" );
+        filters = new Filters( this::refreshGrid, customerService );
+        getHeaderDiv().setWidthFull();
+        getHeaderDiv().add( filters );
+
         setCreateButton( new Button( "New " + getEditItemName() ) );
     }
 
@@ -264,6 +285,117 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
         if ( filmCopies != null )
         {
             filmCopies.setItems( filmCopyService.getAvailableCopies() );
+        }
+    }
+
+    public static class Filters extends Div implements Specification<FilmDistribution>
+    {
+        private final Select<Customer> customer = new Select<>();
+        private final TextField film = new TextField( "Film" );
+        private final DatePicker startDate = new DatePicker( "Start Date" );
+        private final DatePicker endDate = new DatePicker( "End Date" );
+
+
+        public Filters( Runnable onSearch, CustomerService customerService )
+        {
+            setWidthFull();
+            addClassNames( LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM, LumoUtility.BoxSizing.BORDER );
+            addClassName( "filter-layout" );
+
+
+            customer.setLabel( "Customer" );
+            customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
+            customer.setItemLabelGenerator( Customer::fullName );
+            customer.setPlaceholder( "Customer" );
+
+
+            // Action buttons
+            Button resetBtn = new Button( "Reset" );
+            resetBtn.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
+            resetBtn.addClickListener( e -> {
+                customer.clear();
+                film.clear();
+                startDate.clear();
+                endDate.clear();
+                onSearch.run();
+            } );
+
+            Button searchBtn = new Button( "Search" );
+            searchBtn.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
+            searchBtn.addClickListener( e -> onSearch.run() );
+
+            Div actions = new Div( resetBtn, searchBtn );
+            actions.addClassName( LumoUtility.Gap.SMALL );
+            actions.addClassName( "actions" );
+
+            add( customer, film, createDateRangeFilter(), actions );
+        }
+
+        private Component createDateRangeFilter()
+        {
+            startDate.setPlaceholder( "Start Date" );
+
+            endDate.setPlaceholder( "End Date" );
+
+            // For screen readers
+            startDate.setAriaLabel( "Start Date" );
+            endDate.setAriaLabel( "End Date" );
+
+            FlexLayout dateRangeComponent = new FlexLayout( startDate, new Text( " – " ), endDate );
+            dateRangeComponent.setAlignItems( FlexComponent.Alignment.BASELINE );
+            dateRangeComponent.addClassName( LumoUtility.Gap.XSMALL );
+
+            return dateRangeComponent;
+        }
+
+        @Override
+        public Predicate toPredicate( Root<FilmDistribution> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder )
+        {
+            List<Predicate> predicates = new ArrayList<>();
+
+            Logger.getLogger( "Test" ).error( "test" );
+            Logger.getLogger( "Test" ).error( "test" );
+            Logger.getLogger( "Test" ).error( "test" );
+            Logger.getLogger( "Test" ).error( "test" );
+
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            System.out.println( "root: " + root.get( "customer" ).toString() );
+            if ( customer.getValue() != null )
+            {
+                Customer currentCustomer = customer.getValue();
+                Predicate customerMatch = criteriaBuilder.equal( root.get( "customer" ), currentCustomer.getId() );
+                predicates.add( criteriaBuilder.or( customerMatch ) );
+
+                System.out.println( "id: " + currentCustomer.getId() );
+            }
+            if ( !film.isEmpty() )
+            {
+//                String databaseColumn = "phone";
+//                String ignore = "- ()";
+//
+//                String lowerCaseFilter = ignoreCharacters( ignore, film.getValue().toLowerCase() );
+//                Predicate phoneMatch = criteriaBuilder.like( ignoreCharacters( ignore, criteriaBuilder, criteriaBuilder.lower( root.get( databaseColumn ) ) ), "%" + lowerCaseFilter + "%" );
+//                predicates.add( phoneMatch );
+
+            }
+            if ( startDate.getValue() != null )
+            {
+                String databaseColumn = "endDate";
+                predicates.add( criteriaBuilder.greaterThanOrEqualTo( root.get( databaseColumn ), criteriaBuilder.literal( startDate.getValue() ) ) );
+            }
+            if ( endDate.getValue() != null )
+            {
+                String databaseColumn = "endDate";
+                predicates.add( criteriaBuilder.greaterThanOrEqualTo( criteriaBuilder.literal( endDate.getValue() ), root.get( databaseColumn ) ) );
+            }
+            return criteriaBuilder.and( predicates.toArray( Predicate[]::new ) );
         }
     }
 }
