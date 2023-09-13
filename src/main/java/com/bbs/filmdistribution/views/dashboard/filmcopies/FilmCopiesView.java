@@ -12,6 +12,7 @@ import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -19,7 +20,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -50,7 +50,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     // Layout
     private H3 splitTitle;
     private TextField inventoryNumber;
-    private Select<Film> film;
+    private ComboBox<Film> film;
     private final Button saveButton = new Button( "Save" );
 
     /**
@@ -185,7 +185,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
         generateUuidButton.addClickListener( click -> inventoryNumber.setValue( UUID.randomUUID().toString() ) );
 
-        film = new Select<>();
+        film = new ComboBox<>();
         film.setLabel( "Film" );
         film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
         film.setItemLabelGenerator( Film::getName );
