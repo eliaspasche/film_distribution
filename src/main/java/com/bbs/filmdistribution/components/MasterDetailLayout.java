@@ -14,6 +14,7 @@ import lombok.Getter;
 public class MasterDetailLayout extends Div
 {
 
+    private final Div headerDiv;
     private final Div primaryDiv;
     private final Div secondaryDiv;
     private final Div editorDiv;
@@ -25,6 +26,10 @@ public class MasterDetailLayout extends Div
     public MasterDetailLayout()
     {
         addClassNames( "master-detail" );
+        this.headerDiv = new Div();
+
+        add( headerDiv );
+
         SplitLayout splitLayout = new SplitLayout();
 
         add( splitLayout );

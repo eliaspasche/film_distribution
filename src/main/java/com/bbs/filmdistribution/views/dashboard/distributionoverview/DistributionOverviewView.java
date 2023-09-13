@@ -46,7 +46,7 @@ public class DistributionOverviewView extends Div
         addClassNames( "distribution-overview-view" );
 
         filters = new Filters( this::refreshGrid );
-        VerticalLayout layout = new VerticalLayout( createMobileFilters(), filters, createGrid() );
+        VerticalLayout layout = new VerticalLayout( filters, createGrid() );
         layout.setSizeFull();
         layout.setPadding( false );
         layout.setSpacing( false );
