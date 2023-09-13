@@ -9,6 +9,7 @@ import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.util.CustomerNumberUtil;
 import com.bbs.filmdistribution.util.DateUtil;
+import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
@@ -20,10 +21,15 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.PageTitle;
@@ -94,9 +100,13 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
 
         grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         grid.addColumn( item -> item.getCustomer().getFirstName() + " " + item.getCustomer().getName() ).setHeader( "Customer" ).setAutoWidth( true );
-        grid.addColumn( DateUtil.createLocalDateRenderer( FilmDistribution::getStartDate ) ).setHeader( "Start-Date" ).setAutoWidth( true );
-        grid.addColumn( DateUtil.createLocalDateRenderer( FilmDistribution::getEndDate ) ).setHeader( "End-Date" ).setAutoWidth( true );
-        grid.addComponentColumn( this::createReadOnlyFilmCopySelectBox ).setHeader( "Film Copies" ).setAutoWidth( true );
+        grid.addColumn( item -> DateUtil.formatDate( item.getStartDate() ), "startDate" ).setHeader( "Start-Date" ).setSortable( true ).setAutoWidth( true );
+        grid.addColumn( item -> DateUtil.formatDate( item.getEndDate() ), "endDate" ).setHeader( "End-Date" ).setSortable( true ).setAutoWidth( true );
+        grid.addColumn( createToggleDetailsRenderer( grid ) );
+
+        grid.setDetailsVisibleOnClick( false );
+        grid.setItemDetailsRenderer( createFilmCopyDetailsRenderer() );
+
         grid.addComponentColumn( item -> getDeleteButton( item, item.getId().toString(), this ) ).setAutoWidth( true ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
@@ -111,21 +121,6 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
                 UI.getCurrent().navigate( this.getClass() );
             }
         } );
-    }
-
-    /**
-     * Create read only select box to display the {@link FilmCopy} for a {@link FilmDistribution}.
-     *
-     * @param filmDistribution The {@link FilmDistribution}
-     * @return The {@link Select} component
-     */
-    private Select<FilmCopy> createReadOnlyFilmCopySelectBox( FilmDistribution filmDistribution )
-    {
-        Select<FilmCopy> filmCopySelect = new Select<>();
-        filmCopySelect.setItems( filmDistribution.getFilmCopies() );
-        filmCopySelect.setItemLabelGenerator( c -> c.getFilm().getName() );
-
-        return filmCopySelect;
     }
 
     @Override
@@ -153,9 +148,47 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
             {
                 setItemToEdit( new FilmDistribution() );
             }
-            saveItem();
+
+            if ( canDistributeFilms() )
+            {
+                saveItem();
+            }
         } );
 
+    }
+
+    /**
+     * Check the list of {@link FilmCopy} for AgeGroup to a {@link Customer}
+     *
+     * @return {@link Customer} can distribute
+     */
+    private boolean canDistributeFilms()
+    {
+        try
+        {
+            getBinder().writeBean( getItemToEdit() );
+
+            FilmDistribution filmDistribution = getItemToEdit();
+
+            int customerAge = DateUtil.getAgeByDate( filmDistribution.getCustomer().getDateOfBirth() );
+
+            List<FilmCopy> notAllowedFilms = filmDistribution.getFilmCopies().stream()
+                    .filter( item -> item.getFilm().getAgeGroup().getMinimumAge() > customerAge )
+                    .toList();
+
+            if ( notAllowedFilms.isEmpty() )
+            {
+                return true;
+            }
+
+            notAllowedFilms.forEach( item -> NotificationUtil.sendErrorNotification( "The customer is not old enough for " + item.getFilm().getName(), 3 ) );
+            return false;
+        }
+        catch ( ValidationException validationException )
+        {
+            NotificationUtil.sendErrorNotification( "Failed to update the data. Check again that all values are valid", 2 );
+        }
+        return false;
     }
 
     @Override
@@ -266,4 +299,70 @@ public class NewDistributionView extends MasterDetailGridLayout<FilmDistribution
             filmCopies.setItems( filmCopyService.getAvailableCopies() );
         }
     }
+
+    // Grid detail layout for the film copies of an distribution
+
+    /**
+     * Create the button to toggle or view the film copies.
+     *
+     * @param grid The {@link Grid}
+     * @return The {@link Renderer} for a {@link FilmDistribution}
+     */
+    private static Renderer<FilmDistribution> createToggleDetailsRenderer(
+            Grid<FilmDistribution> grid )
+    {
+        return LitRenderer.<FilmDistribution> of(
+                        "<vaadin-button theme=\"tertiary\" @click=\"${handleClick}\">Film copies</vaadin-button>" )
+                .withFunction( "handleClick",
+                        item -> grid.setDetailsVisible( item,
+                                !grid.isDetailsVisible( item ) ) );
+    }
+
+    /**
+     * Create the {@link ComponentRenderer} to display details for a {@link FilmDistribution}
+     *
+     * @return The {@link ComponentRenderer}
+     */
+    private static ComponentRenderer<FilmCopyDetailsLayout, FilmDistribution> createFilmCopyDetailsRenderer()
+    {
+        return new ComponentRenderer<>( FilmCopyDetailsLayout::new,
+                FilmCopyDetailsLayout::setFilmCopyList );
+    }
+
+    /**
+     * The layout for the list of {@link FilmCopy} from {@link FilmDistribution}
+     */
+    private static class FilmCopyDetailsLayout extends Div
+    {
+
+        /**
+         * Create the layout for the list of {@link FilmCopy} for a {@link FilmDistribution}
+         *
+         * @param filmDistribution The {@link FilmDistribution}
+         */
+        public void setFilmCopyList( FilmDistribution filmDistribution )
+        {
+            H4 detailTitle = new H4( "Film copies" );
+            detailTitle.getStyle().set( "margin-bottom", ".5em" );
+            add( detailTitle );
+
+            filmDistribution.getFilmCopies().forEach( item -> add( createBadge( item.getFilm().getName() ) ) );
+        }
+
+        /**
+         * Create badge for a text
+         *
+         * @param text The text.
+         * @return The created badge
+         */
+        private Span createBadge( String text )
+        {
+            Span badge = new Span( text );
+            badge.getElement().getThemeList().add( "badge" );
+            badge.getStyle().set( "margin", ".2em" );
+            return badge;
+        }
+
+    }
+
 }

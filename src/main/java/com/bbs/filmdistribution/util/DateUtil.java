@@ -1,9 +1,8 @@
 package com.bbs.filmdistribution.util;
 
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.function.ValueProvider;
-
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Utility class to handle date values.
@@ -12,6 +11,8 @@ public class DateUtil
 {
 
     private static final String DATE_FORMAT = "dd.MM.yyyy";
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( DATE_FORMAT );
 
     /**
      * The constructor
@@ -22,15 +23,25 @@ public class DateUtil
     }
 
     /**
-     * Create a {@link LocalDateRenderer} to display a formatted {@link LocalDate}
+     * Format a {@link LocalDate}
      *
-     * @param valueProvider The {@link ValueProvider}
-     * @return Created {@link LocalDateRenderer}
-     * @param <T> The object type
+     * @param dateToFormat The {@link LocalDate}
+     * @return The formatted date as string
      */
-    public static <T> LocalDateRenderer<T> createLocalDateRenderer( ValueProvider<T, LocalDate> valueProvider )
+    public static String formatDate( LocalDate dateToFormat )
     {
-        return new LocalDateRenderer<>( valueProvider, DATE_FORMAT );
+        return dateToFormat.format( DATE_TIME_FORMATTER );
+    }
+
+    /**
+     * Get the age of a specific {@link LocalDate}
+     *
+     * @param date The {@link LocalDate} to check
+     * @return The age
+     */
+    public static int getAgeByDate( LocalDate date )
+    {
+        return Period.between( date, LocalDate.now() ).getYears();
     }
 
 }

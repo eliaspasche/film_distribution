@@ -67,13 +67,22 @@ public class HomeView extends HomeLayout
         getInfoLayout().add( new InfoCard( "" + filmCopyService.count(), "Film Copies", true ) );
         getInfoLayout().add( new InfoCard( "" + filmDistributionService.count(), "Distributions", true ) );
 
-        getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
+        addChartsToLayout();
 
-        ThemeVariantChangedEvent.addThemeChangedListener( UI.getCurrent(), e -> {
+        ThemeVariantChangedEvent.addThemeChangedListener( UI.getCurrent(), e -> addChartsToLayout() );
+
+    }
+
+    /**
+     * Add charts to the layout and clear the layout if not empty.
+     */
+    private void addChartsToLayout()
+    {
+        if ( getLayout().getComponentCount() > 0 )
+        {
             getLayout().removeAll();
-            getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
-        } );
-
+        }
+        getLayout().add( buildTopFilmDistributionChart(), buildDistributionRevenuePieChart() );
     }
 
     /**

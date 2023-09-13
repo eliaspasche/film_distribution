@@ -100,13 +100,14 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         Grid<FilmCopy> grid = new Grid<>( FilmCopy.class, false );
         setGrid( grid );
 
+        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+
         grid.addColumn( "inventoryNumber" ).setAutoWidth( true );
         Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
                 .setHeader( "Film" ).setAutoWidth( true );
         grid.addComponentColumn( this::createCopyAvailableBadge ).setAutoWidth( true );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
-        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
-        grid.addThemeVariants( GridVariant.LUMO_NO_BORDER );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {
@@ -160,11 +161,11 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     private Icon createIcon( VaadinIcon vaadinIcon, String label )
     {
         Icon icon = vaadinIcon.create();
-        icon.getStyle().set( "padding", "var(--lumo-space-xs" );
+        icon.getStyle().set( "padding", "var(--lumo-space-xs)" );
         // Accessible label
         icon.getElement().setAttribute( "aria-label", label );
-        // Tooltip
-        icon.getElement().setAttribute( "title", label );
+        icon.setTooltipText( label );
+
         return icon;
     }
 

@@ -74,7 +74,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         Grid.Column<Customer> lastNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         Grid.Column<Customer> firstNameColumn = grid.addColumn( "firstName" ).setAutoWidth( true );
-        grid.addColumn( DateUtil.createLocalDateRenderer( Customer::getDateOfBirth ) ).setHeader( "Date of birth" ).setAutoWidth( true );
+        grid.addColumn( item -> DateUtil.formatDate( item.getDateOfBirth() ), "dateOfBirth" ).setHeader( "Date of birth" ).setSortable( true ).setAutoWidth( true );
 
         Grid.Column<Customer> addressColumn = grid.addColumn( "address" ).setAutoWidth( true );
         Grid.Column<Customer> zipCodeColumn = grid.addColumn( "zipCode" ).setAutoWidth( true );

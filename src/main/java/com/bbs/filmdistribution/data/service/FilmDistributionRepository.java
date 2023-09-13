@@ -30,7 +30,7 @@ public interface FilmDistributionRepository extends JpaRepository<FilmDistributi
      *
      * @return The {@link List} of {@link DistributionRevenueDTO}
      */
-    @Query( value = "select f.name as filmName, cast(sum(f.PRICE * trunc(((d.END_DATE - d.START_DATE) / 7))) AS DECIMAL(5, 2)) as revenue " +
+    @Query( value = "select f.name as filmName, cast(sum((f.PRICE / 7) * trunc((d.END_DATE - d.START_DATE))) AS DECIMAL(5, 2)) as revenue " +
             "from FILM_DISTRIBUTION_ITEMS i join FILM_DISTRIBUTION d on d.ID = i.FILM_DISTRIBUTION_ID join FILM_COPY c on c.ID = i.FILM_COPY_ID " +
             "join FILM f on f.ID = c.FILM_ID group by f.name order by revenue desc", nativeQuery = true )
     List<DistributionRevenueDTO> getDistributionRevenue();
