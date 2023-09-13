@@ -25,9 +25,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.messages.MessageList;
+import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -67,17 +69,14 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private final CustomerService customerService;
     private final FilmCopyService filmCopyService;
     private final FilmService filmService;
-
+    private final Button saveButton = new Button( "Save" );
+    private final Filters filters;
     // Layout
     private H3 splitTitle;
     private Select<Customer> customer;
     private MultiSelectComboBox<FilmCopy> filmCopies;
     private DatePicker startDate;
     private DatePicker endDate;
-
-    private final Button saveButton = new Button( "Save" );
-
-    private final Filters filters;
 
     /**
      * The constructor.
@@ -100,6 +99,27 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         getHeaderDiv().add( filters );
 
         setCreateButton( new Button( "New " + getEditItemName() ) );
+    }
+
+    /**
+     * Create the button to toggle or view the film copies.
+     *
+     * @param grid The {@link Grid}
+     * @return The {@link Renderer} for a {@link FilmDistribution}
+     */
+    private static Renderer<FilmDistribution> createToggleDetailsRenderer( Grid<FilmDistribution> grid )
+    {
+        return LitRenderer.<FilmDistribution> of( "<vaadin-button theme=\"tertiary\" @click=\"${handleClick}\">Film copies</vaadin-button>" ).withFunction( "handleClick", item -> grid.setDetailsVisible( item, !grid.isDetailsVisible( item ) ) );
+    }
+
+    /**
+     * Create the {@link ComponentRenderer} to display details for a {@link FilmDistribution}
+     *
+     * @return The {@link ComponentRenderer}
+     */
+    private static ComponentRenderer<FilmCopyDetailsLayout, FilmDistribution> createFilmCopyDetailsRenderer()
+    {
+        return new ComponentRenderer<>( FilmCopyDetailsLayout::new, FilmCopyDetailsLayout::setFilmCopyList );
     }
 
     @Override
@@ -187,9 +207,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
             int customerAge = DateUtil.getAgeByDate( filmDistribution.getCustomer().getDateOfBirth() );
 
-            List<FilmCopy> notAllowedFilms = filmDistribution.getFilmCopies().stream()
-                    .filter( item -> item.getFilm().getAgeGroup().getMinimumAge() > customerAge )
-                    .toList();
+            List<FilmCopy> notAllowedFilms = filmDistribution.getFilmCopies().stream().filter( item -> item.getFilm().getAgeGroup().getMinimumAge() > customerAge ).toList();
 
             if ( notAllowedFilms.isEmpty() )
             {
@@ -224,7 +242,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         filmCopies = new MultiSelectComboBox<>( "Film Copies" );
         filmCopies.setRenderer( createFilmCopyRenderer() );
         filmCopies.setItems( filmCopyService.getAvailableCopies() );
-        filmCopies.setItemLabelGenerator( c -> c.getFilm().getName() + " " + c.getInventoryNumber() );
+        filmCopies.setItemLabelGenerator( c -> c.getFilm().getName() + " " + c.getFilm().getAgeGroup().getName() );
 
         startDate = new DatePicker( "Start Date" );
         endDate = new DatePicker( "End Date" );
@@ -258,14 +276,12 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         htmlStructure.append( "<div style=\"display: flex;\">" );
         htmlStructure.append( "  <div>" );
         htmlStructure.append( "    ${item.filmName}" );
-        htmlStructure.append(
-                "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.inventoryId}</div>" );
+        htmlStructure.append( "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.inventoryId}</div>" );
+        htmlStructure.append( "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.ageGroup}</div>" );
         htmlStructure.append( "  </div>" );
         htmlStructure.append( "</div>" );
 
-        return LitRenderer.<FilmCopy> of( htmlStructure.toString() )
-                .withProperty( "filmName", item -> item.getFilm().getName() )
-                .withProperty( "inventoryId", FilmCopy::getInventoryNumber );
+        return LitRenderer.<FilmCopy> of( htmlStructure.toString() ).withProperty( "filmName", item -> item.getFilm().getName() ).withProperty( "inventoryId", item -> item.getInventoryNumber().substring( 0, Math.min( item.getInventoryNumber().length(), 25 ) ) + "..." ).withProperty( "ageGroup", item -> item.getFilm().getAgeGroup().getName() );
     }
 
     @Override
@@ -299,6 +315,8 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         }
     }
 
+    // Grid detail layout for the film copies of an distribution
+
     @Override
     public void updateView()
     {
@@ -315,35 +333,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         }
     }
 
-    // Grid detail layout for the film copies of an distribution
-
-    /**
-     * Create the button to toggle or view the film copies.
-     *
-     * @param grid The {@link Grid}
-     * @return The {@link Renderer} for a {@link FilmDistribution}
-     */
-    private static Renderer<FilmDistribution> createToggleDetailsRenderer(
-            Grid<FilmDistribution> grid )
-    {
-        return LitRenderer.<FilmDistribution> of(
-                        "<vaadin-button theme=\"tertiary\" @click=\"${handleClick}\">Film copies</vaadin-button>" )
-                .withFunction( "handleClick",
-                        item -> grid.setDetailsVisible( item,
-                                !grid.isDetailsVisible( item ) ) );
-    }
-
-    /**
-     * Create the {@link ComponentRenderer} to display details for a {@link FilmDistribution}
-     *
-     * @return The {@link ComponentRenderer}
-     */
-    private static ComponentRenderer<FilmCopyDetailsLayout, FilmDistribution> createFilmCopyDetailsRenderer()
-    {
-        return new ComponentRenderer<>( FilmCopyDetailsLayout::new,
-                FilmCopyDetailsLayout::setFilmCopyList );
-    }
-
     /**
      * The layout for the list of {@link FilmCopy} from {@link FilmDistribution}
      */
@@ -357,11 +346,27 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
          */
         public void setFilmCopyList( FilmDistribution filmDistribution )
         {
-            H4 detailTitle = new H4( "Film copies" );
+            H5 detailTitle = new H5( "Film copies" );
             detailTitle.getStyle().set( "margin-bottom", ".5em" );
-            add( detailTitle );
 
-            filmDistribution.getFilmCopies().forEach( item -> add( createBadge( item.getFilm().getName() ) ) );
+            MessageList filmList = new MessageList();
+
+            List<MessageListItem> films = new ArrayList<>();
+
+            // TODO: Add color of FSK label?
+            filmDistribution.getFilmCopies().forEach( item -> {
+                MessageListItem filmListItem = new MessageListItem();
+                filmListItem.setUserName( item.getFilm().getName() );
+                filmListItem.setText( item.getInventoryNumber() );
+                filmListItem.setUserAbbreviation( String.valueOf( item.getFilm().getAgeGroup().getMinimumAge() ) );
+                filmListItem.setUserColorIndex( Math.toIntExact( item.getFilm().getAgeGroup().getId() ) );
+                films.add( filmListItem );
+            } );
+
+            filmList.setItems( films );
+
+            add( detailTitle );
+            add( filmList );
         }
 
         /**
@@ -379,6 +384,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         }
 
     }
+
     public static class Filters extends Div implements Specification<FilmDistribution>
     {
         private final Select<Customer> customer = new Select<>();
