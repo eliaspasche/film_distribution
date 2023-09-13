@@ -2,18 +2,18 @@ package com.bbs.filmdistribution.views.dashboard.distribution;
 
 import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Customer;
+import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
 import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmDistributionService;
+import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.CustomerNumberUtil;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -28,10 +28,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -42,11 +39,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import org.jboss.logging.Logger;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -73,6 +66,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     // Services
     private final CustomerService customerService;
     private final FilmCopyService filmCopyService;
+    private final FilmService filmService;
 
     // Layout
     private H3 splitTitle;
@@ -92,15 +86,16 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      * @param customerService     The {@link CustomerService}
      * @param filmCopyService     The {@link FilmCopyService}
      */
-    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService )
+    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService )
     {
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
         this.filmCopyService = filmCopyService;
+        this.filmService = filmService;
 
 
         getHeaderDiv().addClassNames( "distribution-view" );
-        filters = new Filters( this::refreshGrid, customerService );
+        filters = new Filters( this::refreshGrid, customerService, filmService );
         getHeaderDiv().setWidthFull();
         getHeaderDiv().add( filters );
 
@@ -116,7 +111,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         grid.addThemeVariants( GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_NO_BORDER );
 
-        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
+        grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ), filters ).stream() );
 
         grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         grid.addColumn( item -> item.getCustomer().getFirstName() + " " + item.getCustomer().getName() ).setHeader( "Customer" ).setAutoWidth( true );
@@ -387,12 +382,11 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     public static class Filters extends Div implements Specification<FilmDistribution>
     {
         private final Select<Customer> customer = new Select<>();
-        private final TextField film = new TextField( "Film" );
-        private final DatePicker startDate = new DatePicker( "Start Date" );
-        private final DatePicker endDate = new DatePicker( "End Date" );
+        private final Select<Film> film = new Select<>();
+        private final DatePicker date = new DatePicker( "Date" );
 
 
-        public Filters( Runnable onSearch, CustomerService customerService )
+        public Filters( Runnable onSearch, CustomerService customerService, FilmService filmService )
         {
             setWidthFull();
             addClassNames( LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM, LumoUtility.BoxSizing.BORDER );
@@ -402,7 +396,15 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             customer.setLabel( "Customer" );
             customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
             customer.setItemLabelGenerator( Customer::fullName );
-            customer.setPlaceholder( "Customer" );
+            customer.setPlaceholder( "Select a Customer" );
+
+            film.setLabel( "Film" );
+            film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
+            film.setItemLabelGenerator( Film::getName );
+            film.setPlaceholder( "Select a Film" );
+
+            date.setPlaceholder( "Select a Date" );
+            date.setAriaLabel( "Start Date" );
 
 
             // Action buttons
@@ -411,8 +413,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             resetBtn.addClickListener( e -> {
                 customer.clear();
                 film.clear();
-                startDate.clear();
-                endDate.clear();
+                date.clear();
                 onSearch.run();
             } );
 
@@ -424,24 +425,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             actions.addClassName( LumoUtility.Gap.SMALL );
             actions.addClassName( "actions" );
 
-            add( customer, film, createDateRangeFilter(), actions );
-        }
-
-        private Component createDateRangeFilter()
-        {
-            startDate.setPlaceholder( "Start Date" );
-
-            endDate.setPlaceholder( "End Date" );
-
-            // For screen readers
-            startDate.setAriaLabel( "Start Date" );
-            endDate.setAriaLabel( "End Date" );
-
-            FlexLayout dateRangeComponent = new FlexLayout( startDate, new Text( " – " ), endDate );
-            dateRangeComponent.setAlignItems( FlexComponent.Alignment.BASELINE );
-            dateRangeComponent.addClassName( LumoUtility.Gap.XSMALL );
-
-            return dateRangeComponent;
+            add( customer, film, date, actions );
         }
 
         @Override
@@ -449,47 +433,30 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         {
             List<Predicate> predicates = new ArrayList<>();
 
-            Logger.getLogger( "Test" ).error( "test" );
-            Logger.getLogger( "Test" ).error( "test" );
-            Logger.getLogger( "Test" ).error( "test" );
-            Logger.getLogger( "Test" ).error( "test" );
-
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
-            System.out.println( "root: " + root.get( "customer" ).toString() );
             if ( customer.getValue() != null )
             {
                 Customer currentCustomer = customer.getValue();
-                Predicate customerMatch = criteriaBuilder.equal( root.get( "customer" ), currentCustomer.getId() );
+                Predicate customerMatch = criteriaBuilder.equal( root.get( "customer" ), currentCustomer );
                 predicates.add( criteriaBuilder.or( customerMatch ) );
 
                 System.out.println( "id: " + currentCustomer.getId() );
             }
             if ( !film.isEmpty() )
             {
-//                String databaseColumn = "phone";
-//                String ignore = "- ()";
-//
-//                String lowerCaseFilter = ignoreCharacters( ignore, film.getValue().toLowerCase() );
-//                Predicate phoneMatch = criteriaBuilder.like( ignoreCharacters( ignore, criteriaBuilder, criteriaBuilder.lower( root.get( databaseColumn ) ) ), "%" + lowerCaseFilter + "%" );
-//                predicates.add( phoneMatch );
+                // TODO: Fix me
+                Subquery<Film> filmSubquery = query.subquery( Film.class );
+                Root<Film> filmRoot = filmSubquery.from( Film.class );
+                filmSubquery.select( filmRoot ).where( criteriaBuilder.equal( filmRoot.get( "name" ), film.getValue().getName() ) );
+
+                Predicate filmMatch = criteriaBuilder.exists( filmSubquery );
+                System.out.println( filmMatch );
+                predicates.add( filmMatch );
 
             }
-            if ( startDate.getValue() != null )
+            if ( date.getValue() != null )
             {
-                String databaseColumn = "endDate";
-                predicates.add( criteriaBuilder.greaterThanOrEqualTo( root.get( databaseColumn ), criteriaBuilder.literal( startDate.getValue() ) ) );
-            }
-            if ( endDate.getValue() != null )
-            {
-                String databaseColumn = "endDate";
-                predicates.add( criteriaBuilder.greaterThanOrEqualTo( criteriaBuilder.literal( endDate.getValue() ), root.get( databaseColumn ) ) );
+                predicates.add( criteriaBuilder.greaterThanOrEqualTo( root.get( "endDate" ), criteriaBuilder.literal( date.getValue() ) ) );
+                predicates.add( criteriaBuilder.lessThanOrEqualTo( root.get( "startDate" ), criteriaBuilder.literal( date.getValue() ) ) );
             }
             return criteriaBuilder.and( predicates.toArray( Predicate[]::new ) );
         }
