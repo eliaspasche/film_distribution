@@ -26,7 +26,6 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
@@ -41,7 +40,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -369,20 +371,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             add( filmList );
         }
 
-        /**
-         * Create badge for a text
-         *
-         * @param text The text.
-         * @return The created badge
-         */
-        private Span createBadge( String text )
-        {
-            Span badge = new Span( text );
-            badge.getElement().getThemeList().add( "badge" );
-            badge.getStyle().set( "margin", ".2em" );
-            return badge;
-        }
-
     }
 
     public static class Filters extends Div implements Specification<FilmDistribution>
@@ -441,29 +429,20 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
             if ( customer.getValue() != null )
             {
-                Customer currentCustomer = customer.getValue();
-                Predicate customerMatch = criteriaBuilder.equal( root.get( "customer" ), currentCustomer );
-                predicates.add( criteriaBuilder.or( customerMatch ) );
-
-                System.out.println( "id: " + currentCustomer.getId() );
+                predicates.add( criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( customer.getValue() ) ) );
             }
+
             if ( !film.isEmpty() )
             {
-                // TODO: Fix me
-                Subquery<Film> filmSubquery = query.subquery( Film.class );
-                Root<Film> filmRoot = filmSubquery.from( Film.class );
-                filmSubquery.select( filmRoot ).where( criteriaBuilder.equal( filmRoot.get( "name" ), film.getValue().getName() ) );
-
-                Predicate filmMatch = criteriaBuilder.exists( filmSubquery );
-                System.out.println( filmMatch );
-                predicates.add( filmMatch );
-
+                predicates.add( criteriaBuilder.equal( root.get( "filmCopies" ).get( "film" ), criteriaBuilder.literal( film.getValue() ) ) );
             }
+
             if ( date.getValue() != null )
             {
                 predicates.add( criteriaBuilder.greaterThanOrEqualTo( root.get( "endDate" ), criteriaBuilder.literal( date.getValue() ) ) );
                 predicates.add( criteriaBuilder.lessThanOrEqualTo( root.get( "startDate" ), criteriaBuilder.literal( date.getValue() ) ) );
             }
+
             return criteriaBuilder.and( predicates.toArray( Predicate[]::new ) );
         }
     }
