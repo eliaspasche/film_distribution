@@ -17,6 +17,7 @@ import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
@@ -26,10 +27,11 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
-import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -75,7 +77,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private final Filters filters;
     // Layout
     private H3 splitTitle;
-    private Select<Customer> customer;
+    private ComboBox<Customer> customer;
     private MultiSelectComboBox<FilmCopy> filmCopies;
     private DatePicker startDate;
     private DatePicker endDate;
@@ -98,7 +100,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         getHeaderDiv().addClassNames( "distribution-view" );
         filters = new Filters( this::refreshGrid, customerService, filmService );
         getHeaderDiv().setWidthFull();
-        getHeaderDiv().add( filters );
+        getHeaderDiv().add( createMobileFilters(), filters );
 
         setCreateButton( new Button( "New " + getEditItemName() ) );
     }
@@ -235,9 +237,8 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         splitTitle = new H3( "New " + getEditItemName() );
 
-        customer = new Select<>();
+        customer = new ComboBox<>();
         customer.setLabel( "Customer" );
-        customer.setEmptySelectionAllowed( false );
         customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
         customer.setItemLabelGenerator( c -> c.getFirstName() + " " + c.getName() );
 
@@ -373,10 +374,42 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
     }
 
+    /**
+     * Create the mobile view for the {@link Filters}
+     *
+     * @return The optimized layout for mobile.
+     */
+    private HorizontalLayout createMobileFilters()
+    {
+        // Mobile version
+        HorizontalLayout mobileFilters = new HorizontalLayout();
+        mobileFilters.setWidthFull();
+        mobileFilters.addClassNames( LumoUtility.Padding.MEDIUM, LumoUtility.BoxSizing.BORDER, LumoUtility.AlignItems.CENTER );
+        mobileFilters.addClassName( "mobile-filters" );
+
+        Icon mobileIcon = new Icon( "lumo", "plus" );
+        Span filtersHeading = new Span( "Filters" );
+        mobileFilters.add( mobileIcon, filtersHeading );
+        mobileFilters.setFlexGrow( 1, filtersHeading );
+        mobileFilters.addClickListener( e -> {
+            if ( filters.getClassNames().contains( "visible" ) )
+            {
+                filters.removeClassName( "visible" );
+                mobileIcon.getElement().setAttribute( "icon", "lumo:plus" );
+            }
+            else
+            {
+                filters.addClassName( "visible" );
+                mobileIcon.getElement().setAttribute( "icon", "lumo:minus" );
+            }
+        } );
+        return mobileFilters;
+    }
+
     public static class Filters extends Div implements Specification<FilmDistribution>
     {
-        private final Select<Customer> customer = new Select<>();
-        private final Select<Film> film = new Select<>();
+        private final MultiSelectComboBox<Customer> customers = new MultiSelectComboBox<>();
+        private final ComboBox<Film> film = new ComboBox<>();
         private final DatePicker date = new DatePicker( "Date" );
 
 
@@ -387,10 +420,10 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             addClassName( "filter-layout" );
 
 
-            customer.setLabel( "Customer" );
-            customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
-            customer.setItemLabelGenerator( Customer::fullName );
-            customer.setPlaceholder( "Select a Customer" );
+            customers.setLabel( "Customer" );
+            customers.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
+            customers.setItemLabelGenerator( Customer::fullName );
+            customers.setPlaceholder( "Select Customers" );
 
             film.setLabel( "Film" );
             film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
@@ -405,7 +438,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             Button resetBtn = new Button( "Reset" );
             resetBtn.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
             resetBtn.addClickListener( e -> {
-                customer.clear();
+                customers.clear();
                 film.clear();
                 date.clear();
                 onSearch.run();
@@ -419,7 +452,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             actions.addClassName( LumoUtility.Gap.SMALL );
             actions.addClassName( "actions" );
 
-            add( customer, film, date, actions );
+            add( customers, film, date, actions );
         }
 
         @Override
@@ -427,9 +460,13 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         {
             List<Predicate> predicates = new ArrayList<>();
 
-            if ( customer.getValue() != null )
+            if ( !customers.isEmpty() )
             {
-                predicates.add( criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( customer.getValue() ) ) );
+                List<Predicate> customerPredicates = customers.getValue().stream()
+                        .map( item -> criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( item ) ) )
+                        .toList();
+
+                predicates.add( criteriaBuilder.or( customerPredicates.toArray( Predicate[]::new ) ) );
             }
 
             if ( !film.isEmpty() )
@@ -437,7 +474,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
                 predicates.add( criteriaBuilder.equal( root.get( "filmCopies" ).get( "film" ), criteriaBuilder.literal( film.getValue() ) ) );
             }
 
-            if ( date.getValue() != null )
+            if ( !date.isEmpty() )
             {
                 predicates.add( criteriaBuilder.greaterThanOrEqualTo( root.get( "endDate" ), criteriaBuilder.literal( date.getValue() ) ) );
                 predicates.add( criteriaBuilder.lessThanOrEqualTo( root.get( "startDate" ), criteriaBuilder.literal( date.getValue() ) ) );
