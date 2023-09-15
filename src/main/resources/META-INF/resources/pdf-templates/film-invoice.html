@@ -1,0 +1,66 @@
+<html>
+<head>
+    <link href="film-invoice.css" rel="stylesheet">
+</head>
+<body>
+<div class="mainDiv">
+
+    <div class="headerDiv">
+        <h1>Video Verleih</h1>
+        <p>Müller</p>
+    </div>
+
+    <div class="inputDiv">
+        <table class="customerDetailTable">
+            <tr>
+                <th>
+                    <div>
+                        <span class="companyText">Video Verleih Müller, Postfach 31 23, 37046 Göttingen</span>
+                        <br>
+                        <p id="customerNumber">Customer Number: </p>
+                        <br>
+                        <p id="customerName"></p>
+                        <p id="customerAddress"></p>
+                        <p id="customerPlz"></p>
+                    </div>
+                </th>
+                <th>
+                    <img class="logo" src="movie_logo.png" alt="logo">
+                </th>
+            </tr>
+        </table>
+
+        <div class="invoiceDiv">
+            <h2>Rechnung:</h2>
+            <div class="filmDistDiv">
+                <table id="table">
+                    <tr>
+                        <th>Distribution-Period</th>
+                        <th>Costs</th>
+                        <th>Film</th>
+                    </tr>
+                    <tr>
+                        <td>01.01.2023 - 20.01.2023</td>
+                        <td>10,65 €</td>
+                        <td>21</td>
+                    </tr>
+                </table>
+
+                <div class="costs">
+                    <p id="costsNet">Summe Netto: </p>
+                    <hr>
+                    <p id="costsText">Umsatzsteuer 19,00 %: </p>
+                    <hr>
+                    <p id="costsAmount" style="font-weight: bold">Rechnungsbetrag: </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footerDiv">
+        <p>IBAN: DE34 5678 9101 1123 00 - BIC: TESTBIC</p>
+    </div>
+
+</div>
+</body>
+</html>
