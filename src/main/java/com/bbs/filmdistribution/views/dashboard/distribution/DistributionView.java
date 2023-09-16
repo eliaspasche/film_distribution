@@ -183,23 +183,15 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         Button pdfButton = new Button( "Invoice", new Icon( VaadinIcon.DOWNLOAD ) );
         pdfButton.setTooltipText( "Download" );
         pdfButton.addClickListener( click -> {
+            UI ui = click.getSource().getUI().orElseThrow();
             pdfButton.setVisible( false );
             progressBar.setVisible( true );
-            UI ui = UI.getCurrent();
-            Thread newThread = new Thread( () -> {
 
-                if ( ui != null )
-                {
-                    ui.access( () -> {
-                        invoicePdfService.createInvoicePdf( filmDistribution );
-                        pdfButton.setVisible( true );
-                        progressBar.setVisible( false );
-                    } );
-                }
-
-            } );
-            newThread.start();
-
+            new Thread( () -> ui.access( () -> {
+                invoicePdfService.createInvoicePdf( filmDistribution );
+                pdfButton.setVisible( true );
+                progressBar.setVisible( false );
+            } ) ).start();
         } );
         div.add( pdfButton, progressBar );
         return div;
