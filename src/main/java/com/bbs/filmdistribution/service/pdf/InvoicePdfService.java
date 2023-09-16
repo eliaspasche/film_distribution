@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -93,6 +94,12 @@ public class InvoicePdfService extends AbstractPdfService
         invoiceEntry.append( "</tr>" );
 
         return invoiceEntry.toString();
+    }
+
+    @Override
+    protected String getSavePath()
+    {
+        return super.getSavePath() + "invoices" + File.separatorChar;
     }
 
 }

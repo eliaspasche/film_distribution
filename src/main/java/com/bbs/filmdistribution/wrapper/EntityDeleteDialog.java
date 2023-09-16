@@ -8,11 +8,16 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Dialog to delete a {@link AbstractEntity}
  */
 public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
 {
+    private static final Logger LOGGER = Logger.getLogger( EntityDeleteDialog.class.getName() );
+
     private final String title;
     private final AbstractDatabaseService<T, ?> abstractDatabaseService;
     private final T entityToDelete;
@@ -52,13 +57,24 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
                 ButtonVariant.LUMO_ERROR );
         deleteButton.getStyle().set( "margin-right", "auto" );
         deleteButton.addClickListener( click -> {
-            abstractDatabaseService.delete( entityToDelete.getId() );
-            NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
-            if ( dynamicView != null )
+            try
             {
-                dynamicView.updateView();
+                abstractDatabaseService.delete( entityToDelete.getId() );
+                NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
+                if ( dynamicView != null )
+                {
+                    dynamicView.updateView();
+                }
             }
-            close();
+            catch ( Exception e )
+            {
+                LOGGER.log( Level.WARNING, e.getMessage() );
+                NotificationUtil.sendErrorNotification( "Item could not be removed. Cause: " + e.getCause(), 5 );
+            }
+            finally
+            {
+                close();
+            }
         } );
         getFooter().add( deleteButton );
 

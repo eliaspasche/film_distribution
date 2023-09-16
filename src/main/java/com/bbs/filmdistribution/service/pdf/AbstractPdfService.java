@@ -41,6 +41,16 @@ public abstract class AbstractPdfService
     private final FileDownloadService fileDownloadService;
 
     /**
+     * Get the save path of a created pdf file.
+     *
+     * @return The path as string.
+     */
+    protected String getSavePath()
+    {
+        return appConfig.getPdfSavePath() + File.separatorChar;
+    }
+
+    /**
      * Load an CSS style by from the resources for a pdf file.
      *
      * @param styleName The name of the CSS file
@@ -119,7 +129,7 @@ public abstract class AbstractPdfService
      */
     private void createPdfSavePath()
     {
-        Path pathToCreate = Path.of( appConfig.getPdfSavePath() );
+        Path pathToCreate = Path.of( getSavePath() );
         if ( Files.exists( pathToCreate ) )
         {
             return;
@@ -127,7 +137,7 @@ public abstract class AbstractPdfService
 
         try
         {
-            Files.createDirectory( pathToCreate );
+            Files.createDirectories( pathToCreate );
         }
         catch ( IOException e )
         {
@@ -146,7 +156,7 @@ public abstract class AbstractPdfService
     protected void createPdfFile( Document htmlDocument, String pdfFileName, String styleUrl )
     {
         createPdfSavePath();
-        File outputPdf = new File( appConfig.getPdfSavePath() + pdfFileName + ".pdf" );
+        File outputPdf = new File( getSavePath() + pdfFileName + ".pdf" );
 
         try ( OutputStream outputStream = new FileOutputStream( outputPdf ) )
         {

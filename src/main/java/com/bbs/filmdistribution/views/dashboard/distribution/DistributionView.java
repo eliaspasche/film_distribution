@@ -55,8 +55,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A view to manage the {@link FilmDistribution} objects.
@@ -227,12 +226,13 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         } );
 
         saveButton.addClickListener( e -> {
-            if ( getItemToEdit() == null )
+            boolean isNewItem = getItemToEdit() == null;
+            if ( isNewItem )
             {
                 setItemToEdit( new FilmDistribution() );
             }
 
-            if ( canDistributeFilms() )
+            if ( canDistributeFilms( isNewItem ) )
             {
                 saveItem();
             }
@@ -245,13 +245,20 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      *
      * @return {@link Customer} can distribute
      */
-    private boolean canDistributeFilms()
+    private boolean canDistributeFilms( boolean isNewItem )
     {
         try
         {
+            // Check before write bean (edit mode)
+            Set<FilmCopy> currentFilmCopies = isNewItem ? new HashSet<>() : getItemToEdit().getFilmCopies();
             getBinder().writeBean( getItemToEdit() );
 
             FilmDistribution filmDistribution = getItemToEdit();
+
+            if ( !filmsToDistributeAvailable( filmDistribution, currentFilmCopies ) )
+            {
+                return false;
+            }
 
             int customerAge = DateUtil.getAgeByDate( filmDistribution.getCustomer().getDateOfBirth() );
 
@@ -270,6 +277,32 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             NotificationUtil.sendErrorNotification( "Failed to update the data. Check again that all values are valid", 2 );
         }
         return false;
+    }
+
+    /**
+     * Check if the films to distribute already available.
+     *
+     * @param filmDistribution  The {@link FilmDistribution}
+     * @param currentFilmCopies The current distributed film copies.
+     * @return Are the films already available
+     */
+    private boolean filmsToDistributeAvailable( FilmDistribution filmDistribution, Set<FilmCopy> currentFilmCopies )
+    {
+        List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies();
+        filmCopyList.addAll( currentFilmCopies );
+
+        List<FilmCopy> notAvailable = filmDistribution.getFilmCopies().stream()
+                .filter( filmCopy -> filmCopyList.stream().noneMatch( i -> Objects.equals( i.getId(), filmCopy.getId() ) ) )
+                .toList();
+
+        if ( !notAvailable.isEmpty() )
+        {
+            notAvailable.forEach( item -> NotificationUtil.sendErrorNotification( "The film copy " + item.getFilm().getName() + " is not longer available", 3 ) );
+            refreshGrid();
+            return false;
+        }
+
+        return true;
     }
 
     @Override

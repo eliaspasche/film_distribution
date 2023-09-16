@@ -22,6 +22,8 @@ import lombok.Setter;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Master detail grid layout to persists an {@link AbstractEntity} with an {@link AbstractDatabaseService}
@@ -34,6 +36,8 @@ import java.util.Optional;
 public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T, ?>>
         extends MasterDetailLayout implements BeforeEnterObserver
 {
+
+    private static final Logger LOGGER = Logger.getLogger( MasterDetailGridLayout.class.getName() );
 
     private final String editId;
     private final String editRoute;
@@ -186,12 +190,20 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
         Button deleteButton = new Button( new Icon( VaadinIcon.TRASH ) );
         deleteButton.setTooltipText( "Shift + Click = Instant delete" );
         deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
-        deleteButton.addClickListener( e -> {
-            if ( e.isShiftKey() )
+        deleteButton.addClickListener( click -> {
+            if ( click.isShiftKey() )
             {
-                databaseService.delete( item.getId() );
-                NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
-                refreshGrid();
+                try
+                {
+                    databaseService.delete( item.getId() );
+                    NotificationUtil.sendSuccessNotification( "Successfully removed", 2 );
+                    refreshGrid();
+                }
+                catch ( Exception e )
+                {
+                    LOGGER.log( Level.WARNING, e.getMessage() );
+                    NotificationUtil.sendErrorNotification( "Item could not be removed. Cause: " + e.getCause(), 5 );
+                }
                 return;
             }
             new EntityDeleteDialog<>( "Should the item \"" + identifier + "\" removed?", databaseService, item, view );
