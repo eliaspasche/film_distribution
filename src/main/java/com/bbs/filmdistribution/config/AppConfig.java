@@ -21,4 +21,6 @@ public class AppConfig
     @Value( "${filmdistribution.autologin}" )
     private boolean autoLogin;
 
+    @Value( "${filmdistribution.pdf-save-path}" )
+    private String pdfSavePath;
 }

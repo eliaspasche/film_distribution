@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.data.service;
 
+import com.bbs.filmdistribution.common.DistributionInvoiceDTO;
 import com.bbs.filmdistribution.common.DistributionRevenueDTO;
 import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
@@ -45,4 +46,14 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
         return getRepository().getDistributionRevenue();
     }
 
+    /**
+     * Get a {@link List} with the distributed films for a specific distribution to create invoice.
+     *
+     * @param distributionId The distribution id
+     * @return The {@link List} of {@link DistributionInvoiceDTO}
+     */
+    public List<DistributionInvoiceDTO> getDistributionInvoiceByDistribution( long distributionId )
+    {
+        return getRepository().getDistributionInvoiceByDistribution( distributionId );
+    }
 }

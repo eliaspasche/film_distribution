@@ -1,10 +1,13 @@
 package com.bbs.filmdistribution.service.pdf;
 
+import com.bbs.filmdistribution.config.AppConfig;
+import com.bbs.filmdistribution.service.FileDownloadService;
+import com.bbs.filmdistribution.util.NotificationUtil;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 import org.xhtmlrenderer.layout.SharedContext;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -18,21 +21,24 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Service to create pdf files.
+ * Base implementation to create pdf files.
  */
-@Component
-public class PdfService
+@RequiredArgsConstructor
+public abstract class AbstractPdfService
 {
 
-    private static final Logger LOGGER = Logger.getLogger( PdfService.class.getName() );
-
     public static final String PATH_TO_PDF_TEMPLATES = "META-INF" + File.separatorChar + "resources" + File.separatorChar + "pdf-templates" + File.separatorChar;
+
+    private static final Logger LOGGER = Logger.getLogger( AbstractPdfService.class.getName() );
+
+    // Services
+    private final AppConfig appConfig;
+    private final FileDownloadService fileDownloadService;
 
     /**
      * Load an CSS style by from the resources for a pdf file.
@@ -40,7 +46,7 @@ public class PdfService
      * @param styleName The name of the CSS file
      * @return The url to the file
      */
-    private Optional<String> loadPdfStyle( String styleName )
+    protected Optional<String> loadPdfStyle( String styleName )
     {
         ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + styleName );
 
@@ -61,13 +67,13 @@ public class PdfService
     /**
      * Load html structure from a template to build a pdf file.
      *
-     * @param templateName The name of the template
+     * @param htmlTemplateName The name of the template (example: template.html)
      * @return The input as string
      */
-    private Optional<String> loadPdfTemplate( String templateName )
+    protected Optional<String> loadPdfTemplate( String htmlTemplateName )
     {
 
-        ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + templateName );
+        ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + htmlTemplateName );
         try
         {
             URL fileUrl = resource.getURL();
@@ -88,7 +94,7 @@ public class PdfService
      * @param htmlText The html text.
      * @return The {@link Document}
      */
-    private Document createDocumentFromHtmlText( String htmlText )
+    protected Document createDocumentFromHtmlText( String htmlText )
     {
         Document document = Jsoup.parse( htmlText, "UTF-8" );
         document.outputSettings().syntax( Document.OutputSettings.Syntax.xml );
@@ -96,38 +102,39 @@ public class PdfService
         return document;
     }
 
-
-    public void createInvoicePdf()
+    /**
+     * Get a {@link Element} by an {@link Document} and the defined id.
+     *
+     * @param htmlDocument The {@link Document}
+     * @param id The id of element in the {@link Document}
+     * @return The {@link Element}
+     */
+    protected Element getElementByDocument( Document htmlDocument, String id )
     {
-        String fileInput = loadPdfTemplate( "film-invoice.html" ).get();
+        return htmlDocument.getElementById( id );
+    }
 
-        Document htmlDocument = createDocumentFromHtmlText( fileInput );
-        // Fill customer data
-        htmlDocument.getElementById( "customerNumber" ).appendText( "000001" );
-        htmlDocument.getElementById( "customerName" ).appendText( "John Doe" );
-
-        Element filmTable = htmlDocument.getElementById( "table" );
-        for ( int i = 0; i < 23; i++ )
+    /**
+     * Create the directory path to store the created pdf files.
+     */
+    private void createPdfSavePath()
+    {
+        Path pathToCreate = Path.of( appConfig.getPdfSavePath() );
+        if ( Files.exists( pathToCreate ) )
         {
-            filmTable.append( buildInvoiceEntry() );
+            return;
         }
 
-        createPdfFile( htmlDocument, "test", "film-invoice.css" );
+        try
+        {
+            Files.createDirectory( pathToCreate );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.log( Level.WARNING, e.getMessage() );
+            NotificationUtil.sendErrorNotification( "The pdf file path cannot be created. Cause: " + e.getCause(), 5 );
+        }
     }
-
-    private String buildInvoiceEntry()
-    {
-        SecureRandom secureRandom = new SecureRandom();
-        StringBuilder invoiceEntry = new StringBuilder();
-        invoiceEntry.append( "<tr>" );
-        invoiceEntry.append( "<td>01.01.2023 - 20.01.2023</td>" );
-        invoiceEntry.append( "<td>" + secureRandom.nextInt( 100 ) + " €</td>" );
-        invoiceEntry.append( "<td>22</td>" );
-        invoiceEntry.append( "</tr>" );
-
-        return invoiceEntry.toString();
-    }
-
 
     /**
      * Create pdf file by {@link Document} with specific filename and style.
@@ -136,10 +143,11 @@ public class PdfService
      * @param pdfFileName  The name of pdf file
      * @param styleUrl     The style url
      */
-    private void createPdfFile( Document htmlDocument, String pdfFileName, String styleUrl )
+    protected void createPdfFile( Document htmlDocument, String pdfFileName, String styleUrl )
     {
+        createPdfSavePath();
+        File outputPdf = new File( appConfig.getPdfSavePath() + pdfFileName + ".pdf" );
 
-        File outputPdf = new File( "./" + pdfFileName + ".pdf" );
         try ( OutputStream outputStream = new FileOutputStream( outputPdf ) )
         {
             ITextRenderer renderer = new ITextRenderer();
@@ -163,17 +171,11 @@ public class PdfService
         {
             LOGGER.log( Level.WARNING, "Pdf can not be created", e );
         }
-    }
+        finally
+        {
+            fileDownloadService.downloadFileFromStreamLink( outputPdf.getAbsolutePath() );
+        }
 
-    /**
-     * Create pdf file by {@link Document} with specific filename.
-     *
-     * @param htmlDocument The {@link Document}
-     * @param pdfFileName  The name of pdf file
-     */
-    private void createPdfFile( Document htmlDocument, String pdfFileName )
-    {
-        createPdfFile( htmlDocument, pdfFileName, null );
     }
 
 }

@@ -9,9 +9,10 @@ import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.data.service.FilmService;
-import com.bbs.filmdistribution.util.CustomerNumberUtil;
+import com.bbs.filmdistribution.service.pdf.InvoicePdfService;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
+import com.bbs.filmdistribution.util.NumbersUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
@@ -29,9 +30,11 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -73,14 +76,16 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private final CustomerService customerService;
     private final FilmCopyService filmCopyService;
     private final FilmService filmService;
-    private final Button saveButton = new Button( "Save" );
-    private final Filters filters;
+    private final InvoicePdfService invoicePdfService;
+
     // Layout
     private H3 splitTitle;
     private ComboBox<Customer> customer;
     private MultiSelectComboBox<FilmCopy> filmCopies;
     private DatePicker startDate;
     private DatePicker endDate;
+    private final Button saveButton = new Button( "Save" );
+    private final Filters filters;
 
     /**
      * The constructor.
@@ -89,13 +94,13 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      * @param customerService     The {@link CustomerService}
      * @param filmCopyService     The {@link FilmCopyService}
      */
-    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService )
+    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService, InvoicePdfService invoicePdfService )
     {
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
         this.filmCopyService = filmCopyService;
         this.filmService = filmService;
-
+        this.invoicePdfService = invoicePdfService;
 
         getHeaderDiv().addClassNames( "distribution-view" );
         filters = new Filters( this::refreshGrid, customerService, filmService );
@@ -137,7 +142,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ), filters ).stream() );
 
-        grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
+        grid.addColumn( item -> NumbersUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         grid.addColumn( item -> item.getCustomer().getFirstName() + " " + item.getCustomer().getName() ).setHeader( "Customer" ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getStartDate() ), "startDate" ).setHeader( "Start-Date" ).setSortable( true ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getEndDate() ), "endDate" ).setHeader( "End-Date" ).setSortable( true ).setAutoWidth( true );
@@ -146,6 +151,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         grid.setDetailsVisibleOnClick( false );
         grid.setItemDetailsRenderer( createFilmCopyDetailsRenderer() );
 
+        grid.addComponentColumn( this::createDownloadInvoicePdfLayout );
         grid.addComponentColumn( item -> getDeleteButton( item, item.getId().toString(), this ) ).setAutoWidth( true ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
@@ -160,6 +166,44 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
                 UI.getCurrent().navigate( this.getClass() );
             }
         } );
+    }
+
+    /**
+     * Create the download layout for a {@link FilmDistribution}.
+     *
+     * @param filmDistribution The {@link FilmDistribution}
+     * @return The created layout
+     */
+    private Div createDownloadInvoicePdfLayout( FilmDistribution filmDistribution )
+    {
+        Div div = new Div();
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.setIndeterminate( true );
+        progressBar.setVisible( false );
+
+        Button pdfButton = new Button( "Invoice", new Icon( VaadinIcon.DOWNLOAD ) );
+        pdfButton.setTooltipText( "Download" );
+        pdfButton.addClickListener( click -> {
+            pdfButton.setVisible( false );
+            progressBar.setVisible( true );
+            UI ui = UI.getCurrent();
+            Thread newThread = new Thread( () -> {
+
+                if ( ui != null )
+                {
+                    ui.access( () -> {
+                        invoicePdfService.createInvoicePdf( filmDistribution );
+                        pdfButton.setVisible( true );
+                        progressBar.setVisible( false );
+                    } );
+                }
+
+            } );
+            newThread.start();
+
+        } );
+        div.add( pdfButton, progressBar );
+        return div;
     }
 
     @Override
@@ -318,7 +362,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         }
     }
 
-    // Grid detail layout for the film copies of an distribution
+    // Grid detail layout for the film copies of a distribution
 
     @Override
     public void updateView()
@@ -368,8 +412,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
             filmList.setItems( films );
 
-            add( detailTitle );
-            add( filmList );
+            add( detailTitle, filmList );
         }
 
     }

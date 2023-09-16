@@ -1,6 +1,7 @@
 filmdistribution:
     version: Version @project.version@
     autologin: false
+    pdf-save-path: /film-dist/
 logging:
     level:
         org:

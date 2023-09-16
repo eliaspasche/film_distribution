@@ -17,7 +17,7 @@
                     <div>
                         <span class="companyText">Video Verleih Müller, Postfach 31 23, 37046 Göttingen</span>
                         <br>
-                        <p id="customerNumber">Customer Number: </p>
+                        <p id="customerNumber">Kundennummer: </p>
                         <br>
                         <p id="customerName"></p>
                         <p id="customerAddress"></p>
@@ -35,23 +35,28 @@
             <div class="filmDistDiv">
                 <table id="table">
                     <tr>
-                        <th>Distribution-Period</th>
-                        <th>Costs</th>
+                        <th>Zeitraum</th>
                         <th>Film</th>
-                    </tr>
-                    <tr>
-                        <td>01.01.2023 - 20.01.2023</td>
-                        <td>10,65 €</td>
-                        <td>21</td>
+                        <th>Preis/Woche</th>
+                        <th>Kosten</th>
                     </tr>
                 </table>
 
                 <div class="costs">
-                    <p id="costsNet">Summe Netto: </p>
-                    <hr>
-                    <p id="costsText">Umsatzsteuer 19,00 %: </p>
-                    <hr>
-                    <p id="costsAmount" style="font-weight: bold">Rechnungsbetrag: </p>
+                    <table id="costsTable">
+                        <tr>
+                            <th><p>Summe Netto:</p></th>
+                            <th><p id="costsNet"></p></th>
+                        </tr>
+                        <tr>
+                            <th><p>Umsatzsteuer 19,00 %:</p></th>
+                            <th><p id="costsText"></p></th>
+                        </tr>
+                        <tr>
+                            <th><p>Rechnungsbetrag:</p></th>
+                            <th><p id="costsAmount"></p></th>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>

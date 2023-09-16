@@ -1,5 +1,6 @@
 package com.bbs.filmdistribution.data.service;
 
+import com.bbs.filmdistribution.common.DistributionInvoiceDTO;
 import com.bbs.filmdistribution.common.DistributionRevenueDTO;
 import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
@@ -34,4 +35,17 @@ public interface FilmDistributionRepository extends JpaRepository<FilmDistributi
             "from FILM_DISTRIBUTION_ITEMS i join FILM_DISTRIBUTION d on d.ID = i.FILM_DISTRIBUTION_ID join FILM_COPY c on c.ID = i.FILM_COPY_ID " +
             "join FILM f on f.ID = c.FILM_ID group by f.name order by revenue desc", nativeQuery = true )
     List<DistributionRevenueDTO> getDistributionRevenue();
+
+    /**
+     * Get a {@link List} with the distributed films for a specific distribution to create invoice.
+     *
+     * @param distributionId The distribution id
+     * @return The {@link List} of {@link DistributionInvoiceDTO}
+     */
+    @Query( value = "select f.NAME as filmName, f.PRICE as pricePerWeek, fd.START_DATE as startDate, fd.END_DATE as endDate, " +
+            "cast(sum(f.PRICE * ceil((fd.END_DATE - fd.START_DATE) / 7)) AS DECIMAL(5, 2)) as priceTotal " +
+            "from FILM_DISTRIBUTION_ITEMS fdi join FILM_DISTRIBUTION fd on fdi.FILM_DISTRIBUTION_ID = fd.ID " +
+            "and fd.ID = :distributionId join FILM_COPY c on c.ID = fdi.FILM_COPY_ID " +
+            "join FILM f on f.ID = c.FILM_ID group by f.NAME, f.PRICE, fd.START_DATE, fd.END_DATE", nativeQuery = true )
+    List<DistributionInvoiceDTO> getDistributionInvoiceByDistribution( long distributionId );
 }

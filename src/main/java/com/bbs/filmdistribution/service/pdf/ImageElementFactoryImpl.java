@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.bbs.filmdistribution.service.pdf.PdfService.PATH_TO_PDF_TEMPLATES;
+import static com.bbs.filmdistribution.service.pdf.InvoicePdfService.PATH_TO_PDF_TEMPLATES;
 
 /**
  * Implementation to build an image into a pdf file.

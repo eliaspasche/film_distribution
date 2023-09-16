@@ -4,8 +4,8 @@ import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.Customer;
 import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.util.CustomerNumberUtil;
 import com.bbs.filmdistribution.util.DateUtil;
+import com.bbs.filmdistribution.util.NumbersUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
@@ -71,7 +71,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
 
-        grid.addColumn( item -> CustomerNumberUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
+        grid.addColumn( item -> NumbersUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
         Grid.Column<Customer> lastNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         Grid.Column<Customer> firstNameColumn = grid.addColumn( "firstName" ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getDateOfBirth() ), "dateOfBirth" ).setHeader( "Date of birth" ).setSortable( true ).setAutoWidth( true );
