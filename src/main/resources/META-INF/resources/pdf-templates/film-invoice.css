@@ -25,8 +25,8 @@
 .logo {
     margin: 10px 10px 10px auto;
     float: right;
-    height: 100px;
-    width: 100px;
+    width: 120px;
+    height: 120px;
 }
 
 .title {
@@ -41,6 +41,10 @@
     margin-top: 35px;
 }
 
+#invoiceDate {
+    text-align: right;
+}
+
 .customerDetailTable {
     margin: 20px 0;
     padding: 0 5px;
@@ -52,7 +56,7 @@
 }
 
 .companyText {
-    font-size: 10px;
+    font-size: 11px;
     text-decoration: underline;
 }
 
@@ -69,7 +73,7 @@
     border-bottom: 1px solid #ddd;
 }
 
-.filmDistDiv #table td:nth-child(3), .filmDistDiv #table td:nth-child(4) {
+.filmDistDiv #table th:nth-child(3), .filmDistDiv #table th:nth-child(4), .filmDistDiv #table td:nth-child(3), .filmDistDiv #table td:nth-child(4) {
     text-align: right;
 }
 

@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -57,7 +58,9 @@ public class InvoicePdfService extends AbstractPdfService
         getElementByDocument( htmlDocument, "customerName" ).appendText( customer.getFirstName() + " " + customer.getName() );
         getElementByDocument( htmlDocument, "customerAddress" ).appendText( customer.getAddress() );
         getElementByDocument( htmlDocument, "customerPlz" ).appendText( customer.getZipCode() + " " + customer.getCity() );
+        getElementByDocument( htmlDocument, "invoiceDate" ).appendText( DateUtil.formatDate( LocalDate.now() ) );
 
+        // Fill film costs data
         double costsNet = 0;
         Element filmTable = getElementByDocument( htmlDocument, "table" );
         for ( DistributionInvoiceDTO distributionInvoiceDTO : distributionInvoiceDTOList )

@@ -2,7 +2,7 @@ vaadin-scroller[slot="drawer"] {
   padding: var(--lumo-space-s);
 }
 
-[slot="drawer"]:is(header, footer) {
+[slot="drawer"]:is(footer) {
   display: flex;
   align-items: center;
   gap: var(--lumo-space-s);
@@ -11,10 +11,17 @@ vaadin-scroller[slot="drawer"] {
   box-sizing: border-box;
 }
 
+[slot="drawer"]:is(header) {
+  text-align: center;
+}
+
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
 
+vaadin-app-layout[overlay]::part(navbar) {
+  z-index: 0;
+}
 
 vaadin-app-layout::part(navbar) {
   z-index: 3;
@@ -44,4 +51,11 @@ vaadin-login-form-wrapper::part(footer) {
 
 .chartLayout text {
   font-family: var(--lumo-font-family) !important;
+}
+
+.applicationLogo {
+  width: 120px;
+  height: 120px;
+  margin: 5px 0;
+  text-align: center;
 }

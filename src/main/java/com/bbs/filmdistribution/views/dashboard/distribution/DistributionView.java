@@ -181,6 +181,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         progressBar.setVisible( false );
 
         Button pdfButton = new Button( "Invoice", new Icon( VaadinIcon.DOWNLOAD ) );
+        pdfButton.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
         pdfButton.setTooltipText( "Download" );
         pdfButton.addClickListener( click -> {
             UI ui = click.getSource().getUI().orElseThrow();

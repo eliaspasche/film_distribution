@@ -70,9 +70,10 @@ public class DashboardLayout extends AppLayout
 
     private void addDrawerContent()
     {
-        H1 appName = new H1( "Film Distribution" );
-        appName.addClassNames( LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE );
-        Header header = new Header( appName );
+        Image image = new Image( "/pdf-templates/movie_logo.png", "Application img" );
+        image.setClassName( "applicationLogo" );
+
+        Header header = new Header( image );
 
         Scroller scroller = new Scroller( createNavigation() );
 
