@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * The configuration for the application.
- * Some variables are loaded from the application.properties file.
+ * Some variables are loaded from the application.yml/application-local.yml file.
  */
 @Getter
 @Configuration

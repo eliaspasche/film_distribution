@@ -19,7 +19,6 @@ import java.util.Optional;
 public abstract class AbstractDatabaseService<T extends AbstractEntity, K extends JpaRepository<T, Long> & JpaSpecificationExecutor<T>>
 {
 
-    
     private final K repository;
 
     /**

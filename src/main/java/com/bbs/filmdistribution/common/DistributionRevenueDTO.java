@@ -1,7 +1,7 @@
 package com.bbs.filmdistribution.common;
 
 /**
- * Interface to map values from the database in a query.
+ * Interface for assigning values from a sql query.
  */
 public interface DistributionRevenueDTO
 {

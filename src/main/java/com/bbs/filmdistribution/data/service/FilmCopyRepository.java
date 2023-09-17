@@ -13,7 +13,7 @@ import java.util.List;
 public interface FilmCopyRepository extends JpaRepository<FilmCopy, Long>, JpaSpecificationExecutor<FilmCopy>
 {
     /**
-     * Get the amount of distribution item by a {@link FilmCopy}
+     * Get the amount of distributions by a {@link FilmCopy}
      *
      * @param filmCopyId The id of a {@link FilmCopy}
      * @return The amount of distributions.

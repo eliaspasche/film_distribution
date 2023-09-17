@@ -4,13 +4,6 @@ import com.bbs.filmdistribution.config.AppConfig;
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.security.AuthenticatedUser;
 import com.bbs.filmdistribution.service.DarkModeService;
-import com.bbs.filmdistribution.views.dashboard.account.AccountView;
-import com.bbs.filmdistribution.views.dashboard.agegroups.AgeGroupsView;
-import com.bbs.filmdistribution.views.dashboard.customers.CustomersView;
-import com.bbs.filmdistribution.views.dashboard.distribution.DistributionView;
-import com.bbs.filmdistribution.views.dashboard.filmcopies.FilmCopiesView;
-import com.bbs.filmdistribution.views.dashboard.films.FilmsView;
-import com.bbs.filmdistribution.views.dashboard.home.HomeView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -27,12 +20,17 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RoutePrefix;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.vaadin.lineawesome.LineAwesomeIcon;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 /**
- * The main view is a top-level placeholder for other views.
+ * The main view of the dashboard.
+ * This is the top-level url for other views. (/dashboard/<view-child>)
  */
 @RoutePrefix( value = DashboardLayout.DASHBOARD_PATH, absolute = true )
+@RequiredArgsConstructor
 public class DashboardLayout extends AppLayout
 {
 
@@ -45,18 +43,20 @@ public class DashboardLayout extends AppLayout
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
 
-    public DashboardLayout( AppConfig appConfig, DarkModeService darkModeService, AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker )
+    /**
+     * Initialization of the components in the current view.
+     */
+    @PostConstruct
+    public void init()
     {
-        this.appConfig = appConfig;
-        this.darkModeService = darkModeService;
-        this.authenticatedUser = authenticatedUser;
-        this.accessChecker = accessChecker;
-
         setPrimarySection( Section.DRAWER );
         addDrawerContent();
         addHeaderContent();
     }
 
+    /**
+     * Create the header content of the dashboard.
+     */
     private void addHeaderContent()
     {
         DrawerToggle toggle = new DrawerToggle();
@@ -68,6 +68,9 @@ public class DashboardLayout extends AppLayout
         addToNavbar( true, toggle, viewTitle, createNavBar() );
     }
 
+    /**
+     * Create the content for the sidebar.
+     */
     private void addDrawerContent()
     {
         Image image = new Image( "/images/application-logo.png", "Application img" );
@@ -81,49 +84,28 @@ public class DashboardLayout extends AppLayout
         addToDrawer( header, scroller, createFooter() );
     }
 
+    /**
+     * Create the navigation options for the application in the sidebar.
+     *
+     * @return The created {@link SideNav}
+     */
     private SideNav createNavigation()
     {
         SideNav nav = new SideNav();
 
-        if ( accessChecker.hasAccess( HomeView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Dashboard", HomeView.class, LineAwesomeIcon.HOME_SOLID.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( DistributionView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Distributions", DistributionView.class, LineAwesomeIcon.USER.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( CustomersView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Customers", CustomersView.class, LineAwesomeIcon.USERS_SOLID.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( FilmsView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Films", FilmsView.class, LineAwesomeIcon.FILM_SOLID.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( FilmCopiesView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Film Copies", FilmCopiesView.class, LineAwesomeIcon.COLUMNS_SOLID.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( AgeGroupsView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Age Groups", AgeGroupsView.class, LineAwesomeIcon.CALENDAR_SOLID.create() ) );
-
-        }
-        if ( accessChecker.hasAccess( AccountView.class ) )
-        {
-            nav.addItem( new SideNavItem( "Account", AccountView.class, LineAwesomeIcon.USER.create() ) );
-
-        }
+        Arrays.stream( DashboardViewEnum.values() )
+                .filter( i -> accessChecker.hasAccess( i.getPageClass() ) )
+                .map( i -> new SideNavItem( i.getPageTitle(), i.getPageClass(), i.getDisplayIcon().create() ) )
+                .forEach( nav::addItem );
 
         return nav;
     }
 
+    /**
+     * Create the navigation bar for the dashboard.
+     *
+     * @return The navigation layout.
+     */
     private HorizontalLayout createNavBar()
     {
         HorizontalLayout navbarLayout = new HorizontalLayout();
@@ -150,6 +132,11 @@ public class DashboardLayout extends AppLayout
         return navbarLayout;
     }
 
+    /**
+     * Create the theme switch {@link Button}
+     *
+     * @return The created {@link Button}
+     */
     private Button createDarkModeButton()
     {
         Button darkModeButton = new Button( getDarkModeIcon() );
@@ -163,11 +150,21 @@ public class DashboardLayout extends AppLayout
         return darkModeButton;
     }
 
+    /**
+     * Get the current {@link Icon} of the current theme
+     *
+     * @return The {@link Icon}
+     */
     private Icon getDarkModeIcon()
     {
         return new Icon( darkModeService.isDarkModeActive() ? VaadinIcon.SUN_O : VaadinIcon.MOON_O );
     }
 
+    /**
+     * Create the footer content of the dashboard
+     *
+     * @return The {@link Footer}
+     */
     private Footer createFooter()
     {
         Footer layout = new Footer();
@@ -185,6 +182,11 @@ public class DashboardLayout extends AppLayout
         viewTitle.setText( getCurrentPageTitle() );
     }
 
+    /**
+     * Get the title of the current dashboard view.
+     *
+     * @return The page title.
+     */
     private String getCurrentPageTitle()
     {
         PageTitle title = getContent().getClass().getAnnotation( PageTitle.class );

@@ -44,11 +44,11 @@ public class FilmService extends AbstractDatabaseService<Film, FilmRepository>
     /**
      * Get the amount of available copies by an {@link Film} id
      *
-     * @param id The id
+     * @param filmId The filmId
      * @return The amount of available copies.
      */
-    public int availableCopies( long id )
+    public int availableCopies( long filmId )
     {
-        return getRepository().availableCopies( id );
+        return getRepository().availableCopies( filmId );
     }
 }

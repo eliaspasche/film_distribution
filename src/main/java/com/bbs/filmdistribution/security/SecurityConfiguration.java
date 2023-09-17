@@ -10,6 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+/**
+ * Handle the web security for the application.
+ * This defines a {@link PasswordEncoder} to hash and salt passwords and define
+ * authorized http requests.
+ */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity

@@ -13,9 +13,9 @@ public interface FilmRepository extends JpaRepository<Film, Long>, JpaSpecificat
     /**
      * Get the amount of available copies by an {@link Film} id
      *
-     * @param id The id
+     * @param filmId The filmId
      * @return The amount of available copies.
      */
-    @Query( value = "select count(*) from Film_Copy where FILM_ID = :id", nativeQuery = true )
-    int availableCopies( long id );
+    @Query( value = "select count(*) from Film_Copy where FILM_ID = :filmId", nativeQuery = true )
+    int availableCopies( long filmId );
 }

@@ -50,7 +50,6 @@ public class CookieService
      */
     public String getJSCookie( String key )
     {
-
         Cookie[] cookies = getCookies();
         if ( cookies == null )
             return null;
@@ -81,6 +80,5 @@ public class CookieService
         cookie.setMaxAge( 0 ); // 0 = delete cookie
         VaadinService.getCurrentResponse().addCookie( cookie );
     }
-
 
 }

@@ -9,22 +9,29 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.router.internal.RouteUtil;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 
+/**
+ * Login view to authenticate a user with the application.
+ */
 @AnonymousAllowed
 @PageTitle( "Login" )
 @Route( "login" )
 @RouteAlias( "" )
+@RequiredArgsConstructor
 public class LoginView extends LoginOverlay implements BeforeEnterObserver
 {
 
     private final AuthenticatedUser authenticatedUser;
     private final AppConfig appConfig;
 
-    public LoginView( AuthenticatedUser authenticatedUser, AppConfig appConfig )
+    /**
+     * Initialization of the components in the current view.
+     */
+    @PostConstruct
+    public void init()
     {
-        this.authenticatedUser = authenticatedUser;
-        this.appConfig = appConfig;
-
         setAction( RouteUtil.getRoutePath( VaadinService.getCurrent().getContext(), getClass() ) );
 
         LoginI18n i18n = LoginI18n.createDefault();

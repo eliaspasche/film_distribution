@@ -3,7 +3,7 @@ package com.bbs.filmdistribution.common;
 import java.time.LocalDate;
 
 /**
- * Interface to map values from the database in a query.
+ * Interface for assigning values from a sql query.
  */
 public interface DistributionInvoiceDTO
 {

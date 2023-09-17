@@ -17,7 +17,6 @@ import java.util.List;
 public class Film extends AbstractEntity
 {
     private String name;
-
     private Integer length;
 
     @ManyToOne

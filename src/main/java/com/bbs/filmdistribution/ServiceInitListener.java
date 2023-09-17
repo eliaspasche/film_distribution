@@ -1,11 +1,11 @@
 package com.bbs.filmdistribution;
 
 import com.bbs.filmdistribution.config.AppConfig;
-import com.bbs.filmdistribution.security.UserDetailsServiceImpl;
 import com.bbs.filmdistribution.service.CookieService;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinServiceInitListener;
+import lombok.RequiredArgsConstructor;
 import org.jboss.logging.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -22,6 +22,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
  * Handle new sessions and ui events.
  */
 @Component
+@RequiredArgsConstructor
 public class ServiceInitListener implements VaadinServiceInitListener
 {
 
@@ -30,22 +31,6 @@ public class ServiceInitListener implements VaadinServiceInitListener
     private final AppConfig appConfig;
     private final UserDetailsService userDetailsService;
     private final CookieService cookieService;
-
-    /**
-     * The constructor.
-     *
-     * @param appConfig          The {@link AppConfig}
-     * @param cookieService      The {@link CookieService}
-     * @param userDetailsService The {@link UserDetailsService}
-     */
-    public ServiceInitListener( AppConfig appConfig, CookieService cookieService,
-                                UserDetailsServiceImpl userDetailsService )
-    {
-        this.appConfig = appConfig;
-        this.cookieService = cookieService;
-        this.userDetailsService = userDetailsService;
-
-    }
 
     @Override
     public void serviceInit( ServiceInitEvent event )

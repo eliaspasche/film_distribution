@@ -70,7 +70,7 @@ public class NotificationUtil
     }
 
     /**
-     * Create and show a error notification with defined text and a duration value in seconds.
+     * Create and show an error notification with defined text and a duration value in seconds.
      *
      * @param text              The text do display
      * @param durationInSeconds The duration in seconds

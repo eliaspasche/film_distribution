@@ -2,6 +2,7 @@ package com.bbs.filmdistribution.security;
 
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.data.service.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,16 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 
+/**
+ * Implementation for the {@link UserDetails} to handle the login for a {@link User}
+ */
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService
 {
 
     private final UserRepository userRepository;
-
-    public UserDetailsServiceImpl( UserRepository userRepository )
-    {
-        this.userRepository = userRepository;
-    }
 
     @Override
     @Transactional
