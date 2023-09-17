@@ -1,18 +1,15 @@
 package com.bbs.filmdistribution.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * Utility class to create and format numbers
  */
+// Private constructor to hide the implicit public one
+@NoArgsConstructor( access = AccessLevel.PRIVATE )
 public class NumbersUtil
 {
-
-    /**
-     * The constructor
-     */
-    private NumbersUtil()
-    {
-        // Private constructor to hide the implicit public one
-    }
 
     /**
      * Create a customer number with 7 leading zeros. ( 1 -> 0000001 )

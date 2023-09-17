@@ -142,7 +142,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ), filters ).stream() );
 
         grid.addColumn( item -> NumbersUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
-        grid.addColumn( item -> item.getCustomer().getFirstName() + " " + item.getCustomer().getName() ).setHeader( "Customer" ).setAutoWidth( true );
+        grid.addColumn( item -> item.getCustomer().getFullName() ).setHeader( "Customer" ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getStartDate() ), "startDate" ).setHeader( "Start-Date" ).setSortable( true ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getEndDate() ), "endDate" ).setHeader( "End-Date" ).setSortable( true ).setAutoWidth( true );
         grid.addColumn( createToggleDetailsRenderer( grid ) );
@@ -313,7 +313,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         customer = new ComboBox<>();
         customer.setLabel( "Customer" );
         customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
-        customer.setItemLabelGenerator( c -> c.getFirstName() + " " + c.getName() );
+        customer.setItemLabelGenerator( Customer::getFullName );
 
         filmCopies = new MultiSelectComboBox<>( "Film Copies" );
         filmCopies.setRenderer( createFilmCopyRenderer() );
@@ -494,7 +494,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
             customers.setLabel( "Customer" );
             customers.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
-            customers.setItemLabelGenerator( Customer::fullName );
+            customers.setItemLabelGenerator( Customer::getFullName );
             customers.setPlaceholder( "Select Customers" );
 
             film.setLabel( "Film" );

@@ -23,7 +23,7 @@ public class Customer extends AbstractEntity
     private String zipCode;
     private String city;
 
-    public String fullName()
+    public String getFullName()
     {
         return firstName + " " + name;
     }

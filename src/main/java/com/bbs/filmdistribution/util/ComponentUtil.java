@@ -8,20 +8,16 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Utility class to create components for the application
  */
+// Private constructor to hide the implicit public one
+@NoArgsConstructor( access = AccessLevel.PRIVATE )
 public class ComponentUtil
 {
-
-    /**
-     * The constructor
-     */
-    private ComponentUtil()
-    {
-        // Private constructor to hide the implicit public one
-    }
 
     /**
      * Create {@link NumberField} with label and suffix.

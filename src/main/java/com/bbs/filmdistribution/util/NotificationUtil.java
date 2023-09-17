@@ -7,20 +7,16 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Utility class to create notification for the application
  */
+// Private constructor to hide the implicit public one
+@NoArgsConstructor( access = AccessLevel.PRIVATE )
 public class NotificationUtil
 {
-
-    /**
-     * The constructor
-     */
-    private NotificationUtil()
-    {
-        // Private constructor to hide the implicit public one
-    }
 
     /**
      * Create a notification with a text, duration in seconds and a position.

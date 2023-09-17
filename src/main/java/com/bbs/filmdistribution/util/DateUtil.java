@@ -1,5 +1,8 @@
 package com.bbs.filmdistribution.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -7,20 +10,14 @@ import java.time.format.DateTimeFormatter;
 /**
  * Utility class to handle date values.
  */
+// Private constructor to hide the implicit public one
+@NoArgsConstructor( access = AccessLevel.PRIVATE )
 public class DateUtil
 {
 
     private static final String DATE_FORMAT = "dd.MM.yyyy";
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( DATE_FORMAT );
-
-    /**
-     * The constructor
-     */
-    private DateUtil()
-    {
-        // Private constructor to hide the implicit public one
-    }
 
     /**
      * Format a {@link LocalDate}

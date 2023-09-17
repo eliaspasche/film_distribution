@@ -55,7 +55,7 @@ public class InvoicePdfService extends AbstractPdfService
         // Fill customer data
         String customerNumber = NumbersUtil.createLeadingZeroCustomerNumber( customer.getId() );
         getElementByDocument( htmlDocument, "customerNumber" ).appendText( customerNumber );
-        getElementByDocument( htmlDocument, "customerName" ).appendText( customer.fullName() );
+        getElementByDocument( htmlDocument, "customerName" ).appendText( customer.getFullName() );
         getElementByDocument( htmlDocument, "customerAddress" ).appendText( customer.getAddress() );
         getElementByDocument( htmlDocument, "customerPlz" ).appendText( customer.getZipCode() + " " + customer.getCity() );
         getElementByDocument( htmlDocument, "invoiceDate" ).appendText( DateUtil.formatDate( LocalDate.now() ) );
