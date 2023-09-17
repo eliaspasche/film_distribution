@@ -282,7 +282,10 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private boolean filmsToDistributeAvailable( FilmDistribution filmDistribution, Set<FilmCopy> currentFilmCopies )
     {
         List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies();
-        filmCopyList.addAll( currentFilmCopies );
+        if ( currentFilmCopies != null )
+        {
+            filmCopyList.addAll( currentFilmCopies );
+        }
 
         List<FilmCopy> notAvailable = filmDistribution.getFilmCopies().stream()
                 .filter( filmCopy -> filmCopyList.stream().noneMatch( i -> Objects.equals( i.getId(), filmCopy.getId() ) ) )

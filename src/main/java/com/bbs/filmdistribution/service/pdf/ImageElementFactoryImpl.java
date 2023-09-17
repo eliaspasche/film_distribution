@@ -18,8 +18,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.bbs.filmdistribution.service.pdf.InvoicePdfService.PATH_TO_PDF_TEMPLATES;
-
 /**
  * Implementation to build an image into a pdf file.
  */
@@ -37,7 +35,7 @@ public class ImageElementFactoryImpl implements ReplacedElementFactory
             String imagePath = element.getAttribute( "src" );
             try
             {
-                ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + imagePath );
+                ClassPathResource resource = new ClassPathResource( imagePath );
                 InputStream input = resource.getInputStream();
                 byte[] bytes = IOUtils.toByteArray( input );
                 Image image = Image.getInstance( bytes );

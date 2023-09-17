@@ -70,7 +70,8 @@ public class DashboardLayout extends AppLayout
 
     private void addDrawerContent()
     {
-        Image image = new Image( "/pdf-templates/movie_logo.png", "Application img" );
+        Image image = new Image( "/images/application-logo.png", "Application img" );
+        image.getElement().setAttribute( "draggable", "false" );
         image.setClassName( "applicationLogo" );
 
         Header header = new Header( image );
