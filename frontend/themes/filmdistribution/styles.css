@@ -1,8 +1,5 @@
 @import url('./dashboard-layout.css');
 @import url('./views/distribution-view.css');
-@import url('./views/customers-view.css');
-@import url('./views/film-copies-view.css');
-@import url('./views/age-groups-view.css');
 @import url('./components/master-detail-layout.css');
 
 .versionText {
