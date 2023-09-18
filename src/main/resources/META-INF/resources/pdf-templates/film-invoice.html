@@ -1,72 +1,43 @@
 <html>
-<head>
-    <link href="film-invoice.css" rel="stylesheet">
-</head>
 <body>
-<div class="mainDiv">
+<div class="inputDiv">
 
-    <div class="headerDiv">
-        <h1>Video Verleih</h1>
-        <p>Müller</p>
-    </div>
+    <div class="invoiceDiv">
+        <p id="invoiceDate">Datum: </p>
+        <h2>Rechnung:</h2>
+        <div class="filmDistDiv">
+            <table id="table">
+                <tr>
+                    <th>Zeitraum</th>
+                    <th>Film</th>
+                    <th>Preis/Woche</th>
+                    <th>Kosten</th>
+                </tr>
+            </table>
 
-    <div class="inputDiv">
-        <table class="customerDetailTable">
-            <tr>
-                <th>
-                    <div>
-                        <span class="companyText">Video Verleih Müller, Postfach 31 23, 37046 Göttingen</span>
-                        <br>
-                        <p id="customerNumber">Kundennummer: </p>
-                        <br>
-                        <p id="customerName"></p>
-                        <p id="customerAddress"></p>
-                        <p id="customerPlz"></p>
-                    </div>
-                </th>
-                <th>
-                    <img class="logo" src="/META-INF/resources/images/application-logo.png" alt="logo">
-                </th>
-            </tr>
-        </table>
-
-        <div class="invoiceDiv">
-            <p id="invoiceDate">Datum: </p>
-            <h2>Rechnung:</h2>
-            <div class="filmDistDiv">
-                <table id="table">
+            <div class="costs">
+                <table id="costsTable">
                     <tr>
-                        <th>Zeitraum</th>
-                        <th>Film</th>
-                        <th>Preis/Woche</th>
-                        <th>Kosten</th>
+                        <th><p>Summe Netto:</p></th>
+                        <th><p id="costsNet"></p></th>
+                    </tr>
+                    <tr>
+                        <th><p>Umsatzsteuer 19,00 %:</p></th>
+                        <th><p id="costsText"></p></th>
+                    </tr>
+                    <tr>
+                        <th><p>Rechnungsbetrag:</p></th>
+                        <th><p id="costsAmount"></p></th>
                     </tr>
                 </table>
-
-                <div class="costs">
-                    <table id="costsTable">
-                        <tr>
-                            <th><p>Summe Netto:</p></th>
-                            <th><p id="costsNet"></p></th>
-                        </tr>
-                        <tr>
-                            <th><p>Umsatzsteuer 19,00 %:</p></th>
-                            <th><p id="costsText"></p></th>
-                        </tr>
-                        <tr>
-                            <th><p>Rechnungsbetrag:</p></th>
-                            <th><p id="costsAmount"></p></th>
-                        </tr>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
-
-    <div class="footerDiv">
-        <p>IBAN: DE34 5678 9101 1123 00 - BIC: TESTBIC</p>
-    </div>
-
 </div>
+
+<div class="footerDiv">
+    <p>IBAN: DE34 5678 9101 1123 00 - BIC: TESTBIC</p>
+</div>
+
 </body>
 </html>

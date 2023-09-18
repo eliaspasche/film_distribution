@@ -48,9 +48,10 @@ public class InvoicePdfService extends AbstractPdfService
         Customer customer = filmDistribution.getCustomer();
         List<DistributionInvoiceDTO> distributionInvoiceDTOList = filmDistributionService.getDistributionInvoiceByDistribution( filmDistribution.getId() );
 
+        String headerInput = loadPdfTemplate( "film-header.html" ).orElse( "" );
         String fileInput = loadPdfTemplate( "film-invoice.html" ).orElse( "" );
 
-        Document htmlDocument = createDocumentFromHtmlText( fileInput );
+        Document htmlDocument = createDocumentFromHtmlText( headerInput + fileInput );
 
         // Fill customer data
         String customerNumber = NumbersUtil.createLeadingZeroCustomerNumber( customer.getId() );
@@ -74,7 +75,7 @@ public class InvoicePdfService extends AbstractPdfService
         getElementByDocument( htmlDocument, "costsText" ).appendText( NumbersUtil.formatCurrency( tax ) );
         getElementByDocument( htmlDocument, "costsAmount" ).appendText( NumbersUtil.formatCurrency( costsNet + tax ) );
 
-        createPdfFile( htmlDocument, NumbersUtil.createLeadingZeroCustomerNumber( filmDistribution.getId() ), "film-invoice.css" );
+        createPdfFile( htmlDocument, NumbersUtil.createLeadingZeroCustomerNumber( filmDistribution.getId() ), "film-base.css" );
     }
 
     /**
