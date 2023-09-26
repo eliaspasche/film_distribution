@@ -23,4 +23,7 @@ public class FilmCopy extends AbstractEntity
     @ManyToMany( fetch = FetchType.EAGER )
     @JoinTable( name = "film_distribution_items", joinColumns = @JoinColumn( name = "film_copy_id" ), inverseJoinColumns = @JoinColumn( name = "film_distribution_id" ) )
     private List<FilmDistribution> filmDistributions;
+    
+    @Transient
+    private boolean isAvailable;
 }

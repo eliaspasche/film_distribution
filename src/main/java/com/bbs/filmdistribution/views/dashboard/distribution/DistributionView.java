@@ -9,6 +9,7 @@ import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmDistributionService;
 import com.bbs.filmdistribution.data.service.FilmService;
+import com.bbs.filmdistribution.service.pdf.DistributionReportPdfService;
 import com.bbs.filmdistribution.service.pdf.InvoicePdfService;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
@@ -75,15 +76,14 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private final FilmCopyService filmCopyService;
     private final FilmService filmService;
     private final InvoicePdfService invoicePdfService;
-
+    private final Button saveButton = new Button( "Save" );
+    private final Filters filters;
     // Layout
     private H3 splitTitle;
     private ComboBox<Customer> customer;
     private MultiSelectComboBox<FilmCopy> filmCopies;
     private DatePicker startDate;
     private DatePicker endDate;
-    private final Button saveButton = new Button( "Save" );
-    private final Filters filters;
 
     /**
      * The constructor.
@@ -92,7 +92,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      * @param customerService     The {@link CustomerService}
      * @param filmCopyService     The {@link FilmCopyService}
      */
-    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService, InvoicePdfService invoicePdfService )
+    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService, InvoicePdfService invoicePdfService, DistributionReportPdfService distributionReportPdfService )
     {
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
@@ -101,7 +101,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         this.invoicePdfService = invoicePdfService;
 
         getHeaderDiv().addClassNames( "distribution-view" );
-        filters = new Filters( this::refreshGrid, customerService, filmService );
+        filters = new Filters( this::refreshGrid, customerService, filmService, distributionReportPdfService );
         getHeaderDiv().setWidthFull();
         getHeaderDiv().add( createMobileFilters(), filters );
 
@@ -286,9 +286,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             filmCopyList.addAll( currentFilmCopies );
         }
 
-        List<FilmCopy> notAvailable = filmDistribution.getFilmCopies().stream()
-                .filter( filmCopy -> filmCopyList.stream().noneMatch( i -> Objects.equals( i.getId(), filmCopy.getId() ) ) )
-                .toList();
+        List<FilmCopy> notAvailable = filmDistribution.getFilmCopies().stream().filter( filmCopy -> filmCopyList.stream().noneMatch( i -> Objects.equals( i.getId(), filmCopy.getId() ) ) ).toList();
 
         if ( !notAvailable.isEmpty() )
         {
@@ -402,43 +400,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     }
 
     /**
-     * The layout for the list of {@link FilmCopy} from {@link FilmDistribution}
-     */
-    private static class FilmCopyDetailsLayout extends Div
-    {
-
-        /**
-         * Create the layout for the list of {@link FilmCopy} for a {@link FilmDistribution}
-         *
-         * @param filmDistribution The {@link FilmDistribution}
-         */
-        public void setFilmCopyList( FilmDistribution filmDistribution )
-        {
-            H5 detailTitle = new H5( "Film copies" );
-            detailTitle.getStyle().set( "margin-bottom", ".5em" );
-
-            MessageList filmList = new MessageList();
-
-            List<MessageListItem> films = new ArrayList<>();
-
-            // TODO: Add color of FSK label?
-            filmDistribution.getFilmCopies().forEach( item -> {
-                MessageListItem filmListItem = new MessageListItem();
-                filmListItem.setUserName( item.getFilm().getName() );
-                filmListItem.setText( item.getInventoryNumber() );
-                filmListItem.setUserAbbreviation( String.valueOf( item.getFilm().getAgeGroup().getMinimumAge() ) );
-                filmListItem.setUserColorIndex( Math.toIntExact( item.getFilm().getAgeGroup().getId() ) );
-                films.add( filmListItem );
-            } );
-
-            filmList.setItems( films );
-
-            add( detailTitle, filmList );
-        }
-
-    }
-
-    /**
      * Create the mobile view for the {@link Filters}
      *
      * @return The optimized layout for mobile.
@@ -470,39 +431,78 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         return mobileFilters;
     }
 
+    /**
+     * The layout for the list of {@link FilmCopy} from {@link FilmDistribution}
+     */
+    private static class FilmCopyDetailsLayout extends Div
+    {
+
+        /**
+         * Create the layout for the list of {@link FilmCopy} for a {@link FilmDistribution}
+         *
+         * @param filmDistribution The {@link FilmDistribution}
+         */
+        public void setFilmCopyList( FilmDistribution filmDistribution )
+        {
+            H5 detailTitle = new H5( "Film copies" );
+            detailTitle.getStyle().set( "margin-bottom", ".5em" );
+
+            MessageList filmList = new MessageList();
+
+            List<MessageListItem> films = new ArrayList<>();
+
+            filmDistribution.getFilmCopies().forEach( item -> {
+                MessageListItem filmListItem = new MessageListItem();
+                filmListItem.setUserName( item.getFilm().getName() );
+                filmListItem.setText( item.getInventoryNumber() );
+                filmListItem.setUserAbbreviation( String.valueOf( item.getFilm().getAgeGroup().getMinimumAge() ) );
+                filmListItem.setUserColorIndex( Math.toIntExact( item.getFilm().getAgeGroup().getId() ) );
+                films.add( filmListItem );
+            } );
+
+            filmList.setItems( films );
+
+            add( detailTitle, filmList );
+        }
+
+    }
+
     public static class Filters extends Div implements Specification<FilmDistribution>
     {
-        private final MultiSelectComboBox<Customer> customers = new MultiSelectComboBox<>();
+        private final ComboBox<Customer> customer = new ComboBox<>();
         private final ComboBox<Film> film = new ComboBox<>();
-        private final DatePicker date = new DatePicker( "Date" );
+        private final DatePicker date = new DatePicker( "Reporting Date" );
 
 
-        public Filters( Runnable onSearch, CustomerService customerService, FilmService filmService )
+        public Filters( Runnable onSearch, CustomerService customerService, FilmService filmService, DistributionReportPdfService distributionReportPdfService )
         {
             setWidthFull();
             addClassNames( LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM, LumoUtility.BoxSizing.BORDER );
             addClassName( "filter-layout" );
 
 
-            customers.setLabel( "Customer" );
-            customers.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
-            customers.setItemLabelGenerator( Customer::getFullName );
-            customers.setPlaceholder( "Select Customers" );
+            customer.setLabel( "Customer" );
+            customer.setItems( customerService.list( Pageable.unpaged() ).stream().toList() );
+            customer.setItemLabelGenerator( Customer::getFullName );
+            customer.setPlaceholder( "Select Customers" );
+            customer.setClearButtonVisible( true );
 
             film.setLabel( "Film" );
             film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
             film.setItemLabelGenerator( Film::getName );
             film.setPlaceholder( "Select a Film" );
+            film.setClearButtonVisible( true );
 
-            date.setPlaceholder( "Select a Date" );
-            date.setAriaLabel( "Start Date" );
+
+            date.setPlaceholder( "Select a Reporting Date" );
+            date.setAriaLabel( "Reporting Date" );
 
 
             // Action buttons
             Button resetBtn = new Button( "Reset" );
             resetBtn.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
             resetBtn.addClickListener( e -> {
-                customers.clear();
+                customer.clear();
                 film.clear();
                 date.clear();
                 onSearch.run();
@@ -512,11 +512,33 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             searchBtn.addThemeVariants( ButtonVariant.LUMO_PRIMARY );
             searchBtn.addClickListener( e -> onSearch.run() );
 
-            Div actions = new Div( resetBtn, searchBtn );
+            Button exportButton = new Button( "Export Report" );
+            exportButton.addThemeVariants( ButtonVariant.LUMO_ICON );
+            exportButton.setIcon( new Icon( VaadinIcon.DOWNLOAD ) );
+
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.setIndeterminate( true );
+            progressBar.setWidth( "15px" );
+
+            exportButton.addClickListener( click -> {
+                onSearch.run();
+
+                UI ui = click.getSource().getUI().orElseThrow();
+                exportButton.setEnabled( false );
+                exportButton.setIcon( progressBar );
+
+                new Thread( () -> ui.access( () -> {
+                    distributionReportPdfService.createInvoicePdf( customer.getValue(), film.getValue(), date.getValue() );
+                    exportButton.setEnabled( true );
+                    exportButton.setIcon( new Icon( VaadinIcon.DOWNLOAD ) );
+                } ) ).start();
+            } );
+
+            Div actions = new Div( resetBtn, searchBtn, exportButton );
             actions.addClassName( LumoUtility.Gap.SMALL );
             actions.addClassName( "actions" );
 
-            add( customers, film, date, actions );
+            add( customer, film, date, actions );
         }
 
         @Override
@@ -524,13 +546,9 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         {
             List<Predicate> predicates = new ArrayList<>();
 
-            if ( !customers.isEmpty() )
+            if ( !customer.isEmpty() )
             {
-                List<Predicate> customerPredicates = customers.getValue().stream()
-                        .map( item -> criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( item ) ) )
-                        .toList();
-
-                predicates.add( criteriaBuilder.or( customerPredicates.toArray( Predicate[]::new ) ) );
+                predicates.add( criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( customer.getValue() ) ) );
             }
 
             if ( !film.isEmpty() )

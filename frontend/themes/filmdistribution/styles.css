@@ -6,3 +6,12 @@
     text-align: center;
     width: 100%;
 }
+
+
+* {
+    --vaadin-user-color-1: #ffffff;
+    --vaadin-user-color-2: #ffe948;
+    --vaadin-user-color-3: #2aa93e;
+    --vaadin-user-color-4: #009cd1;
+    --vaadin-user-color-5: #e40e1a;
+}

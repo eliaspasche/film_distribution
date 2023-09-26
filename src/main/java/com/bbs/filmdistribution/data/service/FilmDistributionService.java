@@ -1,11 +1,13 @@
 package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.common.DistributionInvoiceDTO;
+import com.bbs.filmdistribution.common.DistributionReportDTO;
 import com.bbs.filmdistribution.common.DistributionRevenueDTO;
 import com.bbs.filmdistribution.common.TopFilmDistributionDTO;
 import com.bbs.filmdistribution.data.entity.FilmDistribution;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -56,4 +58,10 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
     {
         return getRepository().getDistributionInvoiceByDistribution( distributionId );
     }
+
+    public List<DistributionReportDTO> getDistributionReportForSelectedFilter( Long customerId, Long filmId, LocalDate reportingDate )
+    {
+        return getRepository().getDistributionReportForSelectedFilter( customerId, filmId, reportingDate );
+    }
+
 }
