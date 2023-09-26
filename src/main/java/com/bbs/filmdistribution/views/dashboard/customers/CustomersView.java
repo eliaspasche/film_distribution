@@ -78,7 +78,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         Grid.Column<Customer> addressColumn = grid.addColumn( "address" ).setAutoWidth( true );
         Grid.Column<Customer> zipCodeColumn = grid.addColumn( "zipCode" ).setAutoWidth( true );
         Grid.Column<Customer> cityColumn = grid.addColumn( "city" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
+        grid.addComponentColumn( item -> buildMenuBar( item, item.getName(), this ) ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

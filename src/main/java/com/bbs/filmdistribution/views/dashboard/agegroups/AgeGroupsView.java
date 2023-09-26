@@ -91,7 +91,7 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
 
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "minimumAge" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
+        grid.addComponentColumn( item -> buildMenuBar( item, item.getName(), this ) ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

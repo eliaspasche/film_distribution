@@ -106,7 +106,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         Grid.Column<FilmCopy> filmNameColumn = grid.addColumn( filmCopy -> filmCopy.getFilm().getName() )
                 .setHeader( "Film" ).setAutoWidth( true );
         grid.addComponentColumn( this::createCopyAvailableBadge ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getInventoryNumber(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
+        grid.addComponentColumn( item -> buildMenuBar( item, item.getInventoryNumber(), this ) ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

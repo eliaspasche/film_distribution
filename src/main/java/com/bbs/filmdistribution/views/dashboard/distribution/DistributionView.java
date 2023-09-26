@@ -12,6 +12,7 @@ import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.service.pdf.DistributionReportPdfService;
 import com.bbs.filmdistribution.service.pdf.InvoicePdfService;
 import com.bbs.filmdistribution.util.DateUtil;
+import com.bbs.filmdistribution.util.MenuBarUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.util.NumbersUtil;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
@@ -20,6 +21,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -31,6 +33,7 @@ import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -109,17 +112,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     }
 
     /**
-     * Create the button to toggle or view the film copies.
-     *
-     * @param grid The {@link Grid}
-     * @return The {@link Renderer} for a {@link FilmDistribution}
-     */
-    private static Renderer<FilmDistribution> createToggleDetailsRenderer( Grid<FilmDistribution> grid )
-    {
-        return LitRenderer.<FilmDistribution> of( "<vaadin-button theme=\"tertiary\" @click=\"${handleClick}\">Film copies</vaadin-button>" ).withFunction( "handleClick", item -> grid.setDetailsVisible( item, !grid.isDetailsVisible( item ) ) );
-    }
-
-    /**
      * Create the {@link ComponentRenderer} to display details for a {@link FilmDistribution}
      *
      * @return The {@link ComponentRenderer}
@@ -144,13 +136,11 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         grid.addColumn( item -> item.getCustomer().getFullName() ).setHeader( "Customer" ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getStartDate() ), "startDate" ).setHeader( "Start-Date" ).setSortable( true ).setAutoWidth( true );
         grid.addColumn( item -> DateUtil.formatDate( item.getEndDate() ), "endDate" ).setHeader( "End-Date" ).setSortable( true ).setAutoWidth( true );
-        grid.addColumn( createToggleDetailsRenderer( grid ) );
 
         grid.setDetailsVisibleOnClick( false );
         grid.setItemDetailsRenderer( createFilmCopyDetailsRenderer() );
 
-        grid.addComponentColumn( this::createDownloadInvoicePdfLayout );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getId().toString(), this ) ).setAutoWidth( true ).setFrozenToEnd( true );
+        grid.addComponentColumn( item -> buildMenuBar( item, item.getId().toString(), this ) ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {
@@ -166,35 +156,30 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         } );
     }
 
-    /**
-     * Create the download layout for a {@link FilmDistribution}.
-     *
-     * @param filmDistribution The {@link FilmDistribution}
-     * @return The created layout
-     */
-    private Div createDownloadInvoicePdfLayout( FilmDistribution filmDistribution )
+    @Override
+    public void buildMenuBarItems( MenuBar menuBar, FilmDistribution item )
     {
-        Div div = new Div();
         ProgressBar progressBar = new ProgressBar();
         progressBar.setIndeterminate( true );
         progressBar.setVisible( false );
 
-        Button pdfButton = new Button( "Invoice", new Icon( VaadinIcon.DOWNLOAD ) );
-        pdfButton.addThemeVariants( ButtonVariant.LUMO_TERTIARY );
-        pdfButton.setTooltipText( "Download" );
-        pdfButton.addClickListener( click -> {
+        MenuItem openDetailsItem = MenuBarUtil.createIconItem( menuBar, VaadinIcon.LIST, "Open film copies", null );
+        openDetailsItem.addClickListener( click -> getGrid().setDetailsVisible( item, !getGrid().isDetailsVisible( item ) ) );
+
+        MenuItem downloadMenuItem = MenuBarUtil.createIconItem( menuBar, VaadinIcon.DOWNLOAD, "Download Invoice", null );
+        downloadMenuItem.getElement().appendChild( progressBar.getElement() );
+        downloadMenuItem.addClickListener( click -> {
             UI ui = click.getSource().getUI().orElseThrow();
-            pdfButton.setVisible( false );
+            downloadMenuItem.setEnabled( false );
             progressBar.setVisible( true );
 
             new Thread( () -> ui.access( () -> {
-                invoicePdfService.createInvoicePdf( filmDistribution );
-                pdfButton.setVisible( true );
+                invoicePdfService.createInvoicePdf( item );
+                downloadMenuItem.setEnabled( true );
                 progressBar.setVisible( false );
             } ) ).start();
         } );
-        div.add( pdfButton, progressBar );
-        return div;
+        downloadMenuItem.getElement().appendChild( progressBar.getElement() );
     }
 
     @Override

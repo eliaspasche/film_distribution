@@ -2,15 +2,17 @@ package com.bbs.filmdistribution.components;
 
 import com.bbs.filmdistribution.data.entity.AbstractEntity;
 import com.bbs.filmdistribution.data.service.AbstractDatabaseService;
+import com.bbs.filmdistribution.util.MenuBarUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.wrapper.EntityDeleteDialog;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -171,14 +173,19 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     }
 
     /**
-     * Returns a delete button for the given item.
+     * Returns a {@link MenuBar} for the given item
      */
-    protected Button getDeleteButton( T item, String identifier, DynamicView view )
+    protected MenuBar buildMenuBar( T item, String identifier, DynamicView view )
     {
-        Button deleteButton = new Button( new Icon( VaadinIcon.TRASH ) );
-        deleteButton.setTooltipText( "Shift + Click = Instant delete" );
-        deleteButton.addThemeVariants( ButtonVariant.LUMO_ERROR );
-        deleteButton.addClickListener( click -> {
+        MenuBar menuBar = new MenuBar();
+        menuBar.setWidthFull();
+
+        menuBar.addThemeVariants( MenuBarVariant.LUMO_ICON, MenuBarVariant.LUMO_SMALL );
+
+        buildMenuBarItems( menuBar, item );
+
+        MenuItem deleteMenuItem = MenuBarUtil.createIconItem( menuBar, VaadinIcon.TRASH, "Shift + Click = Instant delete", null, "var(--lumo-error-text-color)" );
+        deleteMenuItem.addClickListener( click -> {
             if ( click.isShiftKey() )
             {
                 try
@@ -197,7 +204,18 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
             new EntityDeleteDialog<>( "Should the item \"" + identifier + "\" removed?", databaseService, item, view );
         } );
 
-        return deleteButton;
+        return menuBar;
+    }
+
+    /**
+     * Add items to the {@link MenuBar} before set the {@link MenuItem} for delete action.
+     *
+     * @param menuBar The {@link MenuBar}
+     * @param item    The item
+     */
+    protected void buildMenuBarItems( MenuBar menuBar, T item )
+    {
+        // Not implemented
     }
 
     @Override

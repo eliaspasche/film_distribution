@@ -70,7 +70,7 @@ public class AccountView extends MasterDetailGridLayout<User, UserService>
         grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "username" ).setAutoWidth( true );
         grid.addColumn( item -> item.getUserRole().name() ).setHeader( "Role" ).setAutoWidth( true );
-        grid.addComponentColumn( item -> getDeleteButton( item, item.getName(), this ) ).setFrozenToEnd( true ).setAutoWidth( true );
+        grid.addComponentColumn( item -> buildMenuBar( item, item.getName(), this ) ).setFrozenToEnd( true );
 
 
         // when a row is selected or deselected, populate form
