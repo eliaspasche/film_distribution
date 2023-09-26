@@ -13,7 +13,6 @@ import com.bbs.filmdistribution.service.pdf.InvoicePdfService;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.util.NotificationUtil;
 import com.bbs.filmdistribution.util.NumbersUtil;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -64,7 +63,7 @@ import java.util.*;
 @Route( value = "distribution/:distributionID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 @Uses( Icon.class )
-public class DistributionView extends MasterDetailGridLayout<FilmDistribution, FilmDistributionService> implements DynamicView
+public class DistributionView extends MasterDetailGridLayout<FilmDistribution, FilmDistributionService>
 {
 
     // Route
@@ -392,13 +391,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     }
 
     // Grid detail layout for the film copies of a distribution
-
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
-    }
-
     @Override
     protected void refreshGrid()
     {

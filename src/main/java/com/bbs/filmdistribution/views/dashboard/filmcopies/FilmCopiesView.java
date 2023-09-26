@@ -6,7 +6,6 @@ import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
@@ -38,7 +37,7 @@ import java.util.UUID;
 @PageTitle( "Film Copies" )
 @Route( value = "filmCopies/:filmCopyID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
-public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopyService> implements DynamicView
+public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopyService>
 {
     // Route
     private static final String FILMCOPY_ID = "filmCopyID";
@@ -219,11 +218,5 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         super.populateForm( value );
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
 
-    }
-
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
     }
 }

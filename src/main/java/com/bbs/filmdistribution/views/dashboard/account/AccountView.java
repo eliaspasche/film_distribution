@@ -5,7 +5,6 @@ import com.bbs.filmdistribution.converter.PasswordConverter;
 import com.bbs.filmdistribution.data.entity.User;
 import com.bbs.filmdistribution.data.entity.UserRole;
 import com.bbs.filmdistribution.data.service.UserService;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -31,7 +30,7 @@ import org.springframework.data.domain.PageRequest;
 @PageTitle( "Account" )
 @Route( value = "account/:accountID?/:action?(edit)", layout = DashboardLayout.class )
 @RolesAllowed( "ADMIN" )
-public class AccountView extends MasterDetailGridLayout<User, UserService> implements DynamicView
+public class AccountView extends MasterDetailGridLayout<User, UserService>
 {
 
     // Route
@@ -162,9 +161,4 @@ public class AccountView extends MasterDetailGridLayout<User, UserService> imple
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
     }
 
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
-    }
 }

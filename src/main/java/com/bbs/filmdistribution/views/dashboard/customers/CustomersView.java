@@ -6,7 +6,6 @@ import com.bbs.filmdistribution.data.service.CustomerService;
 import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.util.NumbersUtil;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
@@ -32,7 +31,7 @@ import org.springframework.data.domain.PageRequest;
 @PageTitle( "Customers" )
 @Route( value = "customers/:customerID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
-public class CustomersView extends MasterDetailGridLayout<Customer, CustomerService> implements DynamicView
+public class CustomersView extends MasterDetailGridLayout<Customer, CustomerService>
 {
     // Route
     private static final String CUSTOMER_ID = "customerID";
@@ -181,9 +180,4 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
     }
 
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
-    }
 }

@@ -6,7 +6,6 @@ import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
@@ -36,7 +35,7 @@ import org.springframework.data.domain.Pageable;
 @PageTitle( "Films" )
 @Route( value = "films/:filmID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
-public class FilmsView extends MasterDetailGridLayout<Film, FilmService> implements DynamicView
+public class FilmsView extends MasterDetailGridLayout<Film, FilmService>
 {
     // Route
     private static final String FILM_ID = "filmID";
@@ -192,12 +191,6 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService> impleme
         super.populateForm( value );
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
         availableCopies.setVisible( value == null || value.getId() == null );
-    }
-
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
     }
 
 }

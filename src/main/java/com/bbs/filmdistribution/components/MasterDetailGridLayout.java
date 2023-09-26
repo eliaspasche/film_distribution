@@ -18,6 +18,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -33,8 +34,9 @@ import java.util.logging.Logger;
  */
 @Getter
 @Setter
+@RequiredArgsConstructor
 public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends AbstractDatabaseService<T, ?>>
-        extends MasterDetailLayout implements BeforeEnterObserver
+        extends MasterDetailLayout implements BeforeEnterObserver, DynamicView
 {
 
     private static final Logger LOGGER = Logger.getLogger( MasterDetailGridLayout.class.getName() );
@@ -52,20 +54,6 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     private Grid<T> grid;
 
     private Button createButton = new Button();
-
-    /**
-     * The constructor.
-     *
-     * @param editId          The key in url to edit a {@link AbstractEntity}
-     * @param editRoute       The edit url which includes the editId
-     * @param databaseService The {@link AbstractDatabaseService}
-     */
-    protected MasterDetailGridLayout( String editId, String editRoute, K databaseService )
-    {
-        this.editId = editId;
-        this.editRoute = editRoute;
-        this.databaseService = databaseService;
-    }
 
     /**
      * Initialization of the components in the current view.
@@ -210,6 +198,12 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
         } );
 
         return deleteButton;
+    }
+
+    @Override
+    public void updateView()
+    {
+        refreshGrid();
     }
 
 }

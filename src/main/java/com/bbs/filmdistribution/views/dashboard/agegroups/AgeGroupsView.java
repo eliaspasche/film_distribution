@@ -4,7 +4,6 @@ import com.bbs.filmdistribution.components.MasterDetailGridLayout;
 import com.bbs.filmdistribution.data.entity.AgeGroup;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.util.ComponentUtil;
-import com.bbs.filmdistribution.views.DynamicView;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -28,7 +27,7 @@ import org.springframework.data.domain.PageRequest;
 @PageTitle( "Age Groups" )
 @Route( value = "ageGroups/:ageGroupID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
-public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupService> implements DynamicView
+public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupService>
 {
     // Route
     private static final String AGEGROUP_ID = "ageGroupID";
@@ -144,12 +143,6 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
     {
         super.populateForm( value );
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
-    }
-
-    @Override
-    public void updateView()
-    {
-        refreshGrid();
     }
 
 }
