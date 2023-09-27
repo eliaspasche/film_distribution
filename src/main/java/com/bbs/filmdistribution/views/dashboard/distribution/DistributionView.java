@@ -506,7 +506,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             progressBar.setWidth( "15px" );
 
             exportButton.addClickListener( click -> {
-//                onSearch.run();
+                onSearch.run();
 
                 UI ui = click.getSource().getUI().orElseThrow();
                 exportButton.setEnabled( false );
