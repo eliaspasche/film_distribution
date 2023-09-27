@@ -1,0 +1,24 @@
+.customerDetailTable {
+    margin: 20px 0;
+    padding: 0 5px;
+    width: 100%;
+}
+
+.customerDetailTable th {
+    text-align: left;
+}
+
+.companyText {
+    font-size: 11px;
+    text-decoration: underline;
+}
+
+.invoiceTable td, .invoiceTable th {
+    padding: 2px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.invoiceTable th:nth-child(3), .invoiceTable th:nth-child(4), .invoiceTable td:nth-child(3), .invoiceTable td:nth-child(4) {
+    text-align: right;
+}

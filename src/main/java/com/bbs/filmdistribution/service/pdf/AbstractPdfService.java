@@ -29,12 +29,11 @@ import java.util.logging.Logger;
  * Base implementation to create pdf files.
  */
 @RequiredArgsConstructor
-public abstract class AbstractPdfService
-{
+public abstract class AbstractPdfService {
 
     public static final String PATH_TO_PDF_TEMPLATES = "META-INF" + File.separatorChar + "resources" + File.separatorChar + "pdf-templates" + File.separatorChar;
 
-    private static final Logger LOGGER = Logger.getLogger( AbstractPdfService.class.getName() );
+    private static final Logger LOGGER = Logger.getLogger(AbstractPdfService.class.getName());
 
     // Services
     private final AppConfig appConfig;
@@ -45,8 +44,7 @@ public abstract class AbstractPdfService
      *
      * @return The path as string.
      */
-    protected String getSavePath()
-    {
+    protected String getSavePath() {
         return appConfig.getPdfSavePath() + File.separatorChar;
     }
 
@@ -60,15 +58,12 @@ public abstract class AbstractPdfService
     {
         ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + styleName );
 
-        try
-        {
+        try {
             URL fileUrl = resource.getURL();
-            Path path = Paths.get( fileUrl.toURI() );
-            return Optional.of( path.toUri().toURL().toString() );
-        }
-        catch ( IOException | URISyntaxException e )
-        {
-            LOGGER.log( Level.WARNING, "Pdf style cannot loaded", e );
+            Path path = Paths.get(fileUrl.toURI());
+            return Optional.of(path.toUri().toURL().toString());
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.log(Level.WARNING, "Pdf style cannot loaded", e);
         }
 
         return Optional.empty();
@@ -80,19 +75,15 @@ public abstract class AbstractPdfService
      * @param htmlTemplateName The name of the template (example: template.html)
      * @return The input as string
      */
-    protected Optional<String> loadPdfTemplate( String htmlTemplateName )
-    {
+    protected Optional<String> loadPdfTemplate(String htmlTemplateName) {
 
-        ClassPathResource resource = new ClassPathResource( PATH_TO_PDF_TEMPLATES + htmlTemplateName );
-        try
-        {
+        ClassPathResource resource = new ClassPathResource(PATH_TO_PDF_TEMPLATES + htmlTemplateName);
+        try {
             URL fileUrl = resource.getURL();
-            Path path = Paths.get( fileUrl.toURI() );
-            return Optional.of( String.join( "\n", Files.readAllLines( path, StandardCharsets.UTF_8 ) ) );
-        }
-        catch ( IOException | URISyntaxException e )
-        {
-            LOGGER.log( Level.WARNING, "Pdf template cannot loaded", e );
+            Path path = Paths.get(fileUrl.toURI());
+            return Optional.of(String.join("\n", Files.readAllLines(path, StandardCharsets.UTF_8)));
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.log(Level.WARNING, "Pdf template cannot loaded", e);
         }
 
         return Optional.empty();
@@ -104,10 +95,9 @@ public abstract class AbstractPdfService
      * @param htmlText The html text.
      * @return The {@link Document}
      */
-    protected Document createDocumentFromHtmlText( String htmlText )
-    {
-        Document document = Jsoup.parse( htmlText, "UTF-8" );
-        document.outputSettings().syntax( Document.OutputSettings.Syntax.xml );
+    protected Document createDocumentFromHtmlText(String htmlText) {
+        Document document = Jsoup.parse(htmlText, "UTF-8");
+        document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 
         return document;
     }
@@ -116,33 +106,27 @@ public abstract class AbstractPdfService
      * Get a {@link Element} by an {@link Document} and the defined id.
      *
      * @param htmlDocument The {@link Document}
-     * @param id The id of element in the {@link Document}
+     * @param id           The id of element in the {@link Document}
      * @return The {@link Element}
      */
-    protected Element getElementByDocument( Document htmlDocument, String id )
-    {
-        return htmlDocument.getElementById( id );
+    protected Element getElementByDocument(Document htmlDocument, String id) {
+        return htmlDocument.getElementById(id);
     }
 
     /**
      * Create the directory path to store the created pdf files.
      */
-    private void createPdfSavePath()
-    {
-        Path pathToCreate = Path.of( getSavePath() );
-        if ( Files.exists( pathToCreate ) )
-        {
+    private void createPdfSavePath() {
+        Path pathToCreate = Path.of(getSavePath());
+        if (Files.exists(pathToCreate)) {
             return;
         }
 
-        try
-        {
-            Files.createDirectories( pathToCreate );
-        }
-        catch ( IOException e )
-        {
-            LOGGER.log( Level.WARNING, e.getMessage() );
-            NotificationUtil.sendErrorNotification( "The pdf file path cannot be created. Cause: " + e.getCause(), 5 );
+        try {
+            Files.createDirectories(pathToCreate);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, e.getMessage());
+            NotificationUtil.sendErrorNotification("The pdf file path cannot be created. Cause: " + e.getCause(), 5);
         }
     }
 
@@ -151,20 +135,19 @@ public abstract class AbstractPdfService
      *
      * @param htmlDocument The {@link Document}
      * @param pdfFileName  The name of pdf file
-     * @param styleUrl     The style url
      */
     protected void createPdfFile( Document htmlDocument, String pdfFileName, String styleUrl )
     {
         createPdfSavePath();
-        File outputPdf = new File( getSavePath() + pdfFileName + ".pdf" );
+        File outputPdf = new File(getSavePath() + pdfFileName + ".pdf");
 
-        try ( OutputStream outputStream = new FileOutputStream( outputPdf ) )
-        {
+        try (OutputStream outputStream = new FileOutputStream(outputPdf)) {
             ITextRenderer renderer = new ITextRenderer();
             SharedContext sharedContext = renderer.getSharedContext();
             sharedContext.setPrint( true );
             sharedContext.setInteractive( false );
             sharedContext.setReplacedElementFactory( new ImageElementFactoryImpl() );
+
             if ( styleUrl != null )
             {
                 loadPdfStyle( styleUrl ).ifPresent( style -> renderer.setDocumentFromString( htmlDocument.html(), style ) );
@@ -175,15 +158,12 @@ public abstract class AbstractPdfService
             }
 
             renderer.layout();
-            renderer.createPDF( outputStream );
-        }
-        catch ( IOException e )
-        {
-            LOGGER.log( Level.WARNING, "Pdf can not be created", e );
-        }
-        finally
-        {
-            fileDownloadService.downloadFileFromStreamLink( outputPdf.getAbsolutePath() );
+
+            renderer.createPDF(outputStream);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Pdf can not be created", e);
+        } finally {
+            fileDownloadService.downloadFileFromStreamLink(outputPdf.getAbsolutePath());
         }
 
     }

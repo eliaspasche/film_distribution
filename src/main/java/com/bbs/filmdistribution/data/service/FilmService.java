@@ -32,7 +32,7 @@ public class FilmService extends AbstractDatabaseService<Film, FilmRepository>
             {
                 FilmCopy filmCopy = new FilmCopy();
                 filmCopy.setFilm( entity );
-                filmCopy.setInventoryNumber( UUID.randomUUID().toString() );
+                filmCopy.setInventoryNumber(UUID.randomUUID().toString().substring(0, 15));
 
                 entity.getFilmCopies().add( filmCopy );
             }

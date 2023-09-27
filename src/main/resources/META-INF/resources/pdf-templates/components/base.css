@@ -1,0 +1,53 @@
+@page {
+    @bottom-left {
+        content: element(footer);
+        vertical-align: top;
+        padding-top: 10px;
+    }
+
+    @top-right {
+        content: element(header);
+        vertical-align: bottom;
+        padding-bottom: 10px;
+    }
+
+    size: A4 portrait;
+    margin: 5cm 1.5cm 4cm 1.5cm;
+}
+
+body {
+    line-height: .8;
+    font-family: Roboto, Arial, sans-serif;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+}
+
+body p {
+    line-height: .3;
+    font-size: 12px;
+}
+
+
+div.mainContent {
+    margin-top: 15px;
+}
+
+.textRightAlign {
+    text-align: right;
+}
+
+.fullWidthTable, .invoiceTable {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+div.reportItem {
+    margin: 20px 0 0 0;
+    border-top: 2px solid #ddd;
+    break-after: page;
+}
+
+
+

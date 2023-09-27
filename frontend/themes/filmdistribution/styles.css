@@ -9,9 +9,36 @@
 
 
 * {
-    --vaadin-user-color-1: #ffffff;
+    --vaadin-user-color-1: #d3d3d3;
     --vaadin-user-color-2: #ffe948;
     --vaadin-user-color-3: #2aa93e;
     --vaadin-user-color-4: #009cd1;
     --vaadin-user-color-5: #e40e1a;
 }
+
+html {
+    --lumo-font-family: Roboto, Arial, Helvetica, sans-serif;
+    --lumo-primary-text-color: hsl(216, 41%, 18%);
+    --lumo-primary-color: hsl(208, 31%, 28%);
+    --lumo-primary-color-50pct: hsla(208, 31%, 28%, 0.5);
+    --lumo-primary-color-10pct: hsla(208, 31%, 28%, 0.1);
+}
+
+vaadin-login-overlay-wrapper::part(backdrop) {
+    background-image: url("../assets/bg-login.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+vaadin-login-overlay-wrapper::part(card) {
+    min-width: 400px;
+    margin: 0 15vw 0 0;
+}
+
+vaadin-login-overlay-wrapper::part(content) {
+    justify-content: flex-end;
+}
+
+
+

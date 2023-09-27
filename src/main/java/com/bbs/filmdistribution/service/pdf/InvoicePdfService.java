@@ -48,8 +48,8 @@ public class InvoicePdfService extends AbstractPdfService
         Customer customer = filmDistribution.getCustomer();
         List<DistributionInvoiceDTO> distributionInvoiceDTOList = filmDistributionService.getDistributionInvoiceByDistribution( filmDistribution.getId() );
 
-        String headerInput = loadPdfTemplate( "film-header.html" ).orElse( "" );
-        String fileInput = loadPdfTemplate( "film-invoice.html" ).orElse( "" );
+        String headerInput = loadPdfTemplate("header.html").orElse("");
+        String fileInput = loadPdfTemplate("invoice.html").orElse("");
 
         Document htmlDocument = createDocumentFromHtmlText( headerInput + fileInput );
 
@@ -59,11 +59,11 @@ public class InvoicePdfService extends AbstractPdfService
         getElementByDocument( htmlDocument, "customerName" ).appendText( customer.getFullName() );
         getElementByDocument( htmlDocument, "customerAddress" ).appendText( customer.getAddress() );
         getElementByDocument( htmlDocument, "customerPlz" ).appendText( customer.getZipCode() + " " + customer.getCity() );
-        getElementByDocument( htmlDocument, "invoiceDate" ).appendText( DateUtil.formatDate( LocalDate.now() ) );
+        getElementByDocument(htmlDocument, "issueDate").appendText(DateUtil.formatDate(LocalDate.now()));
 
         // Fill film costs data
         double costsNet = 0;
-        Element filmTable = getElementByDocument( htmlDocument, "table" );
+        Element filmTable = getElementByDocument(htmlDocument, "invoiceTable");
         for ( DistributionInvoiceDTO distributionInvoiceDTO : distributionInvoiceDTOList )
         {
             costsNet += distributionInvoiceDTO.getPriceTotal();
@@ -71,11 +71,11 @@ public class InvoicePdfService extends AbstractPdfService
         }
 
         double tax = costsNet * 0.19;
-        getElementByDocument( htmlDocument, "costsNet" ).appendText( NumbersUtil.formatCurrency( costsNet ) );
-        getElementByDocument( htmlDocument, "costsText" ).appendText( NumbersUtil.formatCurrency( tax ) );
-        getElementByDocument( htmlDocument, "costsAmount" ).appendText( NumbersUtil.formatCurrency( costsNet + tax ) );
+        getElementByDocument(htmlDocument, "totalNet").appendText(NumbersUtil.formatCurrency(costsNet));
+        getElementByDocument(htmlDocument, "totalTax").appendText(NumbersUtil.formatCurrency(tax));
+        getElementByDocument(htmlDocument, "total").appendText(NumbersUtil.formatCurrency(costsNet + tax));
 
-        createPdfFile( htmlDocument, NumbersUtil.createLeadingZeroCustomerNumber( filmDistribution.getId() ), "film-base.css" );
+        createPdfFile(htmlDocument, NumbersUtil.createLeadingZeroCustomerNumber(filmDistribution.getId()), "pdf-template.css");
     }
 
     /**
@@ -89,15 +89,12 @@ public class InvoicePdfService extends AbstractPdfService
         String startDate = DateUtil.formatDate( distributionInvoiceDTO.getStartDate() );
         String endDate = DateUtil.formatDate( distributionInvoiceDTO.getEndDate() );
 
-        StringBuilder invoiceEntry = new StringBuilder();
-        invoiceEntry.append( "<tr>" );
-        invoiceEntry.append( "<td>" + startDate + " - " + endDate + "</td>" );
-        invoiceEntry.append( "<td>" + distributionInvoiceDTO.getFilmName() + "</td>" );
-        invoiceEntry.append( "<td>" + NumbersUtil.formatCurrency( distributionInvoiceDTO.getPricePerWeek() ) + "</td>" );
-        invoiceEntry.append( "<td>" + NumbersUtil.formatCurrency( distributionInvoiceDTO.getPriceTotal() ) + "</td>" );
-        invoiceEntry.append( "</tr>" );
-
-        return invoiceEntry.toString();
+        return "<tr>" +
+                "<td><p>" + startDate + " - " + endDate + "</p></td>" +
+                "<td><p>" + distributionInvoiceDTO.getFilmName() + "</p></td>" +
+                "<td><p>" + NumbersUtil.formatCurrency(distributionInvoiceDTO.getPricePerWeek()) + "</p></td>" +
+                "<td><p>" + NumbersUtil.formatCurrency(distributionInvoiceDTO.getPriceTotal()) + "</p></td>" +
+                "</tr>";
     }
 
     @Override

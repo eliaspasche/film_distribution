@@ -34,10 +34,12 @@ public class LoginView extends LoginOverlay implements BeforeEnterObserver
     {
         setAction( RouteUtil.getRoutePath( VaadinService.getCurrent().getContext(), getClass() ) );
 
+        addClassName("login-view");
+
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader( new LoginI18n.Header() );
         i18n.getHeader().setTitle( "Film Distribution" );
-        i18n.getHeader().setDescription( "Login using user/user or admin/admin" );
+        i18n.getHeader().setDescription("Management Software for Film Distribution");
         i18n.setAdditionalInformation( this.appConfig.getVersion() );
         setI18n( i18n );
 

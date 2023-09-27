@@ -1,0 +1,41 @@
+div.header {
+    display: block;
+    position: running(header);
+    margin-bottom: 0.5cm;
+}
+
+div.footer {
+    margin-top: 0.5cm;
+    display: block;
+    position: running(footer);
+    border-top: 1px solid #ddd;
+    font-weight: lighter;
+}
+
+#pageNumber:before {
+    content: counter(page);
+}
+
+#pageCount:before {
+    content: counter(pages);
+}
+
+.logo {
+    margin: 10px 10px 10px auto;
+    float: right;
+    width: 120px;
+    height: 120px;
+}
+
+.headerTable, .footerTable {
+    margin: 20px 0;
+    width: 100%;
+}
+
+.headerTable th, .footerTable th {
+    text-align: left;
+}
+
+.footerTable th:last-child {
+    text-align: right;
+}
