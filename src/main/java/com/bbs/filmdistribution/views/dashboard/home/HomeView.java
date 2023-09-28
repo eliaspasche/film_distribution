@@ -36,8 +36,8 @@ import java.util.List;
  * The destination page of the application after login.
  * Some useful information about the saved data is displayed here.
  */
-@PageTitle("Dashboard")
-@Route(value = "home", layout = DashboardLayout.class)
+@PageTitle( "Dashboard" )
+@Route( value = "home", layout = DashboardLayout.class )
 @RouteAlias( value = "", layout = DashboardLayout.class )
 @PermitAll
 @RequiredArgsConstructor
@@ -110,12 +110,13 @@ public class HomeView extends HomeLayout
 
         apexChartsBuilder.withChart( ChartBuilder.get().withType( Type.BAR ).withBackground( "transparent" ).build() ).withPlotOptions(
                         PlotOptionsBuilder.get().withBar(
-                                BarBuilder.get().withColors(null).withHorizontal(false).withDistributed(true)
-                                        .withColumnWidth("55%").build()).build())
+                                BarBuilder.get().withColors( null ).withHorizontal( false ).withDistributed( true )
+                                        .withColumnWidth( "55%" ).build() ).build() )
                 .withSeries( new Series<>( "Amount", dataValues ) )
-                .withLabels(filmNames)
+                .withStroke( StrokeBuilder.get().withWidth( 1.0 ).withColors( "var(--lumo-contrast)" ).build() )
+                .withLabels( filmNames )
                 .withYaxis( YAxisBuilder.get().withLabels( LabelsBuilder.get().withFormatter( new NumberFormatFormatter( 0 ) ).build() ).build() )
-                .withTitle(TitleSubtitleBuilder.get().withText("Top " + displayAmount + " film distributions").build());
+                .withTitle( TitleSubtitleBuilder.get().withText( "Top " + displayAmount + " film distributions" ).build() );
 
         ApexCharts apexCharts = apexChartsBuilder.build();
         apexCharts.setClassName( "chartLayout" );
@@ -151,6 +152,7 @@ public class HomeView extends HomeLayout
                         .build() )
                 .withSeries( dataValues )
                 .withLabels( filmNames )
+                .withStroke( StrokeBuilder.get().withShow( true ).withWidth( 1.0 ).withColors( "var(--lumo-contrast)" ).build() )
                 .withYaxis( YAxisBuilder.get().withLabels( LabelsBuilder.get().withFormatter( new SuffixFormatter( " €" ) ).build() ).build() )
                 .withTitle( TitleSubtitleBuilder.get().withText( "Distribution revenues" ).build() );
 

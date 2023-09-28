@@ -6,6 +6,7 @@ import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.service.AgeGroupService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
+import com.bbs.filmdistribution.util.NumbersUtil;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
@@ -111,11 +112,9 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService>
         Grid.Column<Film> filmNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
         grid.addColumn( "length" ).setAutoWidth( true );
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
-        grid.addColumn( "price" ).setAutoWidth( true );
+        grid.addColumn( item -> NumbersUtil.formatCurrency( item.getPrice() ), "price" ).setHeader( "Price/Week" ).setAutoWidth( true );
         grid.addColumn( item -> getDatabaseService().availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
         grid.addComponentColumn( item -> buildMenuBar( item, item.getName(), this ) ).setFrozenToEnd( true );
-        ;
-
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener( event -> {

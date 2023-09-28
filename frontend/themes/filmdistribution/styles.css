@@ -40,5 +40,13 @@ vaadin-login-overlay-wrapper::part(content) {
     justify-content: flex-end;
 }
 
+@media ( max-width: 1200px ) or ( max-height: 700px) {
+    vaadin-login-overlay-wrapper::part(card) {
+        min-width: 400px;
+        margin: 0;
+    }
 
-
+    vaadin-login-overlay-wrapper::part(content) {
+        justify-content: center;
+    }
+}

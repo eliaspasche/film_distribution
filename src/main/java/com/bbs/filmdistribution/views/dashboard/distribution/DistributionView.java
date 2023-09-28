@@ -63,7 +63,7 @@ import java.util.*;
 /**
  * A view to manage the {@link FilmDistribution} objects.
  */
-@PageTitle("Distributions")
+@PageTitle( "Distributions" )
 @Route( value = "distribution/:distributionID?/:action?(edit)", layout = DashboardLayout.class )
 @PermitAll
 @Uses( Icon.class )
@@ -95,7 +95,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      * @param customerService     The {@link CustomerService}
      * @param filmCopyService     The {@link FilmCopyService}
      */
-    public DistributionView(FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService, InvoicePdfService invoicePdfService, ReportPdfService reportPdfService)
+    public DistributionView( FilmDistributionService distributionService, CustomerService customerService, FilmCopyService filmCopyService, FilmService filmService, InvoicePdfService invoicePdfService, ReportPdfService reportPdfService )
     {
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
@@ -104,7 +104,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         this.invoicePdfService = invoicePdfService;
 
         getHeaderDiv().addClassNames( "distribution-view" );
-        filters = new Filters(this::refreshGrid, customerService, filmService, reportPdfService);
+        filters = new Filters( this::refreshGrid, customerService, filmService, reportPdfService );
         getHeaderDiv().setWidthFull();
         getHeaderDiv().add( createMobileFilters(), filters );
 
@@ -459,7 +459,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         private final DatePicker date = new DatePicker( "Reporting Date" );
 
 
-        public Filters(Runnable onSearch, CustomerService customerService, FilmService filmService, ReportPdfService reportPdfService)
+        public Filters( Runnable onSearch, CustomerService customerService, FilmService filmService, ReportPdfService reportPdfService )
         {
             setWidthFull();
             addClassNames( LumoUtility.Padding.Horizontal.LARGE, LumoUtility.Padding.Vertical.MEDIUM, LumoUtility.BoxSizing.BORDER );
@@ -478,9 +478,9 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             film.setPlaceholder( "Select a Film" );
             film.setClearButtonVisible( true );
 
-
             date.setPlaceholder( "Select a Reporting Date" );
             date.setAriaLabel( "Reporting Date" );
+            date.setClearButtonVisible( true );
 
 
             // Action buttons
@@ -513,7 +513,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
                 exportButton.setIcon( progressBar );
 
                 new Thread( () -> ui.access( () -> {
-                    reportPdfService.createReportPdf(customer.getValue(), film.getValue(), date.getValue());
+                    reportPdfService.createReportPdf( customer.getValue(), film.getValue(), date.getValue() );
                     exportButton.setEnabled( true );
                     exportButton.setIcon( new Icon( VaadinIcon.DOWNLOAD ) );
                 } ) ).start();
