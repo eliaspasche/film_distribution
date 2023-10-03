@@ -132,10 +132,10 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ), filters ).stream() );
 
-        grid.addColumn( item -> NumbersUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
+        grid.addColumn(item -> NumbersUtil.createLeadingZeroCustomerNumber(item.getId())).setHeader("Distribution ID").setAutoWidth(true);
         grid.addColumn( item -> item.getCustomer().getFullName() ).setHeader( "Customer" ).setAutoWidth( true );
-        grid.addColumn( item -> DateUtil.formatDate( item.getStartDate() ), "startDate" ).setHeader( "Start-Date" ).setSortable( true ).setAutoWidth( true );
-        grid.addColumn( item -> DateUtil.formatDate( item.getEndDate() ), "endDate" ).setHeader( "End-Date" ).setSortable( true ).setAutoWidth( true );
+        grid.addColumn(item -> DateUtil.formatDate(item.getStartDate()), "startDate").setHeader("Start Date").setSortable(true).setAutoWidth(true);
+        grid.addColumn(item -> DateUtil.formatDate(item.getEndDate()), "endDate").setHeader("End Date").setSortable(true).setAutoWidth(true);
 
         grid.setDetailsVisibleOnClick( false );
         grid.setItemDetailsRenderer( createFilmCopyDetailsRenderer() );
@@ -506,7 +506,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             progressBar.setWidth( "15px" );
 
             exportButton.addClickListener( click -> {
-                onSearch.run();
 
                 UI ui = click.getSource().getUI().orElseThrow();
                 exportButton.setEnabled( false );
@@ -517,6 +516,8 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
                     exportButton.setEnabled( true );
                     exportButton.setIcon( new Icon( VaadinIcon.DOWNLOAD ) );
                 } ) ).start();
+
+                onSearch.run();
             } );
 
             Div actions = new Div( resetBtn, searchBtn, exportButton );

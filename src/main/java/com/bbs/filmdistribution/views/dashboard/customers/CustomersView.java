@@ -70,10 +70,10 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         grid.setItems( query -> getDatabaseService().list( PageRequest.of( query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort( query ) ) ).stream() );
 
-        grid.addColumn( item -> NumbersUtil.createLeadingZeroCustomerNumber( item.getId() ) ).setHeader( "ID" ).setAutoWidth( true );
-        Grid.Column<Customer> lastNameColumn = grid.addColumn( "name" ).setAutoWidth( true );
+        grid.addColumn(item -> NumbersUtil.createLeadingZeroCustomerNumber(item.getId())).setHeader("Customer ID").setAutoWidth(true);
+        Grid.Column<Customer> lastNameColumn = grid.addColumn("name").setHeader("Last Name").setAutoWidth(true);
         Grid.Column<Customer> firstNameColumn = grid.addColumn( "firstName" ).setAutoWidth( true );
-        grid.addColumn( item -> DateUtil.formatDate( item.getDateOfBirth() ), "dateOfBirth" ).setHeader( "Date of birth" ).setSortable( true ).setAutoWidth( true );
+        grid.addColumn(item -> DateUtil.formatDate(item.getDateOfBirth()), "dateOfBirth").setHeader("Date of Birth").setSortable(true).setAutoWidth(true);
 
         Grid.Column<Customer> addressColumn = grid.addColumn( "address" ).setAutoWidth( true );
         Grid.Column<Customer> zipCodeColumn = grid.addColumn( "zipCode" ).setAutoWidth( true );
@@ -144,11 +144,11 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
 
         splitTitle = new H3( "New " + getEditItemName() );
 
-        firstName = new TextField( "Firstname" );
-        lastName = new TextField( "Lastname" );
-        dateOfBirth = new DatePicker( "Date of birth" );
+        firstName = new TextField("First Name");
+        lastName = new TextField("Last Name");
+        dateOfBirth = new DatePicker("Date of Birth");
         address = new TextField( "Address" );
-        zipCode = new TextField( "Zip-Code" );
+        zipCode = new TextField("Zip Code");
         city = new TextField( "City" );
 
         formLayout.add( firstName, lastName, dateOfBirth, address, zipCode, city );

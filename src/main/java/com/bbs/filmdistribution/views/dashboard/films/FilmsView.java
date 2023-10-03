@@ -113,7 +113,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService>
         grid.addColumn( "length" ).setAutoWidth( true );
         grid.addColumn( item -> item.getAgeGroup().getName() ).setHeader( "Age Group" ).setAutoWidth( true );
         grid.addColumn( item -> NumbersUtil.formatCurrency( item.getPrice() ), "price" ).setHeader( "Price/Week" ).setAutoWidth( true );
-        grid.addColumn( item -> getDatabaseService().availableCopies( item.getId() ) ).setHeader( "Copies" ).setAutoWidth( true );
+        grid.addColumn(item -> getDatabaseService().availableCopies(item.getId())).setHeader("Available Copies").setAutoWidth(true);
         grid.addComponentColumn( item -> buildMenuBar( item, item.getName(), this ) ).setFrozenToEnd( true );
 
         // when a row is selected or deselected, populate form
@@ -158,7 +158,7 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService>
         ageGroup.setItems( ageGroupService.list( Pageable.unpaged() ).stream().toList() );
         ageGroup.setItemLabelGenerator( AgeGroup::getName );
 
-        price = ComponentUtil.createNumberField( "Price", "€/week" );
+        price = ComponentUtil.createNumberField("Price/Week", "€/week");
         price.setMax( 99.99 );
 
         availableCopies = ComponentUtil.createIntegerField( "Available Copies", "pieces" );
