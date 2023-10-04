@@ -6,6 +6,8 @@ aller Kosten, haben wir eine Webapplikation als Softwarelösung entwickelt.
 Die Software beinhaltet ein System, mit dem es möglich ist, neue Benutzer als Admin hinzuzufügen und somit nur
 bestimmten Personen Zugriff auf die Anwendung zu erlauben.
 
+//TODO Benutzer-Rollen (ADMIN, USER)
+
 Grundlegend besitzt jeder Film eine bestimmtes Kontingent an Film-Kopien.
 Auf dieser Basis können anschließend Ausleihen erstellt werden.
 
@@ -48,7 +50,7 @@ und ob die Film-Kopien noch verfügbar sind.
 Außerdem kann zu jeder bestehenden Ausleihe eine Rechnung als PDF erstellt werden.
 
 Für die Auswertung zu einem bestimmten Kunden, Film oder Stichtag kann ein entsprechender Bericht erstellt werden.
-Die nötigen Filter können über der Tabelle Ansicht eingestellt und anschließen über "Create Report" erstellt werden.
+Die nötigen Filter können über der Tabellen Ansicht eingestellt und anschließend über "Create Report" erstellt werden.
 
 ___
 ### Customers
