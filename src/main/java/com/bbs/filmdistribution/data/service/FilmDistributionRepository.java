@@ -45,10 +45,12 @@ public interface FilmDistributionRepository extends JpaRepository<FilmDistributi
     List<DistributionInvoiceDTO> getDistributionInvoiceByDistribution( long distributionId );
 
     /**
-     * @param customerIds
-     * @param filmId
-     * @param reportingDate
-     * @return
+     * Get a list of {@link DistributionReportDTO} with the distributed films for given filter by customerId, filmId and reportingDate.
+     *
+     * @param customerId id of a customer
+     * @param filmId id on a film
+     * @param reportingDate date of report
+     * @return list of {@link DistributionReportDTO}
      */
     @Query( value = "select f.NAME as filmName, count(*) as amount, cust.ID as customerId, f.PRICE as pricePerWeek, fd.START_DATE as startDate, fd.END_DATE as endDate, cast(sum(f.PRICE * ceil((fd.END_DATE - fd.START_DATE) / 7)) AS DECIMAL(5, 2)) as priceTotal from FILM_DISTRIBUTION_ITEMS fdi join FILM_DISTRIBUTION fd on fdi.FILM_DISTRIBUTION_ID = fd.ID join FILM_COPY c on c.ID = fdi.FILM_COPY_ID join FILM f on f.ID = c.FILM_ID join CUSTOMER cust on fd.CUSTOMER_ID = cust.ID WHERE (:customerId IS NULL OR cust.ID IN :customerId) AND (:filmId IS NULL OR f.ID = :filmId) AND (:reportingDate IS NULL OR :reportingDate BETWEEN fd.START_DATE AND fd.END_DATE) group by f.NAME, cust.ID, f.PRICE, fd.START_DATE, fd.END_DATE", nativeQuery = true )
     List<DistributionReportDTO> getDistributionReportForSelectedFilter( Long customerId, Long filmId, LocalDate reportingDate );

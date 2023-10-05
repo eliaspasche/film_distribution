@@ -28,20 +28,18 @@ Die Berechnung ergibt sich anhand der angefangenen Wochen über den Zeitraum der
 
 #### Beispiel:
 
-```
-Start-Datum: 15.09.2023 (Freitag)
-End-Datum: 05.10.2023 (Donnerstag)
-Preis/Woche: 5 €
-
-=> 3 angefangene Wochen ausgehend von Freitag
-
-Preis: 15 €
-```
+> Start-Datum: 15.09.2023 (Freitag)  
+> End-Datum: 05.10.2023 (Donnerstag)  
+> Preis/Woche: 5 €
+>
+> => 3 angefangene Wochen ausgehend von Freitag  
+> Preis: 15 €
 
 Des Weiteren können Rechnungen und Berichte mit bestimmten Filtern als PDF erstellt und ausgedruckt werden.
 
 In folgenden werden die einzelnen Unterseiten genauer beschrieben.
 
+---
 ## Technologies/Frameworks
 
 * Java 17
@@ -50,6 +48,7 @@ In folgenden werden die einzelnen Unterseiten genauer beschrieben.
 * Oracle DB
 * Spring Boot (3.1.0)
 
+---
 ## Running the Application
 
 1. mvn install
@@ -57,19 +56,21 @@ In folgenden werden die einzelnen Unterseiten genauer beschrieben.
 2. Datenbank Verbindung konfigurieren
    * Unter `src/main/resources/application.yml` muss eine Datenbank Verbindung eingetragen werden
 
-```yml
-spring:
-   datasource:
-      driver-class-name: oracle.jdbc.OracleDriver
-      url: jdbc:oracle:thin:@//h2922093.stratoserver.net:1521/orcl.stratoserver.net
-      username: video
-      password: Gruppe2
-```
+   ```yml
+    spring:
+       datasource:
+          driver-class-name: oracle.jdbc.OracleDriver
+          url: jdbc:oracle:thin:@//h2922093.stratoserver.net:1521/orcl.stratoserver.net
+          username: video
+          password: Gruppe2
+    ```
 
 3. Mit `spring-boot:run` kann die Anwendung gestartet werden.
    * Beim ersten Starten dauert es ein paar Minuten, da erst einige Pakete installiert werden.
    * Alternativ kann auch der Einstiegspunkt der Anwendung zum starten verwendet werden.
       * `src/main/java/com/bbs/filmdistribution/Application.java`
+
+---
 ## Menu (Pages)
 
 ### Dashboard
@@ -77,15 +78,12 @@ spring:
 Das Dashboard bietet allgemeine Informationen über die gesamte Webapplikation.
 Angefangen mit der Anzahl von Filmen, Kunden, Ausleihen und Film-Kopien gibt es außerdem zwei Diagramme.
 
-#### Balkendiagramm:
-
+**Balkendiagramm:**  
 Zeigt die Top 5 Filme, auf Basis der aktuell ausgeliehenen Film-Kopien.
 
-#### Donut-Chart:
-
+**Donut-Chart:**  
 Zeigt die Umsätze der aktuell ausgeliehenen Filme an.
 
-___
 ### Distributions
 
 Auf dieser Seite können die Film-Ausleihen verwaltet werden.
@@ -100,20 +98,20 @@ Die ausgeliehenen Filme und die entsprechenden Altersgruppen können ebenfalls f
 Für die Auswertung zu einem bestimmten Kunden, Film oder Stichtag kann ein entsprechender Bericht erstellt werden.
 Die nötigen Filter können über der Tabellen Ansicht eingestellt und anschließend über "Create Report" erstellt werden.
 
-#### Filter Optionen
+**Filter Optionen**
 
 * **Kunde**: Bericht über die Ausleihen eines bestimmten Kunden.
 * **Film**: Bericht über die Ausleihe zu einen bestimmten Film.
 * **Stichtag**: Bericht über die Kunden und Ausleihen zu einem bestimmten Stichtag.
 
 Die Filter können auch in Kombination genutzt werden.
-___
+
 ### Customers
 
 Auf dieser Seite können Kunden verwaltet werden.
 Es können neue Kunden erstellt und bestehende Kunden angepasst oder entfernt werden.
 
-___
+
 ### Films
 
 Diese Seite dient zur Verwaltung der Filme. Hier können Filme erstellt und bei Bedarf angepasst oder entfernt werden.
@@ -123,18 +121,17 @@ werden.
 Jeder Film hat dabei einen festen Preis für jede angefangene Woche.
 Außerdem hat jeder Film ein bestimmtes Mindestalter, um dieses bei der Ausleihe mit dem Alter des Kunden zu überprüfen.
 
-___
+
 ### Film Copies
 
 Zu jedem Film gibt es eine bestimmte Anzahl an Film-Kopien. Diese können auf dieser Seite verwaltet werden.
 Es können zu einem bestimmten Film neue Film-Kopien erstellt werden, die von Kunden ausgeliehen werden können.
 
-___
+
 ### Age Groups
 
 Auf dieser Seite können die Altersgruppen für die Filme festgelegt werden.
 
-___
 ### Account (Admin Only)
 
 Diese Seite dürfen nur Benutzer mit der Admin Rolle betreten.
@@ -143,21 +140,62 @@ Hier können neue Benutzer für die Verwaltung der Webapplikation angelegt oder 
 ___
 ## SQL Scripts
 
-Installation Scrips: [Installation Scripts](./doc/sql_installation.md)
+Die verschiedenen, benötigten SQL-Skripte sind in strukturierten MarkDown-Dateien
+hinterlegt: [Vollständige Übersicht über SQL-Skripte](doc/sql/sql.md). Es wird unterschieden zwischen
+Installation-Skripten,
+die bei einer Installation die benötigten Tabellen erstellen und mit initialen Daten befüllen und den Skripten, die zur
+Laufzeit benötigt werden. Die Skripte zur Laufzeit sind im Programm implementiert und stellen die Schnittstelle zwischen
+Anwendung und Datenbank dar.
 
-Required Scripts at runtime: [SQL Scripts](./doc/sql.md)
-
+___
 ## ER-Diagram
 
+![ER-Diagramm](./doc/ER_Diagram.svg)
+
+___
 ## Optional: Class Explanation (Database related)
 
-Describe:
+Zur Übersicht werden im Folgenden einige grundlegende Klassen erklärt, die in der Anwendung häufig verwendet werden.
 
-* Config
-* Repository
-* Service
-* View
+#### Repository
 
+Die sogenannten `Repository`-Klassen stellen die Schnittstelle zwischen der Anwendung und der Datenbank dar. In dieser
+Anwendung wird Hibernate bzw. Spring JPA verwendet, um auf die Datenbank zuzugreifen. Diese Frameworks übernehmen die
+grundlegenden CRUD-Operationen (Create, Read, Update, Delete). Da für diese Operationen keine direkten SQL-Skripte
+implementiert werden müssen, sind alle SQL-Befehle, die implizit verwendet werden, in der Schnittstellen-Dokumentation
+aufgeführt: [Vollständige Übersicht über SQL-Skripte](doc/sql/sql.md).
+
+Komplexere SQL-Skripte sind als `Query` in den entsprechenden Repositories implementiert. Auf diese Weise kann mit
+einem `Repository` auch ein parametrisierte SQL-Befehl direkt ausgeführt werden.
+
+#### Entities
+
+Eine `Entity` ist im Grunde ein Datenobjekt, das eine oder mehrere Tabellen einer Datenbank abstrahiert. Für
+jede `Entity` gibt es eine entsprechende `Repository`-Klasse. Das Repository kann die von der Datenbank abgerufenen
+Daten in `Entity`-Objekte übertragen oder auch `Entity`-Objekte in die Datenbank speichern. Die `Entity` kann dann
+überall in der Anwendung verwendet werden.
+
+#### Service
+
+`Services` enthalten die Business-Logik der Anwendung. Passenden zu den `Entities` und `Repositories` gibt es jeweils
+einen `Service`. Dieser abstrahiert wiederum das Laden und Speichern und kann zusätzliche Methoden und Logik enthalten.
+Daher werden die Services in der Anwendung verwendet, um Daten zu verwalten.
+
+#### View
+
+Die `Views` stellen im Prinzip die Schnittstelle zum Benutzer dar. In den einzelnen `Views` ist genau definiert, wie die
+Benutzeroberflächen der Anwendung aussehen, welche Daten angezeigt werden und welche Interaktionsmöglichkeiten der
+Nutzer letztendlich hat. Eine `View` verwendet wiederum einen oder mehrere `Services`, um Daten abzurufen oder auch zu
+speichern.
+
+#### Config
+
+Die grundlegende Konfiguration der Anwendung, die bereits beim Start der Anwendung benötigt wird, wird ist in den
+Ressourcen der Anwendung hinterlegt. Bei dem verwendeten Spring-Framework ist diese Konfiguration in
+sogenannten `application.yaml`-Dateien abgelegt. Hier ist zum Beispiel die Datenbankverbindung oder weitere
+Infrastruktur wie Mail-Server oder verwendete Ports der Web-Application konfiguriert
+
+___
 ## Dependencies (artifacts)
 
 Eine Auflistung aller wichtigen Bibliotheken die für das Projekt genutzt wurden.
