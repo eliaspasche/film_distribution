@@ -55,7 +55,6 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
         Button deleteButton = new Button( "Delete" );
         deleteButton.addThemeVariants( ButtonVariant.LUMO_PRIMARY,
                 ButtonVariant.LUMO_ERROR );
-        deleteButton.getStyle().set( "margin-right", "auto" );
         deleteButton.addClickListener( click -> {
             try
             {

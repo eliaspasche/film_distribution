@@ -21,10 +21,10 @@ Ein Benutzer kann dabei zwei Rollen zugeordnet werden (Admin und User).
 Für die Logik der Film Ausleihe, besitzt jeder Film ein bestimmtes Kontingent an Film-Kopien.
 Auf dieser Basis können anschließend Ausleihen erstellt werden.
 
-Zu einer Ausleihe gehört jeweils ein Kunde, eine beliebige Anzahl an Film-Kopien und
-ein Start- sowie ein End-Datum.
+Zu einer Ausleihe gehört jeweils ein Kunde, eine beliebige Anzahl an Film-Kopien sowie
+ein Start- und ein End-Datum.
 
-Die Berechnung ergibt sich anhand der angefangenen Wochen über den Ausleih-Zeitraum.
+Die Berechnung ergibt sich anhand der angefangenen Wochen über den Zeitraum der Ausleihe.
 
 #### Beispiel:
 
@@ -42,11 +42,34 @@ Des Weiteren können Rechnungen und Berichte mit bestimmten Filtern als PDF erst
 
 In folgenden werden die einzelnen Unterseiten genauer beschrieben.
 
+## Technologies/Frameworks
+
+* Java 17
+* Vaadin 24 (24.1.12)
+* Maven (Build Tool)
+* Oracle DB
+* Spring Boot (3.1.0)
 
 ## Running the Application
 
-Short Installation Guide: Maven, NPM, Database Connection, Run Configurations
+1. mvn install
+   * Mit `mvn install` werden alle nötigen Dependencies heruntergeladen.
+2. Datenbank Verbindung konfigurieren
+   * Unter `src/main/resources/application.yml` muss eine Datenbank Verbindung eingetragen werden
 
+```yml
+spring:
+   datasource:
+      driver-class-name: oracle.jdbc.OracleDriver
+      url: jdbc:oracle:thin:@//h2922093.stratoserver.net:1521/orcl.stratoserver.net
+      username: video
+      password: Gruppe2
+```
+
+3. Mit `spring-boot:run` kann die Anwendung gestartet werden.
+   * Beim ersten Starten dauert es ein paar Minuten, da erst einige Pakete installiert werden.
+   * Alternativ kann auch der Einstiegspunkt der Anwendung zum starten verwendet werden.
+      * `src/main/java/com/bbs/filmdistribution/Application.java`
 ## Menu (Pages)
 
 ### Dashboard
@@ -79,21 +102,21 @@ Die nötigen Filter können über der Tabellen Ansicht eingestellt und anschlie�
 
 #### Filter Optionen
 
-* Kunde: Bericht über die Ausleihen eines bestimmten Kunden.
-* Film: Bericht über die Ausleihe zu einen bestimmten Film.
-* Stichtag: Bericht über die Kunden und Ausleihen zu einem bestimmten Stichtag.
+* **Kunde**: Bericht über die Ausleihen eines bestimmten Kunden.
+* **Film**: Bericht über die Ausleihe zu einen bestimmten Film.
+* **Stichtag**: Bericht über die Kunden und Ausleihen zu einem bestimmten Stichtag.
 
 Die Filter können auch in Kombination genutzt werden.
 ___
 ### Customers
 
 Auf dieser Seite können Kunden verwaltet werden.
-Es können neue Kunden erstellt und bestehende Kunden angepasst und entfernt werden.
+Es können neue Kunden erstellt und bestehende Kunden angepasst oder entfernt werden.
 
 ___
 ### Films
 
-Diese Seite dient zur Verwaltung der Filme. Hier können Filme erstellt und bei Bedarf angepasst und entfernt werden.
+Diese Seite dient zur Verwaltung der Filme. Hier können Filme erstellt und bei Bedarf angepasst oder entfernt werden.
 Bei jedem neuen Film kann eine Anzahl bestehender Kopien angegeben werden, damit diese anschließend automatisch erstellt
 werden.
 
@@ -135,5 +158,34 @@ Describe:
 * Service
 * View
 
+## Dependencies (artifacts)
 
+Eine Auflistung aller wichtigen Bibliotheken die für das Projekt genutzt wurden.
 
+#### vaadin
+
+Framework für die Erstellung von modernen Webanwendungen, mit einer komplett Serverseitigen Architektur.
+Die gesamte Anwendung kann dabei mit der Programmiersprache Java realisiert werden.
+
+#### spring-boot-starter-security
+
+Sicherheitsmechanismen für die Webapplikation.
+Beinhaltet Authentifizierung, Passwort-Hash Funktionen und Session-Management.
+
+#### ojdbc8
+
+Treiber für die Oracle Datenbank.
+
+#### lombok
+
+Vereinfacht die Erstellung von sogenannten Boilerplate Code durch Annotationen.
+Als Beispiel können klassische get und set Methoden einfach weggelassen werden.
+Diese können durch Annotationen über der Klasse oder des Feldes ersetzt werden (@Getter, @Setter).
+
+#### apexcharts
+
+Erstellung von Charts und Diagrammen mithilfe des Builder-Patterns.
+
+#### jsoup & flying-saucer-pdf-openpdf
+
+Erstellung von PDF Dateien auf Basis von HTML und CSS.
