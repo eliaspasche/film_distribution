@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -39,6 +40,15 @@ public class DateUtil
     public static int getAgeByDate( LocalDate date )
     {
         return Period.between( date, LocalDate.now() ).getYears();
+    }
+
+    /**
+     * Returns the current date.
+     *
+     * @return LocalDate
+     */
+    public static LocalDate now() {
+        return LocalDate.now(ZoneId.systemDefault());
     }
 
 }

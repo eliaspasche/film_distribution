@@ -1,11 +1,13 @@
 # Reports
 
-#### Amount of Distributions of a Film Copy
+#### Amount of Distribution Items of a Film Copy at Date
 
 ```sql
 SELECT COUNT(*)
-FROM film_distribution_items
-WHERE film_copy_id = :film_copy_id;
+FROM film_distribution_items items
+         LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id
+WHERE film_copy_id = :filmCopyId
+  AND :date BETWEEN distribution.start_date AND distribution.end_date
 ```
 
 #### List top N most distributed films

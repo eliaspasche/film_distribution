@@ -6,6 +6,7 @@ import com.bbs.filmdistribution.data.entity.FilmCopy;
 import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
+import com.bbs.filmdistribution.util.DateUtil;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
@@ -141,7 +142,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
      */
     private Icon createCopyAvailableBadge( FilmCopy filmCopy )
     {
-        boolean copyAvailable = getDatabaseService().isFilmCopyAvailable( filmCopy.getId() );
+        boolean copyAvailable = getDatabaseService().isFilmCopyAvailable(filmCopy.getId(), DateUtil.now());
         VaadinIcon icon = copyAvailable ? VaadinIcon.CHECK : VaadinIcon.CLOSE;
         String styleLabel = "badge " + ( copyAvailable ? "success" : "error" );
 

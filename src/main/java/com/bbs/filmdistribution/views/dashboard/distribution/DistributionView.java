@@ -57,7 +57,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -262,7 +261,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
      */
     private boolean filmsToDistributeAvailable( FilmDistribution filmDistribution, Set<FilmCopy> currentFilmCopies )
     {
-        List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies();
+        List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies(filmDistribution.getEndDate());
         if ( currentFilmCopies != null )
         {
             filmCopyList.addAll( currentFilmCopies );
@@ -272,7 +271,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         if ( !notAvailable.isEmpty() )
         {
-            notAvailable.forEach( item -> NotificationUtil.sendErrorNotification( "The film copy " + item.getFilm().getName() + " is not longer available", 3 ) );
+            notAvailable.forEach(item -> NotificationUtil.sendErrorNotification("The film copy " + item.getFilm().getName() + " is not available until " + DateUtil.formatDate(filmDistribution.getEndDate()), 5));
             refreshGrid();
             return false;
         }
@@ -283,7 +282,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     @Override
     protected void createEditorLayout()
     {
-        LocalDate now = LocalDate.now( ZoneId.systemDefault() );
+        LocalDate now = DateUtil.now();
 
         FormLayout formLayout = new FormLayout();
 
@@ -296,7 +295,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
         filmCopies = new MultiSelectComboBox<>( "Film Copies" );
         filmCopies.setRenderer( createFilmCopyRenderer() );
-        filmCopies.setItems( filmCopyService.getAvailableCopies() );
+        filmCopies.setItems(filmCopyService.getAvailableCopies(now));
         filmCopies.setItemLabelGenerator( c -> c.getFilm().getName() + " " + c.getFilm().getAgeGroup().getName() );
 
         startDate = new DatePicker( "Start Date" );
@@ -309,6 +308,8 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             }
             endDate.setMin( startDate.getValue().plusDays( 7 ) );
             endDate.setMax( startDate.getValue().plusDays( 90 ) );
+
+            filmCopies.setItems(filmCopyService.getAvailableCopies(event.getValue()));
         } );
         startDate.setValue( now );
 
@@ -362,7 +363,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         if ( filmCopies != null && getItemToEdit() != null )
         {
             List<FilmCopy> filmCopyList = new ArrayList<>();
-            filmCopyList.addAll( filmCopyService.getAvailableCopies() );
+            filmCopyList.addAll(filmCopyService.getAvailableCopies(value != null ? value.getStartDate() : DateUtil.now()));
             filmCopyList.addAll( getItemToEdit().getFilmCopies() );
             filmCopies.setItems( filmCopyList );
             filmCopies.setValue( getItemToEdit().getFilmCopies() );
@@ -376,7 +377,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         super.refreshGrid();
         if ( filmCopies != null )
         {
-            filmCopies.setItems( filmCopyService.getAvailableCopies() );
+            filmCopies.setItems(filmCopyService.getAvailableCopies(DateUtil.now()));
         }
     }
 

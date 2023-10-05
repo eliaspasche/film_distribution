@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -16,16 +17,18 @@ public interface FilmCopyRepository extends JpaRepository<FilmCopy, Long>, JpaSp
      * Get the amount of distributions by a {@link FilmCopy}
      *
      * @param filmCopyId The id of a {@link FilmCopy}
+     * @param date {@link LocalDate}
      * @return The amount of distributions.
      */
-    @Query( value = "select count(*) from FILM_DISTRIBUTION_ITEMS where FILM_COPY_ID = :filmCopyId", nativeQuery = true )
-    int getDistributionsByFilmCopyId( long filmCopyId );
+    @Query(value = "SELECT COUNT(*) FROM film_distribution_items items LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE film_copy_id = :filmCopyId AND :date BETWEEN distribution.start_date AND distribution.end_date", nativeQuery = true)
+    int getDistributionsByFilmCopyId(long filmCopyId, LocalDate date);
 
     /**
-     * Get the available {@link FilmCopy} objects
+     * Get the available {@link FilmCopy} objects at a given date
      *
+     * @param date {@link LocalDate}
      * @return The available {@link FilmCopy} as {@link List}
      */
-    @Query( value = "select * from FILM_COPY where ID NOT IN (select FILM_COPY_ID from FILM_DISTRIBUTION_ITEMS)", nativeQuery = true )
-    List<FilmCopy> getAvailableCopies();
+    @Query(value = "SELECT copy.id, copy.inventory_number, copy.film_id FROM film_copy copy LEFT JOIN film_distribution_items items ON copy.id = items.film_copy_id LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE distribution.start_date IS NULL OR distribution.end_date IS NULL OR :date NOT BETWEEN distribution.start_date AND distribution.end_date", nativeQuery = true)
+    List<FilmCopy> getAvailableCopies(LocalDate date);
 }

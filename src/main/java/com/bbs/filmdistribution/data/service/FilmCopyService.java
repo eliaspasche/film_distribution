@@ -3,6 +3,7 @@ package com.bbs.filmdistribution.data.service;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -26,21 +27,23 @@ public class FilmCopyService extends AbstractDatabaseService<FilmCopy, FilmCopyR
      * Check if the {@link FilmCopy} object is available.
      *
      * @param id The id of the {@link FilmCopy}
+     * @param date {@link LocalDate}
      * @return object is available
      */
-    public boolean isFilmCopyAvailable( long id )
+    public boolean isFilmCopyAvailable(long id, LocalDate date)
     {
-        return getRepository().getDistributionsByFilmCopyId( id ) == 0;
+        return getRepository().getDistributionsByFilmCopyId(id, date) == 0;
     }
 
     /**
      * Get the available {@link FilmCopy} objects
      *
+     * @param date {@link LocalDate}
      * @return The available {@link FilmCopy} as {@link List}
      */
-    public List<FilmCopy> getAvailableCopies()
+    public List<FilmCopy> getAvailableCopies(LocalDate date)
     {
-        return getRepository().getAvailableCopies();
+        return getRepository().getAvailableCopies(date);
     }
 
 }

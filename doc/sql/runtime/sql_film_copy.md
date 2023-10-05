@@ -37,12 +37,16 @@ FROM film_copy
 WHERE film.name LIKE '%' || :name || '%';
 ```
 
-#### Available Film Copies
+#### Available Film Copies at Date
 
 ```sql
-SELECT *
-FROM film_copy
-WHERE id NOT IN (SELECT film_copy_id FROM film_distribution_items);
+SELECT copy.id, copy.inventory_number, copy.film_id
+FROM film_copy copy
+         LEFT JOIN film_distribution_items items ON copy.id = items.film_copy_id
+         LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id
+WHERE distribution.start_date IS NULL
+   OR distribution.end_date IS NULL
+   OR :date NOT BETWEEN distribution.start_date AND distribution.end_date;
 ```
 
 #### Count
