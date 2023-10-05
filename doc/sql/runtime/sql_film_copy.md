@@ -26,6 +26,17 @@ FROM film_copy
 WHERE film_copy.id = :id; -- Optional WHERE
 ```
 
+#### Find With Joined Data And Filters
+
+```sql
+SELECT *
+FROM film_copy
+         JOIN film ON film_copy.film_id = film.id
+         JOIN film_distribution_items ON film_copy.id = film_distribution_items.film_copy_id
+         JOIN film_distribution ON film_distribution_items.film_distribution_id = film_distribution.id
+WHERE film.name LIKE '%' || :name || '%';
+```
+
 #### Available Film Copies
 
 ```sql

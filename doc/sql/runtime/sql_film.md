@@ -25,6 +25,16 @@ FROM film
 WHERE film.id = :id; -- Optional WHERE
 ```
 
+#### Find With Joined Data and Filters
+
+```sql
+SELECT *
+FROM film
+         JOIN age_group ON film.age_group_id = age_group.id
+         JOIN film_copy ON film.id = film_copy.film_id
+WHERE film.name LIKE '%' || :name || '%';
+```
+
 #### Amount of Available Copies
 
 ```sql

@@ -15,6 +15,43 @@ SELECT *
 FROM customer;
 ```
 
+#### Find All With Filters
+
+```sql
+SELECT *
+FROM customer
+WHERE name LIKE '%' || :name || '%';
+
+
+SELECT *
+FROM customer
+WHERE first_name LIKE '%' || :first_name || '%';
+
+
+SELECT *
+FROM customer
+WHERE address LIKE '%' || :address || '%';
+
+
+SELECT *
+FROM customer
+WHERE zip_code LIKE '%' || :zip_code || '%';
+
+
+SELECT *
+FROM customer
+WHERE city LIKE '%' || :city || '%';
+
+
+SELECT *
+FROM customer
+WHERE name LIKE '%' || :name || '%'
+  AND first_name LIKE '%' || :first_name || '%'
+  AND address LIKE '%' || :address || '%'
+  AND zip_code LIKE '%' || :zip_code || '%'
+  AND city LIKE '%' || :city || '%';
+```
+
 #### Count
 
 ```sql

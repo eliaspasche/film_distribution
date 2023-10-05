@@ -33,6 +33,43 @@ FROM film_distribution
 WHERE film_distribution.id = :id; -- Optional WHERE
 ```
 
+#### Find All With Joined Data And Filters
+
+```sql
+SELECT *
+FROM film_distribution
+         JOIN customer ON film_distribution.customer_id = customer.id
+         JOIN film_distribution_items ON film_distribution.id = film_distribution_items.film_distribution_id
+         JOIN film_copy ON film_distribution_items.film_copy_id = film_copy.id
+WHERE film_distribution.customer_id = :customer_id;
+
+
+SELECT *
+FROM film_distribution
+         JOIN customer ON film_distribution.customer_id = customer.id
+         JOIN film_distribution_items ON film_distribution.id = film_distribution_items.film_distribution_id
+         JOIN film_copy ON film_distribution_items.film_copy_id = film_copy.id
+WHERE film_copy.film_id = :film_id;
+
+
+SELECT *
+FROM film_distribution
+         JOIN customer ON film_distribution.customer_id = customer.id
+         JOIN film_distribution_items ON film_distribution.id = film_distribution_items.film_distribution_id
+         JOIN film_copy ON film_distribution_items.film_copy_id = film_copy.id
+WHERE :reporting_date BETWEEN film_distribution.start_date AND film_distribution.end_date;
+
+
+SELECT *
+FROM film_distribution
+         JOIN customer ON film_distribution.customer_id = customer.id
+         JOIN film_distribution_items ON film_distribution.id = film_distribution_items.film_distribution_id
+         JOIN film_copy ON film_distribution_items.film_copy_id = film_copy.id
+WHERE (:customer_id IS NULL OR film_distribution.customer_id = :customer_id)
+  AND (:film_id IS NULL OR film_copy.film_id = :film_id)
+  AND (:reporint_date IS NULL OR :reporting_date BETWEEN film_distribution.start_date AND film_distribution.end_date);
+```
+
 #### Count
 
 ```sql
