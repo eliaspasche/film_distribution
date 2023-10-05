@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface AgeGroupRepository extends JpaRepository<AgeGroup, Long>, JpaSpecificationExecutor<AgeGroup>
 {
-
+    // Empty - no special queries needed
 }

@@ -47,7 +47,7 @@ public class AccountView extends MasterDetailGridLayout<User, UserService>
     private final Button saveButton = new Button( "Save" );
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param databaseService The {@link UserService}
      */

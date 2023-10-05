@@ -75,5 +75,4 @@ public class NotificationUtil
     {
         sendNotification( text, durationInSeconds, Notification.Position.BOTTOM_END, NotificationVariant.LUMO_ERROR );
     }
-
 }

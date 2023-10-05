@@ -192,5 +192,4 @@ public class FilmsView extends MasterDetailGridLayout<Film, FilmService>
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
         availableCopies.setVisible( value == null || value.getId() == null );
     }
-
 }

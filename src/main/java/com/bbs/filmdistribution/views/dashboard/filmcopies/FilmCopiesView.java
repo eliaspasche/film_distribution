@@ -217,6 +217,5 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     {
         super.populateForm( value );
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
-
     }
 }

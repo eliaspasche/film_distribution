@@ -49,7 +49,7 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
     private final Button saveButton = new Button( "Save" );
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param databaseService The {@link CustomerService}
      */
@@ -103,7 +103,6 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         headerRow.getCell( addressColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "address" ) );
         headerRow.getCell( zipCodeColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "zipCode" ) );
         headerRow.getCell( cityColumn ).setComponent( ComponentUtil.createGridSearchField( gridFilter, "city" ) );
-
     }
 
     @Override
@@ -179,5 +178,4 @@ public class CustomersView extends MasterDetailGridLayout<Customer, CustomerServ
         super.populateForm( value );
         splitTitle.setText( ( getItemToEdit() == null ? "New" : "Edit" ) + " " + getEditItemName() );
     }
-
 }

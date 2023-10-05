@@ -13,7 +13,7 @@ public class FilmCopyService extends AbstractDatabaseService<FilmCopy, FilmCopyR
 {
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param repository The {@link FilmCopyRepository}
      */

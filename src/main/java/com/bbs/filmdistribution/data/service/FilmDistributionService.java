@@ -18,7 +18,7 @@ public class FilmDistributionService extends AbstractDatabaseService<FilmDistrib
 {
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param filmDistributionRepository The {@link FilmDistributionRepository}
      */

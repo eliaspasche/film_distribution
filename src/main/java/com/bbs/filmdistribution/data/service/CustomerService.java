@@ -11,7 +11,7 @@ public class CustomerService extends AbstractDatabaseService<Customer, CustomerR
 {
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param customerRepository The {@link CustomerRepository}
      */

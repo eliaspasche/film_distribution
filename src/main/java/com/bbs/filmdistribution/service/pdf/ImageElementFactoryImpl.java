@@ -23,7 +23,6 @@ import java.util.logging.Logger;
  */
 public class ImageElementFactoryImpl implements ReplacedElementFactory
 {
-
     private static final Logger LOGGER = Logger.getLogger( ImageElementFactoryImpl.class.getName() );
 
     @Override

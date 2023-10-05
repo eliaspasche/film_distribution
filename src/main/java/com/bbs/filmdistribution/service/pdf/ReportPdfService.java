@@ -32,7 +32,7 @@ public class ReportPdfService extends AbstractPdfService {
     private final CustomerService customerService;
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param appConfig               The {@link AppConfig}
      * @param fileDownloadService     The {@link FileDownloadService}
@@ -45,14 +45,25 @@ public class ReportPdfService extends AbstractPdfService {
     }
 
 
+    /**
+     * Created a pdf report for the distributions with filter options for customer, film and reporting date.
+     *
+     * @param customer      {@link Customer}
+     * @param film          {@link Film}
+     * @param reportingDate {@link LocalDate}
+     */
     public void createReportPdf(Customer customer, Film film, LocalDate reportingDate) {
+        // Load raw report from database
         List<DistributionReportDTO> rawReport = filmDistributionService.getDistributionReportForSelectedFilter(customer != null ? customer.getId() : null, film != null ? film.getId() : null, reportingDate);
 
-        Map<Long, List<DistributionReportDTO>> rawReportGrouped = rawReport.stream().collect(Collectors.groupingBy(DistributionReportDTO::getCustomerId));
+        // Group raw report by customer id
+        Map<Long, List<DistributionReportDTO>> groupedReport = rawReport.stream().collect(Collectors.groupingBy(DistributionReportDTO::getCustomerId));
 
+        // Mapping with total net calculation
         AtomicReference<Double> totalNet = new AtomicReference<>(0d);
-        List<DistributionReport> reports = rawReportGrouped.entrySet().stream().map(entry -> mapToReport(entry, totalNet)).toList();
+        List<DistributionReport> reports = groupedReport.entrySet().stream().map(entry -> mapToReport(entry, totalNet)).toList();
 
+        // Prepare pdf templates
         String headerInput = loadPdfTemplate("header.html").orElse("");
         String fileInput = loadPdfTemplate("report.html").orElse("");
 
@@ -68,6 +79,7 @@ public class ReportPdfService extends AbstractPdfService {
         // Fill film costs data
         Element reportTable = getElementByDocument(htmlDocument, "reportTable");
 
+        // Build report tables
         reports.forEach(report -> reportTable.append(buildReportTableEntry(report)));
 
         double tax = totalNet.get() * 0.19;
@@ -78,6 +90,13 @@ public class ReportPdfService extends AbstractPdfService {
         createPdfFile(htmlDocument, "Report_" + now, "pdf-template.css");
     }
 
+    /**
+     * Maps the grouped report to a {@link DistributionReport}.
+     *
+     * @param entry    grouped raw report
+     * @param totalNet variable to calculate total net
+     * @return {@link DistributionReport}
+     */
     private DistributionReport mapToReport(Map.Entry<Long, List<DistributionReportDTO>> entry, AtomicReference<Double> totalNet) {
         DistributionReport report = new DistributionReport();
 
@@ -93,6 +112,13 @@ public class ReportPdfService extends AbstractPdfService {
         return report;
     }
 
+    /**
+     * Maps a raw {@link DistributionReportDTO} to {@link com.bbs.filmdistribution.common.DistributionReport.DistributionReportItem}
+     *
+     * @param item           {@link DistributionReportDTO}
+     * @param totalNetInside variable to calculate total net of all report items
+     * @return {@link com.bbs.filmdistribution.common.DistributionReport.DistributionReportItem}
+     */
     private static DistributionReport.DistributionReportItem mapToReportItem(DistributionReportDTO item, AtomicReference<Double> totalNetInside) {
         DistributionReport.DistributionReportItem reportItem = new DistributionReport.DistributionReportItem();
         reportItem.setStartDate(item.getStartDate());
@@ -115,14 +141,15 @@ public class ReportPdfService extends AbstractPdfService {
         String startDate = DateUtil.formatDate(reportItem.getStartDate());
         String endDate = DateUtil.formatDate(reportItem.getEndDate());
 
-        return "<tr>" +
-                "<td><p>" + startDate + " - " + endDate + "</p></td>" +
-                "<td><p>" + reportItem.getFilm() + "</p></td>" +
-                "<td><p>" + NumbersUtil.formatCurrency(reportItem.getPricePerWeek()) + "</p></td>" +
-                "<td><p>" + NumbersUtil.formatCurrency(reportItem.getTotal()) + "</p></td>" +
-                "</tr>";
+        return "<tr>" + "<td><p>" + startDate + " - " + endDate + "</p></td>" + "<td><p>" + reportItem.getFilm() + "</p></td>" + "<td><p>" + NumbersUtil.formatCurrency(reportItem.getPricePerWeek()) + "</p></td>" + "<td><p>" + NumbersUtil.formatCurrency(reportItem.getTotal()) + "</p></td>" + "</tr>";
     }
 
+    /**
+     * Builds a html table for the given report.
+     *
+     * @param report {@link DistributionReport}
+     * @return html string
+     */
     private String buildReportTableEntry(DistributionReport report) {
         StringBuilder tableEntry = new StringBuilder();
         tableEntry.append("<tr>");

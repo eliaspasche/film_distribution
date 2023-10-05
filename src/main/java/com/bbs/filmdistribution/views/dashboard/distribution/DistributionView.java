@@ -77,7 +77,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     // Services
     private final CustomerService customerService;
     private final FilmCopyService filmCopyService;
-    private final FilmService filmService;
     private final InvoicePdfService invoicePdfService;
     private final Button saveButton = new Button( "Save" );
     private final Filters filters;
@@ -89,7 +88,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
     private DatePicker endDate;
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param distributionService The {@link FilmDistributionService}
      * @param customerService     The {@link CustomerService}
@@ -100,7 +99,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         super( DISTRIBUTION_ID, DISTRIBUTION_EDIT_ROUTE_TEMPLATE, distributionService );
         this.customerService = customerService;
         this.filmCopyService = filmCopyService;
-        this.filmService = filmService;
         this.invoicePdfService = invoicePdfService;
 
         getHeaderDiv().addClassNames( "distribution-view" );
@@ -214,7 +212,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
                 saveItem();
             }
         } );
-
     }
 
     /**
@@ -316,7 +313,6 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         startDate.setValue( now );
 
         formLayout.add( customer, filmCopies, startDate, endDate );
-
         getEditorDiv().add( splitTitle, formLayout );
 
         createButtonLayout();
@@ -449,9 +445,11 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
 
             add( detailTitle, filmList );
         }
-
     }
 
+    /**
+     * Filter Class for the Distribution View
+     */
     public static class Filters extends Div implements Specification<FilmDistribution>
     {
         private final ComboBox<Customer> customer = new ComboBox<>();
@@ -459,6 +457,9 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         private final DatePicker date = new DatePicker( "Reporting Date" );
 
 
+        /**
+         * Constructor with dependency injection and creation of the filter view.
+         */
         public Filters( Runnable onSearch, CustomerService customerService, FilmService filmService, ReportPdfService reportPdfService )
         {
             setWidthFull();
@@ -532,6 +533,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         {
             List<Predicate> predicates = new ArrayList<>();
 
+            // Add filter predicates
             if ( !customer.isEmpty() )
             {
                 predicates.add( criteriaBuilder.equal( root.get( "customer" ), criteriaBuilder.literal( customer.getValue() ) ) );

@@ -165,7 +165,5 @@ public abstract class AbstractPdfService {
         } finally {
             fileDownloadService.downloadFileFromStreamLink(outputPdf.getAbsolutePath());
         }
-
     }
-
 }

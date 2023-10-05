@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LoginView extends LoginOverlay implements BeforeEnterObserver
 {
-
     private final AuthenticatedUser authenticatedUser;
     private final AppConfig appConfig;
 

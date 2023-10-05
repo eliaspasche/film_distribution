@@ -11,7 +11,7 @@ public class AgeGroupService extends AbstractDatabaseService<AgeGroup, AgeGroupR
 {
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param repository The {@link AgeGroupRepository}
      */

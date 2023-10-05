@@ -7,6 +7,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Bean for storing report data. Used for pdf export only.
+ */
 @Getter
 @Setter
 public class DistributionReport {
@@ -16,6 +19,9 @@ public class DistributionReport {
     Double totalNet;
 
 
+    /**
+     * Bean for single items of a report
+     */
     @Getter
     @Setter
     public static class DistributionReportItem {

@@ -24,7 +24,7 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
     private final DynamicView dynamicView;
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param title                   The title to display in the dialog.
      * @param abstractDatabaseService The {@link AbstractDatabaseService}
@@ -38,11 +38,6 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
         this.entityToDelete = entityToDelete;
         this.dynamicView = dynamicView;
         init();
-    }
-
-    public EntityDeleteDialog( String title, AbstractDatabaseService<T, ?> abstractDatabaseService, T entityToDelete )
-    {
-        this( title, abstractDatabaseService, entityToDelete, null );
     }
 
     /**
@@ -83,5 +78,4 @@ public class EntityDeleteDialog<T extends AbstractEntity> extends Dialog
 
         open();
     }
-
 }

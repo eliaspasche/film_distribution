@@ -87,5 +87,4 @@ public class GridFilter<T extends AbstractEntity>
         return ( root, query, criteriaBuilder ) -> criteriaBuilder.like(
                 criteriaBuilder.lower( root.get( fieldName ) ), "%" + searchValue.toLowerCase() + "%" );
     }
-
 }

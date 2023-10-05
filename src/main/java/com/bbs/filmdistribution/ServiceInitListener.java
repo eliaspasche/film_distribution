@@ -71,5 +71,4 @@ public class ServiceInitListener implements VaadinServiceInitListener
 
         LOGGER.info( "Auto login: " + autoLoginUsername );
     }
-
 }

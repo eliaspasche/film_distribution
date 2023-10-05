@@ -42,7 +42,7 @@ public class AgeGroupsView extends MasterDetailGridLayout<AgeGroup, AgeGroupServ
     private final Button saveButton = new Button( "Save" );
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param ageGroupService The {@link AgeGroupService}
      */

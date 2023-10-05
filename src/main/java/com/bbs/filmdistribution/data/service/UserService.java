@@ -11,7 +11,7 @@ public class UserService extends AbstractDatabaseService<User, UserRepository>
 {
 
     /**
-     * The constructor.
+     * Constructor.
      *
      * @param repository The {@link UserRepository}
      */

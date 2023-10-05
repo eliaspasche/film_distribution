@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor( access = AccessLevel.PRIVATE )
 public class MenuBarUtil
 {
-
     public static MenuItem createIconItem( HasMenuItems menu, VaadinIcon iconName, String toolTipText,
                                            String label )
     {
@@ -53,5 +52,4 @@ public class MenuBarUtil
 
         return item;
     }
-
 }

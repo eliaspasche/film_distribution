@@ -22,7 +22,6 @@ import java.util.List;
 @Component
 public class InvoicePdfService extends AbstractPdfService
 {
-
     private final FilmDistributionService filmDistributionService;
 
     /**
