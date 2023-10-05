@@ -3,16 +3,40 @@
 Für die Ausleihe der Filme, Rechnungen der Kunden, Kundendaten, Kontingent der Filme und eine wöchentliche Kalkulation
 aller Kosten, haben wir eine Webapplikation als Softwarelösung entwickelt.
 
-Die Software beinhaltet ein System, mit dem es möglich ist, neue Benutzer als Admin hinzuzufügen und somit nur
+Die Software beinhaltet ein Accountsystem, mit dem es möglich ist, neue Benutzer als Admin hinzuzufügen und somit nur
 bestimmten Personen Zugriff auf die Anwendung zu erlauben.
 
-//TODO Benutzer-Rollen (ADMIN, USER)
+Ein Benutzer kann dabei zwei Rollen zugeordnet werden (Admin und User).
 
-Grundlegend besitzt jeder Film eine bestimmtes Kontingent an Film-Kopien.
+#### Admin:
+
+* Zugriff auf alle Seiten
+* Account-Verwaltung
+
+#### User:
+
+* Zugriff auf alle Seiten, bis auf die Accountverwaltungsseite
+* Keine Account-Verwaltung
+
+Für die Logik der Film Ausleihe, besitzt jeder Film ein bestimmtes Kontingent an Film-Kopien.
 Auf dieser Basis können anschließend Ausleihen erstellt werden.
 
 Zu einer Ausleihe gehört jeweils ein Kunde, eine beliebige Anzahl an Film-Kopien und
 ein Start- sowie ein End-Datum.
+
+Die Berechnung ergibt sich anhand der angefangenen Wochen über den Ausleih-Zeitraum.
+
+#### Beispiel:
+
+```
+Start-Datum: 15.09.2023 (Freitag)
+End-Datum: 05.10.2023 (Donnerstag)
+Preis/Woche: 5 €
+
+=> 3 angefangene Wochen ausgehend von Freitag
+
+Preis: 15 €
+```
 
 Des Weiteren können Rechnungen und Berichte mit bestimmten Filtern als PDF erstellt und ausgedruckt werden.
 
@@ -34,7 +58,7 @@ Angefangen mit der Anzahl von Filmen, Kunden, Ausleihen und Film-Kopien gibt es 
 
 Zeigt die Top 5 Filme, auf Basis der aktuell ausgeliehenen Film-Kopien.
 
-#### Tortendiagramm:
+#### Donut-Chart:
 
 Zeigt die Umsätze der aktuell ausgeliehenen Filme an.
 
@@ -48,10 +72,18 @@ Bei jedem Speichern wird geprüft, ob die ausgewählten Film-Kopien dem Alter de
 und ob die Film-Kopien noch verfügbar sind.
 
 Außerdem kann zu jeder bestehenden Ausleihe eine Rechnung als PDF erstellt werden.
+Die ausgeliehenen Filme und die entsprechenden Altersgruppen können ebenfalls für jeden Kunden eingesehen werden.
 
 Für die Auswertung zu einem bestimmten Kunden, Film oder Stichtag kann ein entsprechender Bericht erstellt werden.
 Die nötigen Filter können über der Tabellen Ansicht eingestellt und anschließend über "Create Report" erstellt werden.
 
+#### Filter Optionen
+
+* Kunde: Bericht über die Ausleihen eines bestimmten Kunden.
+* Film: Bericht über die Ausleihe zu einen bestimmten Film.
+* Stichtag: Bericht über die Kunden und Ausleihen zu einem bestimmten Stichtag.
+
+Die Filter können auch in Kombination genutzt werden.
 ___
 ### Customers
 
