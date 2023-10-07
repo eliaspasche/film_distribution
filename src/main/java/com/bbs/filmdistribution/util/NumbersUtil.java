@@ -3,6 +3,8 @@ package com.bbs.filmdistribution.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * Utility class to create and format numbers
  */
@@ -31,5 +33,15 @@ public class NumbersUtil
     public static String formatCurrency( double value )
     {
         return String.format( "%,.2f €", value );
+    }
+
+    /**
+     * Create an inventory number based on {@link UUID}.
+     *
+     * @return The created inventory number as String
+     */
+    public static String createInventoryNumber()
+    {
+        return UUID.randomUUID().toString().substring( 0, 15 );
     }
 }

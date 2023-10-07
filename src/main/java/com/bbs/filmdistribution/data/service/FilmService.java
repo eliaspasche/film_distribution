@@ -2,9 +2,8 @@ package com.bbs.filmdistribution.data.service;
 
 import com.bbs.filmdistribution.data.entity.Film;
 import com.bbs.filmdistribution.data.entity.FilmCopy;
+import com.bbs.filmdistribution.util.NumbersUtil;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 /**
  * Service for the {@link Film} object to make interactions with the database.
@@ -32,7 +31,7 @@ public class FilmService extends AbstractDatabaseService<Film, FilmRepository>
             {
                 FilmCopy filmCopy = new FilmCopy();
                 filmCopy.setFilm( entity );
-                filmCopy.setInventoryNumber(UUID.randomUUID().toString().substring(0, 15));
+                filmCopy.setInventoryNumber( NumbersUtil.createInventoryNumber() );
 
                 entity.getFilmCopies().add( filmCopy );
             }

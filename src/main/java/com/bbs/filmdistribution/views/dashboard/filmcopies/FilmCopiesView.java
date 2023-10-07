@@ -7,13 +7,13 @@ import com.bbs.filmdistribution.data.service.FilmCopyService;
 import com.bbs.filmdistribution.data.service.FilmService;
 import com.bbs.filmdistribution.util.ComponentUtil;
 import com.bbs.filmdistribution.util.DateUtil;
+import com.bbs.filmdistribution.util.NumbersUtil;
 import com.bbs.filmdistribution.views.dashboard.DashboardLayout;
 import com.bbs.filmdistribution.wrapper.GridFilter;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -29,8 +29,6 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.util.UUID;
 
 /**
  * A view to manage the {@link FilmCopy} objects.
@@ -49,7 +47,6 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
 
     // Layout
     private H3 splitTitle;
-    private TextField inventoryNumber;
     private ComboBox<Film> film;
     private final Button saveButton = new Button( "Save" );
 
@@ -74,7 +71,6 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
         setBinder( binder );
 
         // Bind fields. This is where you'd define e.g. validation rules
-        binder.forField( inventoryNumber ).asRequired().bind( "inventoryNumber" );
         binder.forField( film ).asRequired().bind( FilmCopy::getFilm, FilmCopy::setFilm );
 
         binder.bindInstanceFields( this );
@@ -88,6 +84,7 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
             if ( getItemToEdit() == null )
             {
                 setItemToEdit( new FilmCopy() );
+                getItemToEdit().setInventoryNumber( NumbersUtil.createInventoryNumber() );
             }
             saveItem();
         } );
@@ -172,27 +169,15 @@ public class FilmCopiesView extends MasterDetailGridLayout<FilmCopy, FilmCopySer
     @Override
     protected void createEditorLayout()
     {
-        FormLayout formLayout = new FormLayout();
-
         splitTitle = new H3( "New " + getEditItemName() );
 
-        Button generateUuidButton = new Button( "UUID" );
-        generateUuidButton.setTooltipText( "Generate UUID" );
-        generateUuidButton.addThemeVariants( ButtonVariant.LUMO_SMALL );
-
-        inventoryNumber = new TextField( "Inventory Number" );
-        inventoryNumber.setSuffixComponent( generateUuidButton );
-
-        generateUuidButton.addClickListener( click -> inventoryNumber.setValue( UUID.randomUUID().toString() ) );
-
         film = new ComboBox<>();
+        film.setWidthFull();
         film.setLabel( "Film" );
         film.setItems( filmService.list( Pageable.unpaged() ).stream().toList() );
         film.setItemLabelGenerator( Film::getName );
 
-        formLayout.add( inventoryNumber, film );
-
-        getEditorDiv().add( splitTitle, formLayout );
+        getEditorDiv().add( splitTitle, film );
 
         createButtonLayout();
     }
