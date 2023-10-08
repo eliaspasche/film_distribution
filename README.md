@@ -177,7 +177,7 @@ Daten in `Entity`-Objekte übertragen oder auch `Entity`-Objekte in die Datenban
 
 #### Service
 
-`Services` enthalten die Business-Logik der Anwendung. Passenden zu den `Entities` und `Repositories` gibt es jeweils
+`Services` enthalten die Business-Logik der Anwendung. Passend zu den `Entities` und `Repositories` gibt es jeweils
 einen `Service`. Dieser abstrahiert wiederum das Laden und Speichern und kann zusätzliche Methoden und Logik enthalten.
 Daher werden die Services in der Anwendung verwendet, um Daten zu verwalten.
 
@@ -190,7 +190,7 @@ speichern.
 
 #### Config
 
-Die grundlegende Konfiguration der Anwendung, die bereits beim Start der Anwendung benötigt wird, wird ist in den
+Die grundlegende Konfiguration der Anwendung, die bereits beim Start der Anwendung benötigt wird, ist in den
 Ressourcen der Anwendung hinterlegt. Bei dem verwendeten Spring-Framework ist diese Konfiguration in
 sogenannten `application.yaml`-Dateien abgelegt. Hier ist zum Beispiel die Datenbankverbindung oder weitere
 Infrastruktur wie Mail-Server oder verwendete Ports der Web-Application konfiguriert
