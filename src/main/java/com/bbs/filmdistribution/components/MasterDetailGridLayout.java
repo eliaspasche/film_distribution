@@ -173,7 +173,13 @@ public abstract class MasterDetailGridLayout<T extends AbstractEntity, K extends
     }
 
     /**
-     * Returns a {@link MenuBar} for the given item
+     * Returns a {@link MenuBar} for the given item.
+     * This {@link MenuBar} contains the delete interaction for the given item.
+     *
+     * @param item       The given item
+     * @param identifier The identifier for the delete message
+     * @param view       The {@link DynamicView}
+     * @return The created {@link MenuBar}
      */
     protected MenuBar buildMenuBar( T item, String identifier, DynamicView view )
     {
