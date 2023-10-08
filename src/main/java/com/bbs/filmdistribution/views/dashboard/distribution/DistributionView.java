@@ -269,7 +269,7 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
         {
             filmCopyList.addAll( currentFilmCopies );
         }
-        
+
         List<FilmCopy> notAvailable = filmDistribution.getFilmCopies().stream().filter( filmCopy -> filmCopyList.stream().noneMatch( i -> Objects.equals( i.getId(), filmCopy.getId() ) ) ).toList();
 
         if ( !notAvailable.isEmpty() )
@@ -312,17 +312,38 @@ public class DistributionView extends MasterDetailGridLayout<FilmDistribution, F
             endDate.setMin( startDate.getValue().plusDays( 7 ) );
             endDate.setMax( startDate.getValue().plusDays( 90 ) );
 
-            List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies( event.getValue(), endDate.getMax() );
-            Set<FilmCopy> selected = filmCopyList.stream().filter( i -> filmCopies.getSelectedItems().stream().anyMatch( c -> Objects.equals( c.getId(), i.getId() ) ) ).collect( Collectors.toSet() );
-            filmCopies.setItems( filmCopyList );
-            filmCopies.setValue( selected );
+            updateFilmCopySelection( event.getValue(), endDate.getValue() != null ? endDate.getValue() : endDate.getMax() );
         } );
+
+        endDate.addValueChangeListener( event -> {
+            if ( event.getValue() == null )
+            {
+                return;
+            }
+
+            updateFilmCopySelection( startDate.getValue() != null ? startDate.getValue() : now, event.getValue() );
+        } );
+
         startDate.setValue( now );
 
         formLayout.add( customer, filmCopies, startDate, endDate );
         getEditorDiv().add( splitTitle, formLayout );
 
         createButtonLayout();
+    }
+
+    /**
+     * Update the items in the {@link MultiSelectComboBox} with the current selection of start and end date.
+     *
+     * @param start The start date
+     * @param end   The end date
+     */
+    private void updateFilmCopySelection( LocalDate start, LocalDate end )
+    {
+        List<FilmCopy> filmCopyList = filmCopyService.getAvailableCopies( start, end );
+        Set<FilmCopy> selected = filmCopyList.stream().filter( i -> filmCopies.getSelectedItems().stream().anyMatch( c -> Objects.equals( c.getId(), i.getId() ) ) ).collect( Collectors.toSet() );
+        filmCopies.setItems( filmCopyList );
+        filmCopies.setValue( selected );
     }
 
     /**
