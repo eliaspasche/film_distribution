@@ -26,24 +26,25 @@ public class FilmCopyService extends AbstractDatabaseService<FilmCopy, FilmCopyR
     /**
      * Check if the {@link FilmCopy} object is available.
      *
-     * @param id The id of the {@link FilmCopy}
+     * @param id   The id of the {@link FilmCopy}
      * @param date {@link LocalDate}
      * @return object is available
      */
-    public boolean isFilmCopyAvailable(long id, LocalDate date)
+    public boolean isFilmCopyAvailable( long id, LocalDate date )
     {
-        return getRepository().getDistributionsByFilmCopyId(id, date) == 0;
+        return getRepository().getDistributionsByFilmCopyId( id, date ) == 0;
     }
 
     /**
-     * Get the available {@link FilmCopy} objects
+     * Get the available {@link FilmCopy} objects at a given date
      *
-     * @param date {@link LocalDate}
+     * @param startDate The start date
+     * @param endDate The end date
      * @return The available {@link FilmCopy} as {@link List}
      */
-    public List<FilmCopy> getAvailableCopies(LocalDate date)
+    public List<FilmCopy> getAvailableCopies( LocalDate startDate, LocalDate endDate )
     {
-        return getRepository().getAvailableCopies(date);
+        return getRepository().getAvailableCopies( startDate, endDate );
     }
 
 }

@@ -17,18 +17,20 @@ public interface FilmCopyRepository extends JpaRepository<FilmCopy, Long>, JpaSp
      * Get the amount of distributions by a {@link FilmCopy}
      *
      * @param filmCopyId The id of a {@link FilmCopy}
-     * @param date {@link LocalDate}
+     * @param date       {@link LocalDate}
      * @return The amount of distributions.
      */
-    @Query(value = "SELECT COUNT(*) FROM film_distribution_items items LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE film_copy_id = :filmCopyId AND :date BETWEEN distribution.start_date AND distribution.end_date", nativeQuery = true)
-    int getDistributionsByFilmCopyId(long filmCopyId, LocalDate date);
+    @Query( value = "SELECT COUNT(*) FROM film_distribution_items items LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE film_copy_id = :filmCopyId AND :date BETWEEN distribution.start_date AND distribution.end_date", nativeQuery = true )
+    int getDistributionsByFilmCopyId( long filmCopyId, LocalDate date );
 
     /**
      * Get the available {@link FilmCopy} objects at a given date
      *
-     * @param date {@link LocalDate}
+     * @param startDate The start date
+     * @param endDate The end date
      * @return The available {@link FilmCopy} as {@link List}
      */
-    @Query(value = "SELECT copy.id, copy.inventory_number, copy.film_id FROM film_copy copy LEFT JOIN film_distribution_items items ON copy.id = items.film_copy_id LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE distribution.start_date IS NULL OR distribution.end_date IS NULL OR :date NOT BETWEEN distribution.start_date AND distribution.end_date", nativeQuery = true)
-    List<FilmCopy> getAvailableCopies(LocalDate date);
+    @Query( value = "SELECT DISTINCT copy.id, copy.inventory_number, copy.film_id FROM film_copy copy LEFT JOIN film_distribution_items items ON copy.id = items.film_copy_id LEFT JOIN film_distribution distribution ON items.film_distribution_id = distribution.id WHERE distribution.start_date IS NULL OR distribution.end_date IS NULL OR ((:startDate NOT BETWEEN distribution.start_date AND distribution.end_date) AND (:endDate NOT BETWEEN distribution.start_date AND distribution.end_date)) " +
+            " AND ((distribution.start_date NOT BETWEEN :startDate AND :endDate) AND (distribution.end_date NOT BETWEEN :startDate AND :endDate))", nativeQuery = true )
+    List<FilmCopy> getAvailableCopies( LocalDate startDate, LocalDate endDate );
 }
